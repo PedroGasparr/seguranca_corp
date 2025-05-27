@@ -71,55 +71,31 @@ function toggleLoading(buttonId, isLoading) {
 }
 
 function toggleAuthForms() {
-    console.log("Função toggleAuthForms chamada"); // Debug
     const loginContainer = document.getElementById('login-container');
     const registerContainer = document.getElementById('register-container');
     
-    if (!loginContainer || !registerContainer) {
-        console.error("Elementos não encontrados!"); // Debug
-        return;
+    if (loginContainer.classList.contains('hidden')) {
+        loginContainer.classList.remove('hidden');
+        registerContainer.classList.add('hidden');
+    } else {
+        loginContainer.classList.add('hidden');
+        registerContainer.classList.remove('hidden');
     }
-    
-    loginContainer.classList.toggle('hidden');
-    registerContainer.classList.toggle('hidden');
-    console.log("Formulários alternados"); // Debug
 }
 
 // Lógica da página de login
 if (isLoginPage) {
     // Alternar entre login e registro
-    function setupAuthLinks() {
-    const registerLink = document.getElementById('show-register-link');
-    const loginLink = document.getElementById('show-login-link');
-    
-    if (registerLink) {
-        registerLink.onclick = function(e) {
-            e.preventDefault();
-            console.log("Register link clicked"); // Debug
-            toggleAuthForms();
-            
-            const loginEmail = document.getElementById('login-email').value;
-            if (loginEmail) {
-                document.getElementById('register-email').value = loginEmail;
-            }
-        };
-    }
-    
-    if (loginLink) {
-        loginLink.onclick = function(e) {
-            e.preventDefault();
-            console.log("Login link clicked"); // Debug
-            toggleAuthForms();
-        };
-    }
-}
-
-// Chame esta função quando o DOM estiver pronto
-if (document.readyState === 'complete') {
-    setupAuthLinks();
-} else {
-    document.addEventListener('DOMContentLoaded', setupAuthLinks);
-}
+    document.getElementById('show-register-link')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleAuthForms();
+        
+        // Preenche o email se já estiver preenchido no login
+        const loginEmail = document.getElementById('login-email').value;
+        if (loginEmail) {
+            document.getElementById('register-email').value = loginEmail;
+        }
+    });
     
     document.getElementById('show-login-link')?.addEventListener('click', (e) => {
         e.preventDefault();
