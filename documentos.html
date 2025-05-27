@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/doc.css">
+    <link rel="icon" href="img/engenheiro.png" type="image/x-icon">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Menu Lateral -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <i class="fas fa-user-circle user-avatar"></i>
+                    <div class="user-info">
+                        <span class="user-name" id="sidebar-user-name">Carregando...</span>
+                        <span class="user-unit" id="sidebar-user-unit">Carregando...</span>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <ul>
+                    <li>
+                        <a href="home.html">
+                            <i class="fas fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="documentos.html">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Documentos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="validades.html">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Validades</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-danger btn-sm" id="sidebar-logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
+            </div>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Cadastro de Documentos</h1>
+                <div class="breadcrumb">
+                    <a href="home.html">Home</a> / <span>Documentos</span>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <div class="card">
+                    <h2><i class="fas fa-plus-circle"></i> Adicionar Documentos</h2>
+                    
+                    <div id="document-message" class="alert hidden"></div>
+                    
+                    <form id="document-form" enctype="multipart/form-data">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="document-name">Nome do Documento*</label>
+                                <input type="text" id="document-name" class="form-control" placeholder="Ex: Certificado ISO 9001" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="document-type">Tipo de Documento*</label>
+                                <select id="document-type" class="form-control" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="PCMSO">PCMSO</option>
+                                    <option value="PGR">PGR</option>
+                                    <option value="PCA">PCA</option>
+                                    <option value="AET">AET</option>
+                                    <option value="PERICULOSIDADE">PERICULOSIDADE</option>
+                                    <option value="INSALUBRIDADE">INSALUBRIDADE</option>
+                                    <option value="LTCAT">LTCAT</option>
+                                    <option value="PPR">PPR</option>
+                                    <option value="CIPA_PROCESSO_ELEITORAL">CIPA PROCESSO ELEITORAL</option>
+                                    <option value="CIPA_REUNIAO_MENSAL">CIPA REUNIAO MENSAL</option>
+                                    <option value="BRIGADA_DE_INCÊNDIO">BRIGADA DE INCÊNDIO</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="document-expiry">Data de Validade*</label>
+                                <input type="date" id="document-expiry" class="form-control" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="document-creation">Data de Criação*</label>
+                                <input type="date" id="document-creation" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="document-status">Status*</label>
+                                <select id="document-status" class="form-control" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="conforme">Conforme</option>
+                                    <option value="atualizacao">Precisa de Atualização</option>
+                                    <option value="vencido">Vencido</option>
+                                    <option value="nao_aplicavel">Não Aplicável</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="document-file">Anexar Documento*</label>
+                                <div class="file-upload-wrapper">
+                                    <input type="file" id="document-file" class="file-upload" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" required>
+                                    <label for="document-file" class="file-upload-label">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <span>Selecione um arquivo</span>
+                                    </label>
+                                    <span class="file-name" id="file-name">Nenhum arquivo selecionado</span>
+                                </div>
+                                <small class="form-text text-muted">Formatos aceitos: PDF, DOC, XLS, JPG, PNG (Tamanho máximo: 10MB)</small>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="document-notes">Observações</label>
+                                <textarea id="document-notes" class="form-control" rows="3" placeholder="Informações adicionais"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="reset" class="btn btn-secondary">
+                                <i class="fas fa-eraser"></i> Limpar
+                            </button>
+                            <button type="button" class="btn btn-primary" id="add-another-btn">
+                                <i class="fas fa-save"></i> Salvar Documento
+                            </button>
+                            <button type="submit" class="btn btn-success" id="save-documents-btn">
+                                <i class="fas fa-save"></i> Salvar Documento
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-list"></i> Documentos Adicionados</h2>
+                        <div class="search-box">
+                            <input type="text" id="document-search" placeholder="Pesquisar documentos...">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="table-controls">
+                        <div class="table-info">
+                            Mostrando <span id="rows-count">0</span> de <span id="total-rows">0</span> registros
+                        </div>
+                        <div class="table-pagination">
+                            <button id="prev-page" disabled><i class="fas fa-chevron-left"></i></button>
+                            <span id="page-info">1/1</span>
+                            <button id="next-page" disabled><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table id="documents-table" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Tipo</th>
+                                    <th>Validade</th>
+                                    <th>Status</th>
+                                    <th>Unidade</th>
+                                    <th>Arquivo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Os documentos serão inseridos aqui via JavaScript -->
+                                <tr class="empty-row">
+                                    <td colspan="6">Nenhum documento cadastrado ainda</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para visualização/edição -->
+    <div class="modal" id="document-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Detalhes do Documento</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-document-form">
+                    <input type="hidden" id="edit-document-id">
+                    <div class="form-group">
+                        <label for="edit-document-name">Nome do Documento</label>
+                        <input type="text" id="edit-document-name" class="form-control" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-document-type">Tipo</label>
+                            <select id="edit-document-type" class="form-control" required>
+                                <option value="certificado">Certificado</option>
+                                <option value="contrato">Contrato</option>
+                                <option value="licenca">Licença</option>
+                                <option value="procedimento">Procedimento</option>
+                                <option value="outro">Outro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-document-expiry">Validade</label>
+                            <input type="date" id="edit-document-expiry" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-document-status">Status</label>
+                            <select id="edit-document-status" class="form-control" required>
+                                <option value="conforme">Conforme</option>
+                                <option value="atualizacao">Precisa de Atualização</option>
+                                <option value="vencido">Vencido</option>
+                                <option value="nao_aplicavel">Não Aplicável</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Arquivo Atual</label>
+                        <div id="current-file-container" class="file-preview">
+                            <a href="#" target="_blank" id="current-file-link">Visualizar arquivo</a>
+                            <small id="current-file-name"></small>
+                        </div>
+                        <label for="edit-document-file">Substituir Arquivo (opcional)</label>
+                        <input type="file" id="edit-document-file" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-document-notes">Observações</label>
+                        <textarea id="edit-document-notes" class="form-control" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="delete-document-btn">
+                    <i class="fas fa-trash"></i> Excluir
+                </button>
+                <button class="btn btn-secondary modal-close">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn btn-primary" id="update-document-btn">
+                    <i class="fas fa-save"></i> Salvar Alterações
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/documentos.js"></script>
+    
+
+</body>
+</html>

@@ -1,0 +1,200 @@
+:root {
+    --primary-color: #4361ee;
+    --secondary-color: #3f37c9;
+    --success-color: #4cc9f0;
+    --warning-color: #f8961e;
+    --danger-color: #f72585;
+    --light-bg: #f8f9fa;
+    --dark-text: #212529;
+    --light-text: #f8f9fa;
+    --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    --hover-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+    --border-radius-lg: 16px;
+    --border-radius-md: 12px;
+    --border-radius-sm: 8px;
+    --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background-color: var(--light-bg);
+    color: var(--dark-text);
+    padding: 24px;
+    line-height: 1.6;
+}
+
+/* Cards Modernos com Glassmorphism */
+.unit-card {
+    transition: var(--transition-smooth);
+    cursor: pointer;
+    margin-bottom: 20px;
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.unit-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--hover-shadow);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.unit-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: var(--light-text);
+    padding: 18px 24px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+}
+
+/* Document Items com Design Mais Clean */
+.document-item {
+    border-left: 4px solid var(--primary-color);
+    margin-bottom: 12px;
+    padding: 16px;
+    background-color: white;
+    border-radius: var(--border-radius-md);
+    transition: var(--transition-fast);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.document-item:hover {
+    background-color: rgba(67, 97, 238, 0.05);
+    transform: translateX(4px);
+}
+
+/* Badges Modernos */
+.badge-status {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.badge-status::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.status-conforme {
+    background-color: rgba(76, 201, 240, 0.15);
+    color: var(--success-color);
+}
+
+.status-nao-conforme {
+    background-color: rgba(247, 37, 133, 0.15);
+    color: var(--danger-color);
+}
+
+.status-pendente {
+    background-color: rgba(248, 150, 30, 0.15);
+    color: var(--warning-color);
+}
+
+/* Efeitos de Loading Modernos */
+.loading-spinner {
+    display: none;
+    text-align: center;
+    margin: 40px 0;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 5px solid rgba(67, 97, 238, 0.2);
+    border-bottom-color: var(--primary-color);
+    border-radius: 50%;
+    display: inline-block;
+    animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+    0% { transform: rotate(0deg) }
+    100% { transform: rotate(360deg) }
+}
+
+/* Botões Modernos */
+.back-button, .download-all-btn {
+    padding: 12px 24px;
+    border-radius: var(--border-radius-md);
+    font-weight: 600;
+    transition: var(--transition-fast);
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.back-button {
+    background-color: white;
+    color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.back-button:hover {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+}
+
+.download-all-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+}
+
+.download-all-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(67, 97, 238, 0.4);
+}
+
+/* Document Actions */
+.document-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+/* Transições suaves para views */
+#unitDetailView {
+    display: none;
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px) }
+    to { opacity: 1; transform: translateY(0) }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    body {
+        padding: 16px;
+    }
+    
+    .unit-header {
+        padding: 14px 18px;
+    }
+    
+    .document-item {
+        padding: 12px;
+    }
+}

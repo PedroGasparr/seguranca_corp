@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema de Segurança do Trabalho</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="img/engenheiro.png" type="image/x-icon">
+</head>
+<body>
+    <div class="auth-container" id="login-container">
+        <div class="auth-box">
+            <div class="logo-container">
+
+                <div class="partner-logos">
+                    <img src="images/nr-logo.png" alt="Normas Regulamentadoras" class="partner-logo" onerror="this.style.display='none'">
+                    <img src="images/epi-logo.png" alt="EPIs" class="partner-logo" onerror="this.style.display='none'">
+                    <img src="images/sst-logo.png" alt="SST" class="partner-logo" onerror="this.style.display='none'">
+                </div>
+            </div>
+            
+            <div class="auth-header">
+                <h2>Bem-vindo ao Sistema de SST</h2>
+                <p>Faça login para acessar o sistema de Segurança do Trabalho</p>
+            </div>
+            
+            <div class="form-container">
+                <div id="login-message" class="alert hidden"></div>
+                
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" class="form-control" placeholder="seu@email.com" required>
+                        <i class="fas fa-envelope input-icon"></i>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="login-password">Senha</label>
+                        <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
+                        <i class="fas fa-lock input-icon"></i>
+                        <i class="fas fa-eye password-toggle" onclick="togglePassword('login-password', this)"></i>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn" id="login-btn">
+                            <span class="btn-text">Entrar</span>
+                            <span class="fa fa-spinner hidden"></span>
+                        </button>
+                    </div>
+                    
+                    <div class="auth-footer">
+                        <a href="#" id="forgot-password-link">Esqueceu sua senha?</a> | 
+                        <a href="#" id="show-register-link">Criar uma conta</a>
+                    </div>
+                </form>
+                
+                <div class="safety-elements">
+                    <i class="fas fa-hard-hat safety-icon" title="Capacete de Segurança"></i>
+                    <i class="fas fa-vest safety-icon" title="Colete Refletivo"></i>
+                    <i class="fas fa-mask safety-icon" title="Máscara de Proteção"></i>
+                    <i class="fas fa-goggles safety-icon" title="Óculos de Proteção"></i>
+                    <i class="fas fa-hand-paper safety-icon" title="Luvas de Proteção"></i>
+                    <i class="fas fa-shoe-prints safety-icon" title="Botinas de Segurança"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-container hidden" id="register-container">
+        <div class="auth-box">
+
+            <div class="auth-header">
+                <h2>Criar conta</h2>
+                <p>Preencha os dados para se registrar no sistema de SST</p>
+            </div>
+            
+            <div class="form-container">
+                <div id="register-message" class="alert hidden"></div>
+                
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="register-name">Nome completo</label>
+                        <input type="text" id="register-name" class="form-control" placeholder="Seu nome completo" required>
+                        <i class="fas fa-user input-icon"></i>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" class="form-control" placeholder="seu@email.com" required>
+                        <i class="fas fa-envelope input-icon"></i>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-password">Senha</label>
+                        <input type="password" id="register-password" class="form-control" placeholder="••••••••" required minlength="6">
+                        <i class="fas fa-lock input-icon"></i>
+                        <i class="fas fa-eye password-toggle" onclick="togglePassword('register-password', this)"></i>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-confirm-password">Confirmar senha</label>
+                        <input type="password" id="register-confirm-password" class="form-control" placeholder="••••••••" required minlength="6">
+                        <i class="fas fa-lock input-icon"></i>
+                        <i class="fas fa-eye password-toggle" onclick="togglePassword('register-confirm-password', this)"></i>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-unit">Unidade</label>
+                        <select id="register-unit" class="select-unit" required>
+                            <option value="" disabled selected>Selecione sua unidade</option>
+                            <option value="CD-TZK-SZN">CD-TZK-SZN</option>
+                                <option value="CD-TRI-GRU">CD-TRI-GRU</option>
+                                <option value="F-WBR-MCZ">F-WBR-MCZ</option>
+                                <option value="ITM-SP">ITM-SP</option>
+                                <option value="F-NTR-MCZ">F-NTR-MCZ</option>
+                                <option value="CD-YMH-SP">CD-YMH-SP</option>
+                                <option value="F-AST-SCI">F-AST-SCI</option>
+                                <option value="F-JD-CAS">F-JD-CAS</option>
+                                <option value="F-JD-CTL">F-JD-CTL</option>
+                                <option value="F-JD-HZA">F-JD-HZA</option>
+                                <option value="F-JD-IDU">F-JD-IDU</option>
+                                <option value="F-JD-MGO">F-JD-MGO</option>
+                                <option value="F-OJI-PAA">F-OJI-PAA</option>
+                                <option value="F-OJI-RCA">F-OJI-RCA</option>
+                                <option value="CD-SZL-SZN">CD-SZL-SZN</option>
+                                <option value="CD-SZN-SZN">CD-SZN-SZN</option>
+                                <option value="F-SRV-SZN">F-SRV-SZN</option>
+                                <option value="F-SZN-SZN">F-SZN-SZN</option>
+                                <option value="F-SZN-BLM">F-SZN-BLM</option>
+                                <option value="F-SZN-IMP">F-SZN-IMP</option>
+                                <option value="CD-SZN-MCW">CD-SZN-MCW</option>
+                                <option value="F-IMS-LRA">F-IMS-LRA</option>
+                                <option value="F-PAP-LRA">F-PAP-LRA</option>
+                                <option value="F-SZN-LRA">F-SZN-LRA</option>
+                                <option value="F-SZN-CPO">F-SZN-CPO</option>
+                                <option value="F-BTK-SRQ">F-BTK-SRQ</option>
+                                <option value="F-IBM-EMB">F-IBM-EMB</option>
+                                <option value="F-WBR-JAD">F-WBR-JAD</option>
+                                <option value="ADM-MTZ-MCZ">ADM-MTZ-MCZ</option>
+                                <option value="F-WTM-JCI">F-WTM-JCI</option>
+                                <option value="F-YHM-SP">F-YHM-SP</option>
+                                <option value="CD-SZN-CPO">CD-SZN-CPO</option>
+                                <option value="CD-SZN-SJP">CD-SZN-SJP</option>
+                                <option value="F-PCO-MCZ">F-PCO-MCZ</option>
+                                <option value="CD-SZN-CCA">CD-SZN-CCA</option>
+                                <option value="CD-SZN-SEA">CD-SZN-SEA</option>
+                                <option value="MATRIZ-ES">MATRIZ-ES</option>
+                                <option value="F-PCO-FSA">F-PCO-FSA</option>
+                                <option value="F-WBR-CAR">F-WBR-CAR</option>
+                                <option value="CD-SZN-CAS">CD-SZN-CAS</option>
+                                <option value="F-IMS-CIM">F-IMS-CIM</option>
+                                <option value="F-SZN-ACZ">F-SZN-ACZ</option>
+                                <option value="F-SZN-MCZ">F-SZN-MCZ</option>
+                        </select>
+                        <i class="fas fa-building input-icon"></i>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-role">Função</label>
+                        <select id="register-role" class="select-unit" required>
+                            <option value="" disabled selected>Selecione sua função</option>
+                            <option value="sst">Técnico de Segurança</option>
+                            <option value="worker">Trabalhador</option>
+                            <option value="manager">Gestor</option>
+                            <option value="visitor">Visitante</option>
+                        </select>
+                        <i class="fas fa-user-tie input-icon"></i>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn" id="register-btn">
+                            <span class="btn-text">Registrar</span>
+                            <span class="fa fa-spinner hidden"></span>
+                        </button>
+                    </div>
+                    
+                    <div class="form-switch">
+                        Já tem uma conta? <a href="#" id="show-login-link">Faça login</a>
+                    </div>
+                </form>
+                
+                <div class="safety-elements">
+                    <i class="fas fa-exclamation-triangle safety-icon" title="Área de Risco"></i>
+                    <i class="fas fa-biohazard safety-icon" title="Risco Biológico"></i>
+                    <i class="fas fa-fire-extinguisher safety-icon" title="Extintor"></i>
+                    <i class="fas fa-first-aid safety-icon" title="Primeiros Socorros"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

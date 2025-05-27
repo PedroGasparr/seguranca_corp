@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Validades</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/doc.css">
+    <link rel="icon" href="img/engenheiro.png" type="image/x-icon">
+    <style>
+        .dashboard-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .unit-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            width: 300px;
+            transition: transform 0.3s;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        
+        .unit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .unit-card h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .status-count {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+        
+        .status-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .status-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .conforme { color: #28a745; }
+        .atualizacao { color: #ffc107; }
+        .vencido { color: #dc3545; }
+        
+        .document-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+            flex-grow: 1;
+        }
+        
+        .document-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f5f5f5;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .document-item.vencido {
+            background-color: #fff5f5;
+        }
+        
+        .document-item.atualizacao {
+            background-color: #fffbf0;
+        }
+        
+        .days-left {
+            font-weight: bold;
+        }
+        
+        .negative-days {
+            color: #dc3545;
+        }
+        
+        .positive-days {
+            color: #28a745;
+        }
+        
+        .warning-days {
+            color: #ffc107;
+        }
+        
+        /* Botão Ver Documentos */
+        .btn-view-docs {
+            background-color: #4e73df;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .btn-view-docs:hover {
+            background-color: #3a5bc7;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.modal-open {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 1000px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #777;
+        }
+        
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        /* Email modal specific */
+        #email-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #email-modal.modal-open {
+            display: flex;
+        }
+        
+        .email-modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .email-recipients {
+            max-height: 150px;
+            overflow-y: auto;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        
+        .email-recipient {
+            margin: 5px 0;
+            padding: 5px;
+            background: white;
+            border-radius: 4px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        /* Back button */
+        .back-button {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+        
+        /* Checkbox styles */
+        .doc-checkbox {
+            cursor: pointer;
+            transform: scale(1.2);
+        }
+        
+        /* Document actions panel */
+        .document-actions {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        #selected-count {
+            font-weight: bold;
+            color: #6c757d;
+        }
+        
+        #move-to-disable-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Status summary adjustments */
+        .status-summary .status-item:nth-child(2) {
+            display: none; /* Esconde o item de Atualização */
+        }
+        
+        /* Table adjustments */
+        .data-table th:first-child {
+            width: 40px;
+        }
+        
+        .data-table td:first-child {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Menu Lateral -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <i class="fas fa-user-circle user-avatar"></i>
+                    <div class="user-info">
+                        <span class="user-name" id="sidebar-user-name">Carregando...</span>
+                        <span class="user-unit" id="sidebar-user-unit">Carregando...</span>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <ul>
+                    <li>
+                        <a href="home.html">
+                            <i class="fas fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="documentos.html">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Documentos</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="validades.html">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Validades</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-danger btn-sm" id="sidebar-logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
+            </div>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Controle de Validades</h1>
+                <div class="breadcrumb">
+                    <a href="home.html">Home</a> / <span>Validades</span>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- Visão para unidades comuns -->
+                <div id="unit-view" class="card" style="display: none;">
+                    <button id="back-to-corp" class="back-button" style="display: none;">
+                        <i class="fas fa-arrow-left"></i> Voltar para todas as unidades
+                    </button>
+                    <div class="card-header">
+                        <h2><i class="fas fa-building"></i> <span id="unit-name-title">Minha Unidade</span></h2>
+                        <div class="search-box">
+                            <input type="text" id="document-search" placeholder="Pesquisar documentos...">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="status-summary">
+                        <div class="status-item">
+                            <span class="status-label">Conformes</span>
+                            <span class="status-value conforme" id="conforme-count">0</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Atualização</span>
+                            <span class="status-value atualizacao" id="atualizacao-count">0</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Vencidos</span>
+                            <span class="status-value vencido" id="vencido-count">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table id="documents-table" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="select-all-docs" title="Selecionar todos"></th>
+                                    <th>Nome</th>
+                                    <th>Tipo</th>
+                                    <th>Validade</th>
+                                    <th>Dias Restantes</th>
+                                    <th>Status</th>
+                                    <th>Documento</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="empty-row">
+                                    <td colspan="7">Carregando documentos...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Painel de ações para documentos selecionados -->
+                    <div class="document-actions" id="docs-actions">
+                        <button class="btn btn-danger" id="move-to-disable-btn">
+                            <i class="fas fa-archive"></i> Mover para Documentos Desativados
+                        </button>
+                        <span id="selected-count">0 selecionados</span>
+                    </div>
+                </div>
+                
+                <!-- Visão para Gestão Corp (cards das unidades) -->
+                <div id="corp-view" class="dashboard-container" style="display: none;">
+                    <!-- Cards serão gerados dinamicamente pelo JavaScript -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para visualização de documentos da unidade -->
+    <div class="modal" id="unit-documents-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-unit-name">Documentos da Unidade</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="status-summary">
+                    <div class="status-item">
+                        <span class="status-label">Conformes</span>
+                        <span class="status-value conforme" id="modal-conforme-count">0</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Atualização</span>
+                        <span class="status-value atualizacao" id="modal-atualizacao-count">0</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Vencidos</span>
+                        <span class="status-value vencido" id="modal-vencido-count">0</span>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table id="modal-documents-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Tipo</th>
+                                <th>Validade</th>
+                                <th>Dias Restantes</th>
+                                <th>Status</th>
+                                <th>Documento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="empty-row">
+                                <td colspan="6">Carregando documentos...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="send-email-btn">
+                    <i class="fas fa-envelope"></i> Enviar Alerta por Email
+                </button>
+                <button class="btn btn-secondary modal-close">
+                    <i class="fas fa-times"></i> Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para envio de email -->
+    <div class="modal" id="email-modal">
+        <div class="email-modal-content">
+            <h3><i class="fas fa-envelope"></i> Enviar Alerta de Documentos</h3>
+            
+            <div class="form-group">
+                <label>Unidade: <strong id="email-unit-name"></strong></label>
+            </div>
+            
+            <div class="form-group">
+                <label>Documentos Vencidos/Próximos do Vencimento:</label>
+                <div id="email-documents-list" class="document-list"></div>
+            </div>
+            
+            <div class="form-group">
+                <label>Destinatários:</label>
+                <div id="email-recipients" class="email-recipients"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email-subject">Assunto:</label>
+                <input type="text" id="email-subject" class="form-control" value="Alerta de Documentos Pendentes">
+            </div>
+            
+            <div class="form-group">
+                <label for="email-message">Mensagem:</label>
+                <textarea id="email-message" class="form-control" rows="5">
+Prezados,
+
+Identificamos que os seguintes documentos da unidade estão vencidos ou próximos do vencimento:
+
+[LISTA_DE_DOCUMENTOS]
+
+Por favor, regularize a situação o mais breve possível.
+
+Atenciosamente,
+Gestão Corporativa
+                </textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn btn-secondary" id="cancel-email-btn">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn btn-primary" id="confirm-send-email-btn">
+                    <i class="fas fa-paper-plane"></i> Enviar Email
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-functions-compat.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/validades.js"></script>
+</body>
+</html>

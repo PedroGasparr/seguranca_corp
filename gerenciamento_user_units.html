@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Unidades - Application GZL</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="img/engenheiro.png" type="image/x-icon">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .sidebar {
+            background-color: #343a40;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            padding-top: 20px;
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .nav-link:hover, .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+        .user-info {
+            background-color: #e9ecef;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        .show {
+            display: block;
+        }
+        .alert {
+            transition: all 0.5s ease;
+        }
+        .tag {
+            display: inline-block;
+            background-color: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .tag-remove {
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        .unit-selector {
+            border: 1px dashed #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar d-flex flex-column flex-shrink-0 p-3" style="width: 250px;">
+            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                <span class="fs-4">Application GZL</span>
+            </a>
+            <hr>
+            <ul class="nav nav-pills flex-column mb-auto">
+                <li class="nav-item">
+                    <a href="home.html" class="nav-link">
+                        <i class="fas fa-home me-2"></i>
+                        Home
+                    </a>
+                </li>
+            </ul>
+            <hr>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <h2 class="mb-4">Gerenciamento de Unidades</h2>
+            
+            <div class="alert alert-danger hidden" id="error-message"></div>
+            <div class="alert alert-success hidden" id="success-message"></div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Selecionar Usuário</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="user-select" class="form-label">Selecione um usuário:</label>
+                        <select class="form-select" id="user-select">
+                            <option value="">Carregando usuários...</option>
+                        </select>
+                    </div>
+                    
+                    <div id="user-details" class="hidden">
+                        <div class="user-info mb-4">
+                            <h5>Informações do Usuário</h5>
+                            <p><strong>Nome:</strong> <span id="user-name"></span></p>
+                            <p><strong>Email:</strong> <span id="user-email"></span></p>
+                            <p><strong>Unidade Atual:</strong> <span id="user-current-unit"></span></p>
+                            <p><strong>Último Login:</strong> <span id="user-last-login"></span></p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5>Definir Unidade Principal</h5>
+                            <select class="form-select mb-3" id="main-unit-select">
+                                <option value="">Selecione a unidade principal</option>
+                                <option value="gestão corp">Gestão Corp</option>
+                                <option value="CD-TZK-SZN">CD-TZK-SZN</option>
+                                <option value="CD-TRI-GRU">CD-TRI-GRU</option>
+                                <option value="F-WBR-MCZ">F-WBR-MCZ</option>
+                                <option value="ITM-SP">ITM-SP</option>
+                                <option value="F-NTR-MCZ">F-NTR-MCZ</option>
+                                <option value="CD-YMH-SP">CD-YMH-SP</option>
+                                <option value="F-AST-SCI">F-AST-SCI</option>
+                                <option value="F-JD-CAS">F-JD-CAS</option>
+                                <option value="F-JD-CTL">F-JD-CTL</option>
+                                <option value="F-JD-HZA">F-JD-HZA</option>
+                                <option value="F-JD-IDU">F-JD-IDU</option>
+                                <option value="F-JD-MGO">F-JD-MGO</option>
+                                <option value="F-OJI-PAA">F-OJI-PAA</option>
+                                <option value="F-OJI-RCA">F-OJI-RCA</option>
+                                <option value="CD-SZL-SZN">CD-SZL-SZN</option>
+                                <option value="CD-SZN-SZN">CD-SZN-SZN</option>
+                                <option value="F-SRV-SZN">F-SRV-SZN</option>
+                                <option value="F-SZN-SZN">F-SZN-SZN</option>
+                                <option value="F-SZN-BLM">F-SZN-BLM</option>
+                                <option value="F-SZN-IMP">F-SZN-IMP</option>
+                                <option value="CD-SZN-MCW">CD-SZN-MCW</option>
+                                <option value="F-IMS-LRA">F-IMS-LRA</option>
+                                <option value="F-PAP-LRA">F-PAP-LRA</option>
+                                <option value="F-SZN-LRA">F-SZN-LRA</option>
+                                <option value="F-SZN-CPO">F-SZN-CPO</option>
+                                <option value="F-BTK-SRQ">F-BTK-SRQ</option>
+                                <option value="F-IBM-EMB">F-IBM-EMB</option>
+                                <option value="F-WBR-JAD">F-WBR-JAD</option>
+                                <option value="ADM-MTZ-MCZ">ADM-MTZ-MCZ</option>
+                                <option value="F-WTM-JCI">F-WTM-JCI</option>
+                                <option value="F-YHM-SP">F-YHM-SP</option>
+                                <option value="CD-SZN-CPO">CD-SZN-CPO</option>
+                                <option value="CD-SZN-SJP">CD-SZN-SJP</option>
+                                <option value="F-PCO-MCZ">F-PCO-MCZ</option>
+                                <option value="CD-SZN-CCA">CD-SZN-CCA</option>
+                                <option value="CD-SZN-SEA">CD-SZN-SEA</option>
+                                <option value="MATRIZ-ES">MATRIZ-ES</option>
+                                <option value="F-PCO-FSA">F-PCO-FSA</option>
+                                <option value="F-WBR-CAR">F-WBR-CAR</option>
+                                <option value="CD-SZN-CAS">CD-SZN-CAS</option>
+                                <option value="F-IMS-CIM">F-IMS-CIM</option>
+                                <option value="F-SZN-ACZ">F-SZN-ACZ</option>
+                                <option value="F-SZN-MCZ">F-SZN-MCZ</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5>Unidades Reservas</h5>
+                            <div class="unit-selector mb-3">
+                                <div class="input-group">
+                                    <select class="form-select" id="reserve-unit-select">
+                                        <option value="">Selecione uma unidade reserva</option>
+                                        <option value="gestão corp">Gestão Corp</option>
+                                        <option value="CD-TZK-SZN">CD-TZK-SZN</option>
+                                        <option value="CD-TRI-GRU">CD-TRI-GRU</option>
+                                        <option value="F-WBR-MCZ">F-WBR-MCZ</option>
+                                        <option value="ITM-SP">ITM-SP</option>
+                                        <option value="F-NTR-MCZ">F-NTR-MCZ</option>
+                                        <option value="CD-YMH-SP">CD-YMH-SP</option>
+                                        <option value="F-AST-SCI">F-AST-SCI</option>
+                                        <option value="F-JD-CAS">F-JD-CAS</option>
+                                        <option value="F-JD-CTL">F-JD-CTL</option>
+                                        <option value="F-JD-HZA">F-JD-HZA</option>
+                                        <option value="F-JD-IDU">F-JD-IDU</option>
+                                        <option value="F-JD-MGO">F-JD-MGO</option>
+                                        <option value="F-OJI-PAA">F-OJI-PAA</option>
+                                        <option value="F-OJI-RCA">F-OJI-RCA</option>
+                                        <option value="CD-SZL-SZN">CD-SZL-SZN</option>
+                                        <option value="CD-SZN-SZN">CD-SZN-SZN</option>
+                                        <option value="F-SRV-SZN">F-SRV-SZN</option>
+                                        <option value="F-SZN-SZN">F-SZN-SZN</option>
+                                        <option value="F-SZN-BLM">F-SZN-BLM</option>
+                                        <option value="F-SZN-IMP">F-SZN-IMP</option>
+                                        <option value="CD-SZN-MCW">CD-SZN-MCW</option>
+                                        <option value="F-IMS-LRA">F-IMS-LRA</option>
+                                        <option value="F-PAP-LRA">F-PAP-LRA</option>
+                                        <option value="F-SZN-LRA">F-SZN-LRA</option>
+                                        <option value="F-SZN-CPO">F-SZN-CPO</option>
+                                        <option value="F-BTK-SRQ">F-BTK-SRQ</option>
+                                        <option value="F-IBM-EMB">F-IBM-EMB</option>
+                                        <option value="F-WBR-JAD">F-WBR-JAD</option>
+                                        <option value="ADM-MTZ-MCZ">ADM-MTZ-MCZ</option>
+                                        <option value="F-WTM-JCI">F-WTM-JCI</option>
+                                        <option value="F-YHM-SP">F-YHM-SP</option>
+                                        <option value="CD-SZN-CPO">CD-SZN-CPO</option>
+                                        <option value="CD-SZN-SJP">CD-SZN-SJP</option>
+                                        <option value="F-PCO-MCZ">F-PCO-MCZ</option>
+                                        <option value="CD-SZN-CCA">CD-SZN-CCA</option>
+                                        <option value="CD-SZN-SEA">CD-SZN-SEA</option>
+                                        <option value="MATRIZ-ES">MATRIZ-ES</option>
+                                        <option value="F-PCO-FSA">F-PCO-FSA</option>
+                                        <option value="F-WBR-CAR">F-WBR-CAR</option>
+                                        <option value="CD-SZN-CAS">CD-SZN-CAS</option>
+                                        <option value="F-IMS-CIM">F-IMS-CIM</option>
+                                        <option value="F-SZN-ACZ">F-SZN-ACZ</option>
+                                        <option value="F-SZN-MCZ">F-SZN-MCZ</option>
+                                    </select>
+                                    <button class="btn btn-primary" type="button" id="add-reserve-unit-btn">
+                                        <i class="fas fa-plus"></i> Adicionar
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="reserve-units-container">
+                                <!-- As unidades reservas serão adicionadas aqui -->
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="save-units-btn">
+                            <i class="fas fa-save"></i> Salvar Alterações
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    
+    <!-- Seu arquivo auth.js -->
+    <script src="js/auth.js"></script>
+    
+    <script>
+        // Função para mostrar mensagens
+        function showMessage(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = message;
+                element.classList.remove('hidden', 'alert-success', 'alert-danger', 'alert-warning');
+                element.classList.add(`alert-${type}`, 'show');
+                
+                setTimeout(() => {
+                    element.classList.remove('show');
+                    setTimeout(() => element.classList.add('hidden'), 500);
+                }, 5000);
+            }
+        }
+
+        // Carregar lista de usuários
+        function loadUsers() {
+            const userSelect = document.getElementById('user-select');
+            userSelect.innerHTML = '<option value="">Carregando usuários...</option>';
+            
+            db.collection('users').get()
+                .then((querySnapshot) => {
+                    userSelect.innerHTML = '<option value="">Selecione um usuário</option>';
+                    
+                    querySnapshot.forEach((doc) => {
+                        const userData = doc.data();
+                        const option = document.createElement('option');
+                        option.value = doc.id;
+                        option.textContent = `${userData.name} (${userData.email}) - ${userData.unit || 'Sem unidade'}`;
+                        userSelect.appendChild(option);
+                    });
+                })
+                .catch((error) => {
+                    console.error("Erro ao carregar usuários:", error);
+                    userSelect.innerHTML = '<option value="">Erro ao carregar usuários</option>';
+                    showMessage('error-message', 'Erro ao carregar lista de usuários', 'danger');
+                });
+        }
+
+        // Carregar detalhes do usuário selecionado
+        function loadUserDetails(userId) {
+            const userDetails = document.getElementById('user-details');
+            userDetails.classList.add('hidden');
+            
+            db.collection('users').doc(userId).get()
+                .then((doc) => {
+                    if (!doc.exists) {
+                        showMessage('error-message', 'Usuário não encontrado', 'danger');
+                        return;
+                    }
+                    
+                    const userData = doc.data();
+                    
+                    // Preencher informações do usuário
+                    document.getElementById('user-name').textContent = userData.name;
+                    document.getElementById('user-email').textContent = userData.email;
+                    document.getElementById('user-current-unit').textContent = userData.unit || 'Não definida';
+                    
+                    if (userData.lastLogin) {
+                        const lastLoginDate = userData.lastLogin.toDate();
+                        document.getElementById('user-last-login').textContent = 
+                            lastLoginDate.toLocaleDateString('pt-BR') + ' às ' + lastLoginDate.toLocaleTimeString('pt-BR');
+                    } else {
+                        document.getElementById('user-last-login').textContent = 'Nunca fez login';
+                    }
+                    
+                    // Definir unidade principal selecionada
+                    const mainUnitSelect = document.getElementById('main-unit-select');
+                    if (userData.unit) {
+                        mainUnitSelect.value = userData.unit;
+                    } else {
+                        mainUnitSelect.value = '';
+                    }
+                    
+                    // Limpar e preencher unidades reservas
+                    const reserveUnitsContainer = document.getElementById('reserve-units-container');
+                    reserveUnitsContainer.innerHTML = '';
+                    
+                    if (userData.unitreserv && Array.isArray(userData.unitreserv)) {
+                        userData.unitreserv.forEach(unit => {
+                            addReserveUnitTag(unit);
+                        });
+                    }
+                    
+                    // Mostrar detalhes
+                    userDetails.classList.remove('hidden');
+                })
+                .catch((error) => {
+                    console.error("Erro ao carregar detalhes do usuário:", error);
+                    showMessage('error-message', 'Erro ao carregar detalhes do usuário', 'danger');
+                });
+        }
+
+        // Adicionar tag de unidade reserva
+        function addReserveUnitTag(unit) {
+            const reserveUnitsContainer = document.getElementById('reserve-units-container');
+            
+            const tag = document.createElement('span');
+            tag.className = 'tag';
+            tag.innerHTML = `
+                ${unit}
+                <span class="tag-remove" data-unit="${unit}">
+                    <i class="fas fa-times"></i>
+                </span>
+            `;
+            
+            reserveUnitsContainer.appendChild(tag);
+            
+            // Adicionar evento de remoção
+            tag.querySelector('.tag-remove').addEventListener('click', function() {
+                tag.remove();
+            });
+        }
+
+        // Salvar alterações
+        function saveUserUnits(userId) {
+            const mainUnit = document.getElementById('main-unit-select').value;
+            const reserveUnitTags = document.querySelectorAll('#reserve-units-container .tag');
+            
+            // Coletar unidades reservas
+            const reserveUnits = [];
+            reserveUnitTags.forEach(tag => {
+                const unit = tag.textContent.trim().replace('×', '').trim();
+                reserveUnits.push(unit);
+            });
+            
+            // Validar
+            if (!mainUnit) {
+                showMessage('error-message', 'Selecione uma unidade principal', 'danger');
+                return Promise.reject('Unidade principal não selecionada');
+            }
+            
+            // Preparar dados para atualização
+            const updateData = {
+                unit: mainUnit
+            };
+            
+            // Só atualiza unitreserv se houver unidades reservas
+            if (reserveUnits.length > 0) {
+                updateData.unitreserv = reserveUnits;
+            } else {
+                // Se não houver unidades reservas, remove o campo (usando FieldValue.delete() do Firestore)
+                updateData.unitreserv = firebase.firestore.FieldValue.delete();
+            }
+            
+            // Atualizar no Firestore
+            return db.collection('users').doc(userId).update(updateData)
+                .then(() => {
+                    showMessage('success-message', 'Unidades atualizadas com sucesso!', 'success');
+                    return true;
+                })
+                .catch((error) => {
+                    console.error("Erro ao atualizar unidades:", error);
+                    showMessage('error-message', 'Erro ao atualizar unidades', 'danger');
+                    return false;
+                });
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Carregar lista de usuários
+            loadUsers();
+            
+            // Quando selecionar um usuário
+            document.getElementById('user-select').addEventListener('change', function() {
+                const userId = this.value;
+                if (userId) {
+                    loadUserDetails(userId);
+                } else {
+                    document.getElementById('user-details').classList.add('hidden');
+                }
+            });
+            
+            // Adicionar unidade reserva
+            document.getElementById('add-reserve-unit-btn').addEventListener('click', function() {
+                const reserveUnitSelect = document.getElementById('reserve-unit-select');
+                const selectedUnit = reserveUnitSelect.value;
+                
+                if (!selectedUnit) {
+                    showMessage('error-message', 'Selecione uma unidade para adicionar', 'danger');
+                    return;
+                }
+                
+                // Verificar se já existe
+                const existingTags = document.querySelectorAll('#reserve-units-container .tag');
+                let alreadyExists = false;
+                
+                existingTags.forEach(tag => {
+                    const unit = tag.textContent.trim().replace('×', '').trim();
+                    if (unit === selectedUnit) {
+                        alreadyExists = true;
+                    }
+                });
+                
+                if (alreadyExists) {
+                    showMessage('error-message', 'Esta unidade já foi adicionada', 'warning');
+                    return;
+                }
+                
+                addReserveUnitTag(selectedUnit);
+                reserveUnitSelect.value = '';
+            });
+            
+            // Salvar alterações
+            document.getElementById('save-units-btn').addEventListener('click', function() {
+                const userId = document.getElementById('user-select').value;
+                if (!userId) {
+                    showMessage('error-message', 'Selecione um usuário primeiro', 'danger');
+                    return;
+                }
+                
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+                
+                saveUserUnits(userId)
+                    .then(success => {
+                        if (success) {
+                            // Atualizar a lista de usuários para refletir as mudanças
+                            loadUsers();
+                        }
+                    })
+                    .finally(() => {
+                        this.disabled = false;
+                        this.innerHTML = '<i class="fas fa-save"></i> Salvar Alterações';
+                    });
+            });
+            
+            // Logout
+            document.getElementById('sidebar-logout-btn').addEventListener('click', function() {
+                firebase.auth().signOut().then(() => {
+                    window.location.href = 'index.html';
+                }).catch(error => {
+                    console.error('Erro ao fazer logout:', error);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
