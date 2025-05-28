@@ -20,7 +20,7 @@ const isLoginPage = window.location.pathname.includes('index.html') ||
                     window.location.pathname === '/' || 
                     window.location.pathname === '/index.html';
 
-const isHomePage = window.location.pathname.includes('home.html');
+const isHomePage = window.location.pathname.includes('./src/home.html');
 
 // Funções compartilhadas
 function showMessage(elementId, message, type) {
@@ -118,7 +118,7 @@ if (isLoginPage) {
                 });
             })
             .then(() => {
-                window.location.href = 'home.html';
+                window.location.href = './src/home.html';
             })
             .catch((error) => {
                 let errorMessage = error.message;
@@ -205,7 +205,7 @@ if (isLoginPage) {
             })
             .then(() => {
                 showMessage('register-message', 'Conta criada com sucesso! Redirecionando...', 'success');
-                setTimeout(() => window.location.href = 'home.html', 2000);
+                setTimeout(() => window.location.href = './src/home.html', 2000);
             })
             .catch((error) => {
                 let errorMessage = error.message;
