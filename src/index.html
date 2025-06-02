@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sessão Encerrada</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #2c3e50;
+        }
+        
+        .logout-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        .security-icon {
+            font-size: 3rem;
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #e74c3c;
+            margin-bottom: 15px;
+        }
+        
+        p {
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        
+        .security-features {
+            text-align: left;
+            margin: 25px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .security-features li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .security-features i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .timer {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #e74c3c;
+            margin: 20px 0;
+        }
+        
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="logout-container">
+        <div class="security-icon">
+            <i class="fas fa-lock"></i>
+        </div>
+        <h1>Você escolheu sair</h1>
+        <p>Sua sessão foi encerrada com sucesso por motivos de segurança.</p>
+        
+        <div class="security-features">
+            <h3>Medidas de segurança aplicadas:</h3>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Sessão encerrada em todos os dispositivos</li>
+                <li><i class="fas fa-check-circle"></i> Tokens de acesso invalidados</li>
+                <li><i class="fas fa-check-circle"></i> Cache limpo</li>
+                <li><i class="fas fa-check-circle"></i> Dados sensíveis protegidos</li>
+            </ul>
+        </div>
+        
+        <div class="timer" id="countdown">Redirecionando em 10 segundos...</div>
+        
+        <button class="btn" id="redirectNow">
+            <i class="fas fa-external-link-alt"></i> Sair agora
+        </button>
+    </div>
+
+    <script>
+        // Contador regressivo
+        let seconds = 10;
+        const countdownElement = document.getElementById('countdown');
+        const timer = setInterval(() => {
+            seconds--;
+            countdownElement.textContent = `Redirecionando em ${seconds} segundos...`;
+            
+            if (seconds <= 0) {
+                clearInterval(timer);
+                window.location.href = 'https://www.google.com';
+            }
+        }, 1000);
+        
+        // Botão para sair imediatamente
+        document.getElementById('redirectNow').addEventListener('click', () => {
+            clearInterval(timer);
+            window.location.href = 'https://www.google.com';
+        });
+        
+        // Limpeza de segurança adicional
+        window.addEventListener('beforeunload', () => {
+            // Limpar qualquer dado sensível da sessionStorage/localStorage
+            sessionStorage.clear();
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('sensitiveData');
+        });
+    </script>
+</body>
+</html>

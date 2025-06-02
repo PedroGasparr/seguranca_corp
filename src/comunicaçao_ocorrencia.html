@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comunicação de Ocorrência</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" href="../img/engenheiro.png" type="image/x-icon">
+    <link rel="stylesheet" href="../css/comunicaçãao_ocorrencia.css">
+    <style>
+        :root {
+            --sidebar-width: 280px;
+            --sidebar-bg: #2c3e50;
+            --sidebar-color: #ecf0f1;
+            --sidebar-active-bg: #34495e;
+            --sidebar-hover-bg: #34495e;
+            --info-color: #4895ef;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+        }
+        
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-color);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s;
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+        font-size: 2.5rem;
+        color: var(--info-color);
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .user-unit {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .sidebar-menu {
+            flex: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+        
+        .sidebar-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--sidebar-color);
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+        
+        .sidebar-menu a:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        padding-left: 1.75rem;
+        }
+        
+       .sidebar-menu li.active a {
+        background: rgba(67, 97, 238, 0.2);
+        color: white;
+        border-left: 3px solid var(--primary-color);
+        }
+
+        .sidebar-footer {
+        padding: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        }
+
+        
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            background-color: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .content-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .content-header h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            color: #2c3e50;
+        }
+        
+        .breadcrumb {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        /* Checklist Styles */
+        .checklist-container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        
+        .checklist-section {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .checklist-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-control {
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+        }
+        
+        .form-control:focus {
+            border-color: #4895ef;
+            box-shadow: 0 0 0 0.2rem rgba(72, 149, 239, 0.25);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+        
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .image-upload-container {
+            margin-top: 15px;
+        }
+        
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .image-preview-item {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            border: 1px dashed #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .image-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .remove-image {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(255, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .btn-add-image {
+            margin-top: 10px;
+        }
+        
+        .btn-submit {
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-submit:hover {
+            background-color: #34495e;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Menu Lateral -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <i class="fas fa-user-circle user-avatar"></i>
+                    <div class="user-info">
+                        <span class="user-name" id="sidebar-user-name"></span>
+                        <span class="user-unit" id="sidebar-user-unit"></span>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <ul>
+                    <li>
+                        <a href="home.html">
+                            <i class="fas fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="documentos.html">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Documentos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="validades.html">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Validades</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="procedimentos_operacionais.html">
+                            <i class="fas fa-book"></i>
+                            <span>Procedimentos Operacionais</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="#">
+                            <i class="fas fa-bullhorn"></i>
+                            <span>Comunicação de Ocorrencia</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-search"></i>
+                            <span>Investigação de Ocorrencia</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="confirm-unit-change" class="btn btn-sm btn-success w-100" style="display: none;">
+                    <i class="fas fa-check"></i> Confirmar
+                </button>
+            </div>
+            
+            <button class="btn btn-danger btn-sm w-100" id="sidebar-logout-btn">
+                <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Sair</span>
+            </button>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>Comunicação de Ocorrência</h1>
+                <div class="breadcrumb">Checklist • Formulário</div>
+            </div>
+
+            <div class="checklist-container">
+                <form id="ocorrenciaForm" action="https://formsubmit.co/pedrogaspar443@gmail.com" method="POST" enctype="multipart/form-data">
+                    
+                    <!-- Seção 1: Informações Básicas -->
+                    <div class="checklist-section">
+                        <h3>1. Informações Básicas</h3>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="dataOcorrencia">📅 Data da ocorrência:</label>
+                                    <input type="date" class="form-control" id="dataOcorrencia" name="dataOcorrencia" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="horarioOcorrencia">⏰ Horário da ocorrência:</label>
+                                    <input type="time" class="form-control" id="horarioOcorrencia" name="horarioOcorrencia" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="nomeTecnico">👤 Nome do técnico:</label>
+                                    <input type="text" class="form-control" id="nomeTecnico" name="nomeTecnico"  required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="emailUsuario">🧾 Email do usuário:</label>
+                                    <input type="email" class="form-control" id="emailUsuario" name="emailUsuario"  required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="localServico">📍 Local do serviço:</label>
+                                    <input type="text" class="form-control" id="localServico" name="localServico" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="clienteEnvolvido">🏢 Cliente envolvido:</label>
+                            <input type="text" class="form-control" id="clienteEnvolvido" name="clienteEnvolvido" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção 2: Tipo de Serviço Realizado -->
+                    <div class="checklist-section">
+                        <h3>2. Tipo de Serviço Realizado (marque um ou mais)</h3>
+                        
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="segurancaSaude" name="tipoServico" value="Segurança e Saúde do Trabalho">
+                                <label for="segurancaSaude">Segurança e Saúde do Trabalho</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="manutencao" name="tipoServico" value="Serviço de manutenção (pintura, elétrica, pedreiros)">
+                                <label for="manutencao">Serviço de manutenção (pintura, elétrica, pedreiros)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="amarração" name="tipoServico" value="Amarração de carga">
+                                <label for="amarração">Amarração de carga</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="enlonamento" name="tipoServico" value="Enlonamento">
+                                <label for="enlonamento">Enlonamento</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="movimentacao" name="tipoServico" value="Movimentação de produtos no estoque">
+                                <label for="movimentacao">Movimentação de produtos no estoque</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="carregamento" name="tipoServico" value="Carregamento">
+                                <label for="carregamento">Carregamento</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="facilities" name="tipoServico" value="Facilities (áreas comuns/administrativas)">
+                                <label for="facilities">Facilities (áreas comuns/administrativas)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="retrabalho" name="tipoServico" value="Retrabalho de produtos">
+                                <label for="retrabalho">Retrabalho de produtos</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="pallets" name="tipoServico" value="Conserto/Recuperação/Inspeção de Pallets">
+                                <label for="pallets">Conserto/Recuperação/Inspeção de Pallets</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="limpezaEquipamento" name="tipoServico" value="Limpeza com equipamento">
+                                <label for="limpezaEquipamento">Limpeza com equipamento</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="limpezaManual" name="tipoServico" value="Limpeza manual">
+                                <label for="limpezaManual">Limpeza manual</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="peacao" name="tipoServico" value="Peação de container">
+                                <label for="peacao">Peação de container</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="descarregamento" name="tipoServico" value="Descarregamento">
+                                <label for="descarregamento">Descarregamento</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="conferencia" name="tipoServico" value="Conferência">
+                                <label for="conferencia">Conferência</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção 3: Natureza da Ocorrência -->
+                    <div class="checklist-section">
+                        <h3>3. Natureza da Ocorrência</h3>
+                        
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="avariaEquipamento" name="naturezaOcorrencia" value="Avaria em equipamento">
+                                <label for="avariaEquipamento">Avaria em equipamento</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="avariaProduto" name="naturezaOcorrencia" value="Avaria em produto">
+                                <label for="avariaProduto">Avaria em produto</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="condicaoInsegura" name="naturezaOcorrencia" value="Condição insegura">
+                                <label for="condicaoInsegura">Condição insegura</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="acessoNaoAutorizado" name="naturezaOcorrencia" value="Acesso não autorizado">
+                                <label for="acessoNaoAutorizado">Acesso não autorizado</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="falhaProcesso" name="naturezaOcorrencia" value="Falha no processo">
+                                <label for="falhaProcesso">Falha no processo</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="faltaEPIs" name="naturezaOcorrencia" value="Falta de EPIs">
+                                <label for="faltaEPIs">Falta de EPIs</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="comportamentoInadequado" name="naturezaOcorrencia" value="Comportamento inadequado">
+                                <label for="comportamentoInadequado">Comportamento inadequado</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="ausenciaCliente" name="naturezaOcorrencia" value="Ausência de cliente ou responsável">
+                                <label for="ausenciaCliente">Ausência de cliente ou responsável</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="faltaMateriais" name="naturezaOcorrencia" value="Falta de materiais">
+                                <label for="faltaMateriais">Falta de materiais</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="faltaMateriais" name="naturezaOcorrencia" value="Falta de materiais">
+                                <label for="Acidente">Acidente</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="faltaMateriais" name="naturezaOcorrencia" value="Falta de materiais">
+                                <label for="Incidente">Incidente</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="outrasNaturezas" name="naturezaOcorrencia" value="Outras">
+                                <label for="outrasNaturezas">Outras (especificar):</label>
+                                <input type="text" id="outrasNaturezasText" name="outrasNaturezasText" class="form-control" style="width: 200px; display: none;">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção 4: Descrição da Ocorrência -->
+                    <div class="checklist-section">
+                        <h3>4. Descrição da Ocorrência</h3>
+                        <p>Detalhe claramente o que aconteceu, com nomes, horários e fatos observados:</p>
+                        <div class="form-group">
+                            <textarea class="form-control" id="descricaoOcorrencia" name="descricaoOcorrencia" rows="3" required></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção 5: Ações Tomadas -->
+                    <div class="checklist-section">
+                        <h3>5. Ações Tomadas</h3>
+                        <div class="form-group">
+                            <label>O que foi feito para conter ou corrigir a situação?</label>
+                            <textarea class="form-control" id="acoesTomadas" name="acoesTomadas" rows="2" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Quem foi informado?</label>
+                            <textarea class="form-control" id="quemFoiInformado" name="quemFoiInformado" rows="2" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Foi necessário interromper o serviço?</label>
+                            <textarea class="form-control" id="interrupcaoServico" name="interrupcaoServico" rows="2" required></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção 6: Evidências -->
+                    <div class="checklist-section">
+                        <h3>6. Evidências</h3>
+                        
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="fotosTiradas" name="evidencias" value="Fotos tiradas">
+                                <label for="fotosTiradas">Fotos tiradas</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="videosGravados" name="evidencias" value="Vídeos gravados">
+                                <label for="videosGravados">Vídeos gravados</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="relatorioTecnico" name="evidencias" value="Relatório técnico anexo">
+                                <label for="relatorioTecnico">Relatório técnico anexo</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="testemunhas" name="evidencias" value="Testemunhas">
+                                <label for="testemunhas">Testemunhas:</label>
+                                <input type="text" id="testemunhasText" name="testemunhasText" class="form-control" style="width: 200px; display: none;">
+                            </div>
+                        </div>
+                        
+                        <div class="image-upload-container">
+                            <label for="imagensOcorrencia">Adicionar imagens:</label>
+                            <input type="file" id="imagensOcorrencia" name="imagensOcorrencia" class="form-control" accept="image/*" multiple>
+                            <button type="button" class="btn btn-primary btn-sm btn-add-image mt-2" id="btnAddMoreImages">
+                                <i class="fas fa-plus"></i> Adicionar mais imagens
+                            </button>
+                            
+                            <div class="image-preview" id="imagePreview"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção 7: Situação Atual -->
+                    <div class="checklist-section">
+                        <h3>7. Situação Atual</h3>
+                        
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="radio" id="ocorrenciaResolvida" name="situacaoAtual" value="Ocorrência resolvida no local" required>
+                                <label for="ocorrenciaResolvida">Ocorrência resolvida no local</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="radio" id="precisaAcompanhamento" name="situacaoAtual" value="Ocorrência precisa de acompanhamento">
+                                <label for="precisaAcompanhamento">Ocorrência precisa de acompanhamento</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="radio" id="servicoInterrompido" name="situacaoAtual" value="Serviço foi interrompido">
+                                <label for="servicoInterrompido">Serviço foi interrompido</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="radio" id="aguardarOrientacao" name="situacaoAtual" value="Aguardar orientação do superior">
+                                <label for="aguardarOrientacao">Aguardar orientação do superior</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção 8: Assinatura -->
+                    <div class="checklist-section">
+                        <h3>8. Assinatura do Técnico</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="nomeCompleto">🖊️ Nome completo:</label>
+                                    <input type="text" class="form-control" id="nomeCompleto" name="nomeCompleto"  required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="dataHoraEnvio">📅 Data/Hora do envio:</label>
+                                    <input type="text" class="form-control" id="dataHoraEnvio" name="dataHoraEnvio" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção de Emails -->
+                    <div class="checklist-section">
+                        <h3>9. Envio por Email</h3>
+                        <div class="form-group">
+                            <label for="emailsDestinatarios">Enviar para (principal):</label>
+                            <input type="email" class="form-control" id="emailsDestinatarios" name="emailsDestinatarios" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="emailsCopia">Cópia (CC - separar por vírgula):</label>
+                            <textarea class="form-control" id="emailsCopia" name="emailsCopia" rows="2" placeholder="email1@exemplo.com, email2@exemplo.com"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="text-end mt-4">
+                        <button type="submit" class="btn btn-submit" id="btnSubmit">
+                            <i class="fas fa-paper-plane"></i> Enviar Comunicação
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Comunicação Enviada</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Sua comunicação de ocorrência foi enviada com sucesso e salva no sistema.</p>
+                    <p>Um email foi enviado para os destinatários informados.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/home.js"></script>
+    
+    <script>
+        // Inicializa Firebase com as configurações do auth.js
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configura a data/hora atual
+            const now = new Date();
+            document.getElementById('dataHoraEnvio').value = now.toLocaleString('pt-BR');
+            
+            // Preenche automaticamente o nome do técnico e email se o usuário estiver logado
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    document.getElementById('emailUsuario').value = user.email || '';
+                }
+            });
+                firebase.auth().onAuthStateChanged((user) => {
+                    if (user) {
+                        firebase.firestore().collection('users').doc(user.uid).get()
+                            .then(doc => {
+                                if (doc.exists) {
+                                    const userData = doc.data();
+                                    document.getElementById('localServico').value = userData.unit || '';
+                                }
+                            })
+                            .catch(error => {
+                                console.error("Erro ao buscar unidade:", error);
+                            });
+                    }
+                });
+
+                firebase.auth().onAuthStateChanged((user) => {
+                    if (user) {
+                        firebase.firestore().collection('users').doc(user.uid).get()
+                            .then(doc => {
+                                if (doc.exists) {
+                                    const userData = doc.data();
+                                    document.getElementById('nomeTecnico').value = userData.name || '';
+                                    document.getElementById('nomeCompleto').value = userData.name || '';
+                                }
+                            })
+                            .catch(error => {
+                                console.error("Erro ao buscar unidade:", error);
+                            });
+                    }
+                });
+            
+            // Mostra campo de texto quando "Outras" for selecionada
+            document.getElementById('outrasNaturezas').addEventListener('change', function() {
+                document.getElementById('outrasNaturezasText').style.display = this.checked ? 'inline-block' : 'none';
+                if (!this.checked) {
+                    document.getElementById('outrasNaturezasText').value = '';
+                }
+            });
+            
+            // Mostra campo de texto quando "Testemunhas" for selecionada
+            document.getElementById('testemunhas').addEventListener('change', function() {
+                document.getElementById('testemunhasText').style.display = this.checked ? 'inline-block' : 'none';
+                if (!this.checked) {
+                    document.getElementById('testemunhasText').value = '';
+                }
+            });
+            
+            // Preview de imagens
+            document.getElementById('imagensOcorrencia').addEventListener('change', function(e) {
+                const preview = document.getElementById('imagePreview');
+                preview.innerHTML = '';
+                
+                if (this.files) {
+                    [].forEach.call(this.files, readAndPreview);
+                }
+                
+                function readAndPreview(file) {
+                    if (!/\.(jpe?g|png|gif)$/i.test(file.name)) {
+                        return alert(file.name + " não é uma imagem válida.");
+                    }
+                    
+                    const reader = new FileReader();
+                    
+                    reader.addEventListener("load", function() {
+                        const previewItem = document.createElement('div');
+                        previewItem.className = 'image-preview-item';
+                        
+                        const img = document.createElement('img');
+                        img.src = this.result;
+                        
+                        const removeBtn = document.createElement('button');
+                        removeBtn.className = 'remove-image';
+                        removeBtn.innerHTML = '&times;';
+                        removeBtn.addEventListener('click', function() {
+                            previewItem.remove();
+                        });
+                        
+                        previewItem.appendChild(img);
+                        previewItem.appendChild(removeBtn);
+                        preview.appendChild(previewItem);
+                    });
+                    
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Adicionar mais imagens
+            document.getElementById('btnAddMoreImages').addEventListener('click', function() {
+                document.getElementById('imagensOcorrencia').click();
+            });
+            
+            // Envio do formulário
+            document.getElementById('ocorrenciaForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const submitBtn = document.getElementById('btnSubmit');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+                // Coleta todos os dados do formulário
+                const formData = new FormData(this);
+                const ocorrenciaData = {
+                    dataOcorrencia: formData.get('dataOcorrencia'),
+                    horarioOcorrencia: formData.get('horarioOcorrencia'),
+                    nomeTecnico: formData.get('nomeTecnico'),
+                    emailUsuario: formData.get('emailUsuario'),
+                    localServico: formData.get('localServico'),
+                    clienteEnvolvido: formData.get('clienteEnvolvido'),
+                    tipoServico: Array.from(document.querySelectorAll('input[name="tipoServico"]:checked')).map(el => el.value),
+                    naturezaOcorrencia: Array.from(document.querySelectorAll('input[name="naturezaOcorrencia"]:checked')).map(el => {
+                        return el.id === 'outrasNaturezas' ? 
+                            `Outras: ${document.getElementById('outrasNaturezasText').value}` : 
+                            el.value;
+                    }),
+                    descricaoOcorrencia: formData.get('descricaoOcorrencia'),
+                    acoesTomadas: formData.get('acoesTomadas'),
+                    quemFoiInformado: formData.get('quemFoiInformado'),
+                    interrupcaoServico: formData.get('interrupcaoServico'),
+                    evidencias: Array.from(document.querySelectorAll('input[name="evidencias"]:checked')).map(el => {
+                        return el.id === 'testemunhas' ? 
+                            `Testemunhas: ${document.getElementById('testemunhasText').value}` : 
+                            el.value;
+                    }),
+                    situacaoAtual: document.querySelector('input[name="situacaoAtual"]:checked').value,
+                    nomeCompleto: formData.get('nomeCompleto'),
+                    dataHoraEnvio: formData.get('dataHoraEnvio'),
+                    emailsDestinatarios: formData.get('emailsDestinatarios'),
+                    emailsCopia: formData.get('emailsCopia'),
+                    userId: firebase.auth().currentUser.uid,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                // Processa as imagens
+                const files = document.getElementById('imagensOcorrencia').files;
+                const imagensPromises = [];
+                
+                if (files && files.length > 0) {
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        imagensPromises.push(new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                resolve(e.target.result);
+                            };
+                            reader.readAsDataURL(file);
+                        }));
+                    }
+                }
+
+                // Aguarda todas as imagens serem processadas
+                Promise.all(imagensPromises).then((imagensBase64) => {
+                    ocorrenciaData.imagens = imagensBase64;
+                    
+                    // Salva no Firestore
+                    firebase.firestore().collection('comunicacao').add(ocorrenciaData)
+                        .then((docRef) => {
+                            console.log('Documento salvo com ID:', docRef.id);
+                            
+                            // Envia o email via FormSubmit SEM redirecionamento
+                            const emailFormData = new FormData(document.getElementById('ocorrenciaForm'));
+                            emailFormData.append('_captcha', 'false');
+                            emailFormData.append('_template', 'table');
+                            
+                            fetch('https://formsubmit.co/ajax/pedrogaspar443@gmail.com', {
+                                method: 'POST',
+                                body: emailFormData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                // Mostra modal de confirmação
+                                const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                                modal.show();
+                                
+                                // Limpa o formulário
+                                document.getElementById('ocorrenciaForm').reset();
+                                document.getElementById('imagePreview').innerHTML = '';
+                            })
+                            .catch(error => {
+                                console.error('Erro ao enviar email:', error);
+                                alert('Ocorreu um erro ao enviar o email, mas os dados foram salvos.');
+                            });
+                        })
+                        .catch((error) => {
+                            console.error('Erro ao salvar documento:', error);
+                            alert('Ocorreu um erro ao salvar a comunicação. Por favor, tente novamente.');
+                        })
+                        .finally(() => {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Comunicação';
+                        });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
