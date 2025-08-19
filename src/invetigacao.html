@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Ocorrências</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/Investigacao.css">
+</head>
+<body>
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="app-container">
+        <!-- Menu Lateral -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <i class="fas fa-user-circle user-avatar"></i>
+                    <div class="user-info">
+                        <span class="user-name" id="sidebar-user-name"></span>
+                        <span class="user-unit" id="sidebar-user-unit"></span>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <ul>
+                    <li>
+                        <a href="home.html">
+                            <i class="fas fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="documentos.html">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Documentos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="validades.html">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Validades</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="procedimentos_operacionais.html">
+                            <i class="fas fa-book"></i>
+                            <span>Procedimentos Operacionais</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="comunicaçao_ocorrencia.html">
+                            <i class="fas fa-bullhorn"></i>
+                            <span>Comunicação de Ocorrência</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="invetigacao.html">
+                            <i class="fas fa-search"></i>
+                            <span>Investigação de Ocorrência</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="confirm-unit-change" class="btn btn-sm btn-success w-100" style="display: none;">
+                    <i class="fas fa-check"></i> Confirmar
+                </button>
+            </div>
+            
+            <button class="btn btn-danger btn-sm w-100" id="sidebar-logout-btn">
+                <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Sair</span>
+            </button>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>Gerenciar Ocorrências</h1>
+                <div class="breadcrumb">Pesquisa • Edição</div>
+            </div>
+
+            <!-- Formulário de Pesquisa -->
+            <div class="search-container fade-in">
+                <form id="searchForm" class="search-form">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="searchTerm" class="form-label">Pesquisar por:</label>
+                                <input type="text" class="form-control" id="searchTerm" placeholder="ID, Unidade ou Nome">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="searchStatus" class="form-label">Status:</label>
+                                <select class="form-control" id="searchStatus">
+                                    <option value="all">Todos</option>
+                                    <option value="open">Abertos</option>
+                                    <option value="closed">Finalizados</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="searchDate" class="form-label">Data:</label>
+                                <input type="date" class="form-control" id="searchDate">
+                            </div>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-search w-100">
+                                <i class="fas fa-search"></i> Pesquisar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Resultados da Pesquisa -->
+            <div class="results-container fade-in">
+                <h4>Resultados</h4>
+                <div id="searchResults">
+                    <!-- Ocorrências serão carregadas aqui -->
+                    <div class="text-center py-5" id="loadingIndicator">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Carregando...</span>
+                        </div>
+                        <p class="mt-2">Carregando ocorrências...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de Edição -->
+    <div class="modal fade modal-edit" id="editModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Ocorrência <span id="modalOccurrenceId"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm">
+                        <!-- Seção 1: Informações Básicas -->
+                        <div class="form-section">
+                            <h4>Informações Básicas</h4>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Status:</label>
+                                        <div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="status" id="statusOpen" value="open">
+                                                <label class="form-check-label" for="statusOpen">Aberto</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="status" id="statusClosed" value="closed">
+                                                <label class="form-check-label" for="statusClosed">Finalizado</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Classificação Cliente:</label>
+                                        <select class="form-control" name="classificacaoCliente">
+                                            <option value="Sem Classificação">Sem Classificação</option>
+                                            <option value="CAF">CAF</option>
+                                            <option value="SAF">SAF</option>
+                                            <option value="OSA">OSA</option>
+                                            <option value="INCIDENTE">INCIDENTE</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Classificação GZL:</label>
+                                        <select class="form-control" name="classificacaoGZL">
+                                            <option value="Sem Classificação">Sem Classificação</option>
+                                            <option value="CAF">CAF</option>
+                                            <option value="SAF">SAF</option>
+                                            <option value="OSA">OSA</option>
+                                            <option value="INCIDENTE">INCIDENTE</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="form-label">Dias Perdidos:</label>
+                                        <input type="number" class="form-control" name="diasPerdidos" min="0">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="form-label">Dias Debitados:</label>
+                                        <input type="number" class="form-control" name="diasDebitados" min="0">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">O que motivou o ocorrido:</label>
+                                        <select class="form-control" name="classificacao">
+                                           <option value=""></option>
+                                           <option value="Condição estrutural">Condição estrutural</option>
+                                           <option value="Descumprimento de procedimento">Descumprimento de procedimento</option>
+                                           <option value="Falha de Gestão">Falha de Gestão</option>
+                                           <option value="Falha Operacional">Falha Operacional</option>
+                                           <option value="Falha no Procedimento">Falha no Procedimento</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Seção 2: Análise de Causa Raiz -->
+                        <div class="form-section">
+                            <h4>Análise de Causa Raiz</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Medição / Quantificação:</label>
+                                        <textarea class="form-control" name="processo" rows="3"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Mão de Obra:</label>
+                                        <textarea class="form-control" name="maoDeObra" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Método:</label>
+                                        <textarea class="form-control" name="metodo" rows="3"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Material:</label>
+                                        <textarea class="form-control" name="material" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Meio Ambiente:</label>
+                                        <textarea class="form-control" name="meioAmbiente" rows="3"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Local / Área de trabalho:</label>
+                                        <textarea class="form-control" name="localAreaTrabalho" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Gestão:</label>
+                                        <textarea class="form-control" name="gestao" rows="3"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Máquina / Ferramenta / Equipamento:</label>
+                                        <textarea class="form-control" name="maquina" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="form-label">Causa Raíz:</label>
+                                        <textarea class="form-control" name="causasRaizes" rows="4"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Seção 3: Grupo de Investigação (EDITÁVEL) -->
+                        <div class="form-section">
+                            <h4>Grupo de Investigação</h4>
+                            <div id="modalMembersList">
+                                <!-- Membros serão adicionados aqui dinamicamente -->
+                            </div>
+                            <button type="button" class="btn-add" id="addMemberBtn">
+                                <i class="fas fa-plus"></i> Adicionar Integrante
+                            </button>
+                        </div>
+
+                        <!-- Seção 4: Condições Típicas -->
+                        <div class="form-section">
+                            <h4>Condições Típicas</h4>
+                            <div id="modalConditionsList"></div>
+                        </div>
+
+                        <!-- Seção 5: Plano de Ação (EDITÁVEL) - NOVO PADRÃO -->
+                        <div class="form-section">
+                            <h4>Plano de Ação</h4>
+                            <div id="modalActionsList">
+                                <!-- Ações serão adicionadas aqui dinamicamente -->
+                            </div>
+                            <button type="button" class="btn-add" id="addActionBtn">
+                                <i class="fas fa-plus"></i> Adicionar Ação
+                            </button>
+                        </div>
+
+                        <!-- Seção 6: Dados Originais (somente leitura) -->
+                        <div class="form-section">
+                            <h4>Dados Originais da Ocorrência</h4>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Unidade:</label>
+                                        <input type="text" class="form-control" name="unidade" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Data do Ocorrido:</label>
+                                        <input type="text" class="form-control" name="dataOcorrido" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Envolvido:</label>
+                                        <input type="text" class="form-control" name="nomeEnvolvido" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Tempo de Empresa:</label>
+                                        <input type="text" class="form-control" name="tempoEmpresa" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="form-label">Jornada:</label>
+                                        <input type="text" class="form-control" name="jornadaTrabalho" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="form-label">Tipo Colaborador:</label>
+                                        <input type="text" class="form-control" name="tipoColaborador" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="form-label">Descrição:</label>
+                                        <textarea class="form-control" name="descricaoOcorrencia" rows="3" readonly></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" id="saveChangesBtn">Salvar Alterações</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/auth.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const db = firebase.firestore();
+            const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+            let currentEditingId = null;
+            let currentMembers = [];
+            let currentActions = [];
+
+            // Carrega todas as ocorrências inicialmente
+            loadOccurrences();
+
+            // Pesquisa ocorrências
+            document.getElementById('searchForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                loadOccurrences();
+            });
+
+            // Toggle sidebar em mobile
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('active');
+            });
+
+            // Função para carregar ocorrências
+            function loadOccurrences() {
+                const searchTerm = document.getElementById('searchTerm').value.toLowerCase();
+                const statusFilter = document.getElementById('searchStatus').value;
+                const dateFilter = document.getElementById('searchDate').value;
+                
+                const resultsContainer = document.getElementById('searchResults');
+                resultsContainer.innerHTML = `
+                    <div class="text-center py-5" id="loadingIndicator">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Carregando...</span>
+                        </div>
+                        <p class="mt-2">Carregando ocorrências...</p>
+                    </div>
+                `;
+
+                let query = db.collection('investigacoes').orderBy('createdAt', 'desc');
+
+                query.get().then((querySnapshot) => {
+                    resultsContainer.innerHTML = '';
+                    
+                    if (querySnapshot.empty) {
+                        resultsContainer.innerHTML = '<p class="text-center py-5">Nenhuma ocorrência encontrada</p>';
+                        return;
+                    }
+
+                    let hasResults = false;
+
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        const occurrenceId = doc.id;
+                        
+                        // Verifica se o status existe, caso contrário considera como "open"
+                        const occurrenceStatus = data.status || 'open';
+                        
+                        // Aplica filtro de status
+                        if (statusFilter !== 'all' && occurrenceStatus !== statusFilter) {
+                            return;
+                        }
+                        
+                        // Aplica filtro de termo de pesquisa
+                        if (searchTerm && 
+                            !data.unidade.toLowerCase().includes(searchTerm) && 
+                            !data.nomeEnvolvido.toLowerCase().includes(searchTerm) &&
+                            !occurrenceId.toLowerCase().includes(searchTerm)) {
+                            return;
+                        }
+
+                        // Aplica filtro de data
+                        if (dateFilter && data.dataOcorrido !== dateFilter) {
+                            return;
+                        }
+
+                        hasResults = true;
+                        
+                        const statusClass = occurrenceStatus === 'closed' ? 'status-closed' : 'status-open';
+                        const statusText = occurrenceStatus === 'closed' ? 'Finalizado' : 'Aberto';
+
+                        const occurrenceItem = document.createElement('div');
+                        occurrenceItem.className = 'occurrence-item fade-in';
+                        
+                        // Adiciona classificação se existir
+                        const classificacaoHtml = data.classificacao ? 
+                            `<span class="classification-badge">${data.classificacao}</span>` : '';
+                        
+                        occurrenceItem.innerHTML = `
+                            <h5>Ocorrência ${occurrenceId}</h5>
+                            <div class="occurrence-meta">
+                                <span><i class="fas fa-building"></i> <strong>Unidade:</strong> ${data.unidade}</span>
+                                <span><i class="fas fa-user"></i> <strong>Envolvido:</strong> ${data.nomeEnvolvido}</span>
+                                <span><i class="fas fa-calendar"></i> <strong>Data:</strong> ${data.dataOcorrido}</span>
+                                <span class="status-badge ${statusClass}">${statusText}</span>
+                                ${classificacaoHtml}
+                            </div>
+                        `;
+                        
+                        occurrenceItem.addEventListener('click', () => openEditModal(occurrenceId, data));
+                        resultsContainer.appendChild(occurrenceItem);
+                    });
+
+                    if (!hasResults) {
+                        resultsContainer.innerHTML = '<p class="text-center py-5">Nenhuma ocorrência encontrada com os filtros aplicados</p>';
+                    }
+                }).catch((error) => {
+                    console.error("Erro ao carregar ocorrências:", error);
+                    resultsContainer.innerHTML = '<p class="text-center py-5 text-danger">Erro ao carregar ocorrências</p>';
+                });
+            }
+
+            // Adicionar membro ao grupo de investigação
+            document.getElementById('addMemberBtn').addEventListener('click', function() {
+                const memberId = Date.now(); // ID único
+                const memberDiv = document.createElement('div');
+                memberDiv.className = 'member-item fade-in';
+                memberDiv.dataset.id = memberId;
+                memberDiv.innerHTML = `
+                    <h6>Integrante</h6>
+                    <button type="button" class="btn-remove remove-member-btn">
+                        <i class="fas fa-trash"></i> Remover
+                    </button>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">Nome:</label>
+                                <input type="text" class="form-control" name="memberName" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Função:</label>
+                                <select class="form-control" name="memberRole" required>
+                                    <option value="" disabled selected>Selecione a função</option>
+                                    <option value="Gerente">Gerente</option>
+                                    <option value="Supervisor">Supervisor</option>
+                                    <option value="Operador">Operador</option>
+                                    <option value="Analista">Analista</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Empresa:</label>
+                                <input type="text" class="form-control" name="memberCompany" required>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="form-label">CIPA:</label>
+                                <select class="form-control" name="memberCipa" required>
+                                    <option value="Sim">Sim</option>
+                                    <option value="Não" selected>Não</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('modalMembersList').appendChild(memberDiv);
+                
+                // Adiciona evento de remoção
+                memberDiv.querySelector('.remove-member-btn').addEventListener('click', function() {
+                    memberDiv.classList.add('fade-out');
+                    setTimeout(() => memberDiv.remove(), 300);
+                });
+            });
+
+            // Adicionar ação - NOVO PADRÃO
+            document.getElementById('addActionBtn').addEventListener('click', function() {
+                const actionId = Date.now(); // ID único
+                const actionDiv = document.createElement('div');
+                actionDiv.className = 'action-item fade-in';
+                actionDiv.dataset.id = actionId;
+                actionDiv.innerHTML = `
+                    <div class="action-header">
+                        <h6>Ação</h6>
+                        <div class="action-status-container">
+                            <button type="button" class="btn-action-status btn-status-andamento" data-status="andamento">
+                                Em Andamento
+                            </button>
+                            <button type="button" class="btn-action-finalizar">
+                                Finalizar Ação
+                            </button>
+                            <button type="button" class="btn-remove remove-action-btn">
+                                <i class="fas fa-trash"></i> Remover
+                            </button>
+                        </div>
+                    </div>
+                    <div class="action-row">
+                        <div class="action-field">
+                            <label class="form-label">Classificação da causa:</label>
+                            <input type="text" class="form-control" name="actionClassification" required>
+                        </div>
+                        <div class="action-field">
+                            <label class="form-label">Causa:</label>
+                            <input type="text" class="form-control" name="actionCause" required>
+                        </div>
+                    </div>
+                    <div class="action-row">
+                        <div class="action-field">
+                            <label class="form-label">O que fazer:</label>
+                            <textarea class="form-control" name="actionWhatToDo" rows="2" required></textarea>
+                        </div>
+                    </div>
+                    <div class="action-row">
+                        <div class="action-field">
+                            <label class="form-label">Responsável:</label>
+                            <input type="text" class="form-control" name="actionResponsible" required>
+                        </div>
+                        <div class="action-field">
+                            <label class="form-label">Prazo:</label>
+                            <input type="date" class="form-control" name="actionDeadline" required>
+                        </div>
+                        <div class="action-field">
+                            <label class="form-label">Status:</label>
+                            <input type="text" class="form-control" name="actionStatus" value="Em andamento" readonly>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('modalActionsList').appendChild(actionDiv);
+                
+                // Adiciona evento de remoção
+                actionDiv.querySelector('.remove-action-btn').addEventListener('click', function() {
+                    actionDiv.classList.add('fade-out');
+                    setTimeout(() => actionDiv.remove(), 300);
+                });
+                
+                // Adiciona evento para finalizar ação
+                actionDiv.querySelector('.btn-action-finalizar').addEventListener('click', function() {
+                    const statusField = actionDiv.querySelector('input[name="actionStatus"]');
+                    statusField.value = "Finalizado";
+                    
+                    const statusBtn = actionDiv.querySelector('.btn-action-status');
+                    statusBtn.textContent = "Finalizado";
+                    statusBtn.className = "btn-action-status btn-status-finalizado";
+                    statusBtn.setAttribute('data-status', 'finalizado');
+                });
+                
+                // Adiciona evento para alterar status
+                actionDiv.querySelector('.btn-action-status').addEventListener('click', function() {
+                    const status = this.getAttribute('data-status');
+                    const statusField = actionDiv.querySelector('input[name="actionStatus"]');
+                    
+                    if (status === 'andamento') {
+                        this.textContent = "Atrasado";
+                        this.className = "btn-action-status btn-status-atrasado";
+                        this.setAttribute('data-status', 'atrasado');
+                        statusField.value = "Atrasado";
+                    } else if (status === 'atrasado') {
+                        this.textContent = "Em andamento";
+                        this.className = "btn-action-status btn-status-andamento";
+                        this.setAttribute('data-status', 'andamento');
+                        statusField.value = "Em andamento";
+                    }
+                    // Status 'finalizado' não pode ser alterado por aqui
+                });
+            });
+
+            // Abre modal de edição
+            function openEditModal(id, data) {
+                currentEditingId = id;
+                currentMembers = data.membrosInvestigacao || [];
+                currentActions = data.acoesImediatas || [];
+                
+                document.getElementById('modalOccurrenceId').textContent = id;
+                
+                // Preenche formulário com os dados
+                const form = document.getElementById('editForm');
+                form.elements['status'].value = data.status || 'open';
+                form.elements['classificacaoCliente'].value = data.classificacaoCliente || 'Sem Classificação';
+                form.elements['classificacaoGZL'].value = data.classificacaoGZL || 'Sem Classificação';
+                form.elements['diasPerdidos'].value = data.diasPerdidos || '';
+                form.elements['diasDebitados'].value = data.diasDebitados || '';
+                form.elements['classificacao'].value = data.classificacao || '';
+                form.elements['processo'].value = data.processo || '';
+                form.elements['maoDeObra'].value = data.maoDeObra || '';
+                form.elements['metodo'].value = data.metodo || '';
+                form.elements['material'].value = data.material || '';
+                form.elements['localAreaTrabalho'].value = data.localAreaTrabalho || '';
+                form.elements['meioAmbiente'].value = data.meioAmbiente || '';
+                form.elements['gestao'].value = data.gestao || '';
+                form.elements['maquina'].value = data.maquina || '';
+                form.elements['causasRaizes'].value = data.causasRaizes || '';
+                
+                // Dados originais (somente leitura)
+                form.elements['unidade'].value = data.unidade || '';
+                form.elements['dataOcorrido'].value = data.dataOcorrido || '';
+                form.elements['nomeEnvolvido'].value = data.nomeEnvolvido || '';
+                form.elements['tempoEmpresa'].value = data.tempoEmpresa || '';
+                form.elements['jornadaTrabalho'].value = data.jornadaTrabalho || '';
+                form.elements['tipoColaborador'].value = data.tipoColaborador || '';
+                form.elements['descricaoOcorrencia'].value = data.descricaoOcorrencia || '';
+
+                // Preenche membros da investigação (editáveis)
+                const membersList = document.getElementById('modalMembersList');
+                membersList.innerHTML = '';
+                if (currentMembers.length > 0) {
+                    currentMembers.forEach((member, index) => {
+                        const memberDiv = document.createElement('div');
+                        memberDiv.className = 'member-item fade-in';
+                        memberDiv.innerHTML = `
+                            <h6>Integrante ${index + 1}</h6>
+                            <button type="button" class="btn-remove remove-member-btn">
+                                <i class="fas fa-trash"></i> Remover
+                            </button>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Nome:</label>
+                                        <input type="text" class="form-control" name="memberName" value="${member.nome || ''}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="form-label">Função:</label>
+                                        <select class="form-control" name="memberRole" required>
+                                            <option value="Gerente" ${member.funcao === 'Gerente' ? 'selected' : ''}>Gerente</option>
+                                            <option value="Supervisor" ${member.funcao === 'Supervisor' ? 'selected' : ''}>Supervisor</option>
+                                            <option value="Operador" ${member.funcao === 'Operador' ? 'selected' : ''}>Operador</option>
+                                            <option value="Analista" ${member.funcao === 'Analista' ? 'selected' : ''}>Analista</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="form-label">Empresa:</label>
+                                        <input type="text" class="form-control" name="memberCompany" value="${member.empresa || ''}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label class="form-label">CIPA:</label>
+                                        <select class="form-control" name="memberCipa" required>
+                                            <option value="Sim" ${member.cipa === 'Sim' ? 'selected' : ''}>Sim</option>
+                                            <option value="Não" ${member.cipa === 'Não' || !member.cipa ? 'selected' : ''}>Não</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        membersList.appendChild(memberDiv);
+                        
+                        // Adiciona evento de remoção
+                        memberDiv.querySelector('.remove-member-btn').addEventListener('click', function() {
+                            memberDiv.classList.add('fade-out');
+                            setTimeout(() => memberDiv.remove(), 300);
+                        });
+                    });
+                }
+
+                // Preenche ações (editáveis) - NOVO PADRÃO
+                const actionsList = document.getElementById('modalActionsList');
+                actionsList.innerHTML = '';
+                if (currentActions.length > 0) {
+                    currentActions.forEach((action, index) => {
+                        const actionStatus = action.status || 'andamento';
+                        let statusClass = 'btn-status-andamento';
+                        let statusText = 'Em andamento';
+                        
+                        if (actionStatus === 'finalizado') {
+                            statusClass = 'btn-status-finalizado';
+                            statusText = 'Finalizado';
+                        } else if (actionStatus === 'atrasado') {
+                            statusClass = 'btn-status-atrasado';
+                            statusText = 'Atrasado';
+                        }
+                        
+                        const actionDiv = document.createElement('div');
+                        actionDiv.className = 'action-item fade-in';
+                        actionDiv.innerHTML = `
+                            <div class="action-header">
+                                <h6>Ação ${index + 1}</h6>
+                                <div class="action-status-container">
+                                    <button type="button" class="btn-action-status ${statusClass}" data-status="${actionStatus}">
+                                        ${statusText}
+                                    </button>
+                                    ${actionStatus !== 'finalizado' ? 
+                                        `<button type="button" class="btn-action-finalizar">
+                                            Finalizar Ação
+                                        </button>` : ''
+                                    }
+                                    <button type="button" class="btn-remove remove-action-btn">
+                                        <i class="fas fa-trash"></i> Remover
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="action-row">
+                                <div class="action-field">
+                                    <label class="form-label">Classificação da causa:</label>
+                                    <input type="text" class="form-control" name="actionClassification" value="${action.classificacao || ''}" required>
+                                </div>
+                                <div class="action-field">
+                                    <label class="form-label">Causa:</label>
+                                    <input type="text" class="form-control" name="actionCause" value="${action.causa || ''}" required>
+                                </div>
+                            </div>
+                            <div class="action-row">
+                                <div class="action-field">
+                                    <label class="form-label">O que fazer:</label>
+                                    <textarea class="form-control" name="actionWhatToDo" rows="2" required>${action.whatToDo || ''}</textarea>
+                                </div>
+                            </div>
+                            <div class="action-row">
+                                <div class="action-field">
+                                    <label class="form-label">Responsável:</label>
+                                    <input type="text" class="form-control" name="actionResponsible" value="${action.responsavel || ''}" required>
+                                </div>
+                                <div class="action-field">
+                                    <label class="form-label">Prazo:</label>
+                                    <input type="date" class="form-control" name="actionDeadline" value="${action.prazo || ''}" required>
+                                </div>
+                                <div class="action-field">
+                                    <label class="form-label">Status:</label>
+                                    <input type="text" class="form-control" name="actionStatus" value="${statusText}" readonly>
+                                </div>
+                            </div>
+                        `;
+                        actionsList.appendChild(actionDiv);
+                        
+                        // Adiciona evento de remoção
+                        actionDiv.querySelector('.remove-action-btn').addEventListener('click', function() {
+                            actionDiv.classList.add('fade-out');
+                            setTimeout(() => actionDiv.remove(), 300);
+                        });
+                        
+                        // Adiciona evento para finalizar ação (se não estiver finalizada)
+                        if (actionStatus !== 'finalizado') {
+                            actionDiv.querySelector('.btn-action-finalizar').addEventListener('click', function() {
+                                const statusField = actionDiv.querySelector('input[name="actionStatus"]');
+                                statusField.value = "Finalizado";
+                                
+                                const statusBtn = actionDiv.querySelector('.btn-action-status');
+                                statusBtn.textContent = "Finalizado";
+                                statusBtn.className = "btn-action-status btn-status-finalizado";
+                                statusBtn.setAttribute('data-status', 'finalizado');
+                                
+                                // Remove o botão de finalizar
+                                this.remove();
+                            });
+                        }
+                        
+                        // Adiciona evento para alterar status (apenas para andamento/atrasado)
+                        if (actionStatus !== 'finalizado') {
+                            actionDiv.querySelector('.btn-action-status').addEventListener('click', function() {
+                                const status = this.getAttribute('data-status');
+                                const statusField = actionDiv.querySelector('input[name="actionStatus"]');
+                                
+                                if (status === 'andamento') {
+                                    this.textContent = "Atrasado";
+                                    this.className = "btn-action-status btn-status-atrasado";
+                                    this.setAttribute('data-status', 'atrasado');
+                                    statusField.value = "Atrasado";
+                                } else if (status === 'atrasado') {
+                                    this.textContent = "Em andamento";
+                                    this.className = "btn-action-status btn-status-andamento";
+                                    this.setAttribute('data-status', 'andamento');
+                                    statusField.value = "Em andamento";
+                                }
+                            });
+                        }
+                    });
+                }
+
+                // Preenche condições típicas
+                const conditionsList = document.getElementById('modalConditionsList');
+                conditionsList.innerHTML = '';
+                if (data.condicaoTipica && data.condicaoTipica.length > 0) {
+                    const conditionsContainer = document.createElement('div');
+                    conditionsContainer.className = 'conditions-list';
+                    data.condicaoTipica.forEach(condition => {
+                        const conditionBadge = document.createElement('span');
+                        conditionBadge.className = 'condition-badge';
+                        conditionBadge.innerHTML = `<i class="fas fa-tag"></i> ${condition}`;
+                        conditionsContainer.appendChild(conditionBadge);
+                    });
+                    conditionsList.appendChild(conditionsContainer);
+                } else {
+                    conditionsList.innerHTML = '<p>Nenhuma condição típica selecionada</p>';
+                }
+                
+                editModal.show();
+            }
+
+            // Salva alterações
+            document.getElementById('saveChangesBtn').addEventListener('click', function() {
+                const form = document.getElementById('editForm');
+                
+                // Coleta dados dos membros
+                const membersData = [];
+                const memberItems = document.querySelectorAll('#modalMembersList .member-item');
+                memberItems.forEach(item => {
+                    membersData.push({
+                        nome: item.querySelector('input[name="memberName"]').value,
+                        funcao: item.querySelector('select[name="memberRole"]').value,
+                        empresa: item.querySelector('input[name="memberCompany"]').value,
+                        cipa: item.querySelector('select[name="memberCipa"]').value
+                    });
+                });
+
+                // Coleta dados das ações - NOVO PADRÃO
+                const actionsData = [];
+                const actionItems = document.querySelectorAll('#modalActionsList .action-item');
+                actionItems.forEach(item => {
+                    const status = item.querySelector('.btn-action-status').getAttribute('data-status');
+                    
+                    actionsData.push({
+                        classificacao: item.querySelector('input[name="actionClassification"]').value,
+                        causa: item.querySelector('input[name="actionCause"]').value,
+                        whatToDo: item.querySelector('textarea[name="actionWhatToDo"]').value,
+                        responsavel: item.querySelector('input[name="actionResponsible"]').value,
+                        prazo: item.querySelector('input[name="actionDeadline"]').value,
+                        status: status
+                    });
+                });
+
+                const formData = {
+                    status: form.elements['status'].value,
+                    classificacaoCliente: form.elements['classificacaoCliente'].value,
+                    classificacaoGZL: form.elements['classificacaoGZL'].value,
+                    diasPerdidos: parseInt(form.elements['diasPerdidos'].value) || 0,
+                    diasDebitados: parseInt(form.elements['diasDebitados'].value) || 0,
+                    classificacao: form.elements['classificacao'].value,
+                    processo: form.elements['processo'].value,
+                    maoDeObra: form.elements['maoDeObra'].value,
+                    metodo: form.elements['metodo'].value,
+                    material: form.elements['material'].value,
+                    meioAmbiente: form.elements['meioAmbiente'].value,
+                    localAreaTrabalho: form.elements['localAreaTrabalho'].value,
+                    gestao: form.elements['gestao'].value,
+                    maquina: form.elements['maquina'].value,
+                    causasRaizes: form.elements['causasRaizes'].value,
+                    membrosInvestigacao: membersData,
+                    acoesImediatas: actionsData,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                const saveBtn = this;
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+
+                db.collection('investigacoes').doc(currentEditingId).update(formData)
+                    .then(() => {
+                        alert('Alterações salvas com sucesso!');
+                        editModal.hide();
+                        loadOccurrences();
+                    })
+                    .catch((error) => {
+                        console.error("Erro ao salvar alterações:", error);
+                        alert('Erro ao salvar alterações. Por favor, tente novamente.');
+                    })
+                    .finally(() => {
+                        saveBtn.disabled = false;
+                        saveBtn.innerHTML = 'Salvar Alterações';
+                    });
+            });
+
+            // Carrega informações do usuário
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    document.getElementById('sidebar-user-name').textContent = user.displayName || user.email;
+                    
+                    firebase.firestore().collection('users').doc(user.uid).get()
+                        .then(doc => {
+                            if (doc.exists) {
+                                document.getElementById('sidebar-user-unit').textContent = doc.data().unit || '';
+                            }
+                        });
+                }
+            });
+
+            // Logout
+            document.getElementById('sidebar-logout-btn').addEventListener('click', function() {
+                firebase.auth().signOut().then(() => {
+                    window.location.href = 'login.html';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

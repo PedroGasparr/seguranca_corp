@@ -3,271 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comunicação de Ocorrência</title>
+    <title>Investigação de Ocorrência</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="icon" href="../img/engenheiro.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/comunicaçãao_ocorrencia.css">
-    <style>
-        :root {
-            --sidebar-width: 280px;
-            --sidebar-bg: #2c3e50;
-            --sidebar-color: #ecf0f1;
-            --sidebar-active-bg: #34495e;
-            --sidebar-hover-bg: #34495e;
-            --info-color: #4895ef;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f7fa;
-        }
-        
-        .app-container {
-            display: flex;
-            min-height: 100vh;
-        }
-        
-        /* Sidebar Styles */
-        .sidebar {
-            width: var(--sidebar-width);
-            background-color: var(--sidebar-bg);
-            color: var(--sidebar-color);
-            display: flex;
-            flex-direction: column;
-            transition: all 0.3s;
-            position: fixed;
-            height: 100vh;
-            z-index: 1000;
-        }
-        
-        .sidebar-header {
-            padding: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .user-avatar {
-        font-size: 2.5rem;
-        color: var(--info-color);
-        }
-        
-        .user-info {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .user-name {
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-        
-        .user-unit {
-            font-size: 0.8rem;
-            opacity: 0.8;
-        }
-        
-        .sidebar-menu {
-            flex: 1;
-            padding: 20px 0;
-            overflow-y: auto;
-        }
-        
-        .sidebar-menu ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .sidebar-menu li {
-            margin-bottom: 5px;
-        }
-        
-        .sidebar-menu li a {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            color: var(--sidebar-color);
-            text-decoration: none;
-            transition: all 0.3s;
-            font-size: 0.95rem;
-        }
-        
-        .sidebar-menu a:hover {
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-        padding-left: 1.75rem;
-        }
-        
-       .sidebar-menu li.active a {
-        background: rgba(67, 97, 238, 0.2);
-        color: white;
-        border-left: 3px solid var(--primary-color);
-        }
-
-        .sidebar-footer {
-        padding: 1rem;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        }
-
-        
-        /* Main Content Styles */
-        .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            padding: 20px;
-            background-color: #f5f7fa;
-            min-height: 100vh;
-        }
-        
-        .content-header {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .content-header h1 {
-            font-size: 1.8rem;
-            margin: 0;
-            color: #2c3e50;
-        }
-        
-        .breadcrumb {
-            font-size: 0.9rem;
-            color: #7f8c8d;
-            margin-top: 5px;
-        }
-        
-        /* Checklist Styles */
-        .checklist-container {
-            background-color: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            margin-bottom: 30px;
-        }
-        
-        .checklist-section {
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .checklist-section h3 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .form-control {
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            padding: 8px 12px;
-        }
-        
-        .form-control:focus {
-            border-color: #4895ef;
-            box-shadow: 0 0 0 0.2rem rgba(72, 149, 239, 0.25);
-        }
-        
-        .checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .checkbox-item input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-        }
-        
-        textarea.form-control {
-            min-height: 100px;
-            resize: vertical;
-        }
-        
-        .image-upload-container {
-            margin-top: 15px;
-        }
-        
-        .image-preview {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .image-preview-item {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            border: 1px dashed #ddd;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        
-        .image-preview-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .remove-image {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background-color: rgba(255, 0, 0, 0.7);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-        
-        .btn-add-image {
-            margin-top: 10px;
-        }
-        
-        .btn-submit {
-            background-color: #2c3e50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-        
-        .btn-submit:hover {
-            background-color: #34495e;
-        }
-        
-    </style>
 </head>
 <body>
     <div class="app-container">
@@ -310,15 +49,15 @@
                         </a>
                     </li>
                     <li class="active">
-                        <a href="#">
+                        <a href="comunicacao_ocorrencia.html">
                             <i class="fas fa-bullhorn"></i>
-                            <span>Comunicação de Ocorrencia</span>
+                            <span>Comunicação de Ocorrência</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#">
+                        <a href="invetigacao.html">
                             <i class="fas fa-search"></i>
-                            <span>Investigação de Ocorrencia</span>
+                            <span>Investigação de Ocorrência</span>
                         </a>
                     </li>
                 </ul>
@@ -339,33 +78,147 @@
         <main class="main-content">
             <div class="content-header">
                 <h1>Comunicação de Ocorrência</h1>
-                <div class="breadcrumb">Checklist • Formulário</div>
+                <div class="breadcrumb">Formulário • Comunicação</div>
             </div>
 
-            <div class="checklist-container">
-                <form id="ocorrenciaForm" action="https://formsubmit.co/pedrogaspar443@gmail.com" method="POST" enctype="multipart/form-data">
+            <div class="form-container">
+                <form id="investigacaoForm" action="https://formsubmit.co/seu-email@exemplo.com" method="POST">
                     
-                    <!-- Seção 1: Informações Básicas -->
-                    <div class="checklist-section">
-                        <h3>1. Informações Básicas</h3>
+                    <!-- Seção 1: Informações Gerais -->
+                    <div class="form-section">
+                        <h3>Informações Gerais</h3>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="unidade" class="form-label">Unidade:</label>
+                                    <input type="text" class="form-control" id="unidade" name="unidade" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="dataOcorrido" class="form-label">Data do Ocorrido:</label>
+                                    <input type="date" class="form-control" id="dataOcorrido" name="dataOcorrido" required>
+                                </div>
+                            </div>
+                        </div>
                         
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="dataOcorrencia">📅 Data da ocorrência:</label>
-                                    <input type="date" class="form-control" id="dataOcorrencia" name="dataOcorrencia" required>
+                                    <label for="diaSemana" class="form-label">Dia da Semana:</label>
+                                    <select class="form-control" id="diaSemana" name="diaSemana" required>
+                                        <option value="">Selecione</option>
+                                        <option value="Segunda-feira">Segunda-feira</option>
+                                        <option value="Terça-feira">Terça-feira</option>
+                                        <option value="Quarta-feira">Quarta-feira</option>
+                                        <option value="Quinta-feira">Quinta-feira</option>
+                                        <option value="Sexta-feira">Sexta-feira</option>
+                                        <option value="Sábado">Sábado</option>
+                                        <option value="Domingo">Domingo</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="horarioOcorrencia">⏰ Horário da ocorrência:</label>
-                                    <input type="time" class="form-control" id="horarioOcorrencia" name="horarioOcorrencia" required>
+                                    <label class="form-label">Reincidente?:</label>
+                                    <div class="checkbox-group">
+                                        <div class="checkbox-item">
+                                            <input type="radio" id="reincidenteSim" name="reincidente" value="Sim" required>
+                                            <label for="reincidenteSim">Sim</label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="radio" id="reincidenteNao" name="reincidente" value="Não">
+                                            <label for="reincidenteNao">Não</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="nomeTecnico">👤 Nome do técnico:</label>
-                                    <input type="text" class="form-control" id="nomeTecnico" name="nomeTecnico"  required>
+                                    <label for="nivel" class="form-label">Nível:</label>
+                                    <select class="form-control" id="nivel" name="nivel" required>
+                                        <option value="">Selecione</option>
+                                        <option value="Incidente">Incidente</option>
+                                        <option value="Leve">Leve</option>
+                                        <option value="Moderado">Moderado</option>
+                                        <option value="Grave">Grave</option>
+                                        <option value="Gravíssimo">Gravíssimo</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-divider"></div>
+                    
+                    <!-- Seção 2: Envolvido -->
+                    <div class="form-section">
+                        <h3>Envolvido</h3>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="nomeEnvolvido" class="form-label">Nome:</label>
+                                    <input type="text" class="form-control" id="nomeEnvolvido" name="nomeEnvolvido" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="tipoOcorrencia" class="form-label">Tipo de Ocorrência:</label>
+                                    <select class="form-control" id="tipoOcorrencia" name="tipoOcorrencia" required>
+                                        <option value="">Selecione</option>
+                                        <option value="Típico">Típico</option>
+                                        <option value="Trajeto">Trajeto</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="tempoEmpresa" class="form-label">Tempo de Empresa:</label>
+                                    <select class="form-control" id="tempoEmpresa" name="tempoEmpresa" required>
+                                        <option value="">Selecione</option>
+                                        <option value="0 a 3 meses">0 a 3 meses</option>
+                                        <option value="3 a 6 meses">3 a 6 meses</option>
+                                        <option value="6 meses a 1 ano">6 meses a 1 ano</option>
+                                        <option value="1 a 2 anos">1 a 2 anos</option>
+                                        <option value="2 a 5 anos">2 a 5 anos</option>
+                                        <option value="5 a 10 anos">5 a 10 anos</option>
+                                        <option value="Mais de 10 anos">Mais de 10 anos</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-label">Jornada de Trabalho:</label>
+                                    <div class="checkbox-group">
+                                        <div class="checkbox-item">
+                                            <input type="radio" id="jornadaNormal" name="jornadaTrabalho" value="Normal" required>
+                                            <label for="jornadaNormal">Normal</label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="radio" id="jornadaExtra" name="jornadaTrabalho" value="Extra">
+                                            <label for="jornadaExtra">Extra</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-label">Tipo de Colaborador:</label>
+                                    <div class="checkbox-group">
+                                        <div class="checkbox-item">
+                                            <input type="radio" id="colaboradorFixo" name="tipoColaborador" value="Fixo" required>
+                                            <label for="colaboradorFixo">Fixo</label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="radio" id="colaboradorIntermitente" name="tipoColaborador" value="Intermitente">
+                                            <label for="colaboradorIntermitente">Intermitente</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -373,265 +226,229 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="emailUsuario">🧾 Email do usuário:</label>
-                                    <input type="email" class="form-control" id="emailUsuario" name="emailUsuario"  required>
+                                    <label for="lesao" class="form-label">Lesão:</label>
+                                    <input type="text" class="form-control" id="lesao" name="lesao">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="localServico">📍 Local do serviço:</label>
-                                    <input type="text" class="form-control" id="localServico" name="localServico" required>
+                                    <label for="parteAtingida" class="form-label">Parte Atingida:</label>
+                                    <select class="form-control" id="parteAtingida" name="parteAtingida">
+                                        <option value="N/A">N/A</option>
+                                        <option value="Cabeça">Cabeça</option>
+                                        <option value="Couro cabeludo">Couro cabeludo</option>
+                                        <option value="Testa">Testa</option>
+                                        <option value="Olho Direito">Olho Direito</option>
+                                        <option value="Olho Esquerdo">Olho Esquerdo</option>
+                                        <option value="Nariz">Nariz</option>
+                                        <option value="Boca">Boca</option>
+                                        <option value="Dente">Dente</option>
+                                        <option value="Língua">Língua</option>
+                                        <option value="Orelha Direita">Orelha Direita</option>
+                                        <option value="Orelha Esquerda">Orelha Esquerda</option>
+                                        <option value="Pescoço">Pescoço</option>
+                                        <option value="Ombro Direito">Ombro Direito</option>
+                                        <option value="Ombro Esquerdo">Ombro Esquerdo</option>
+                                        <option value="Braço Direito">Braço Direito</option>
+                                        <option value="Braço Esquerdo">Braço Esquerdo</option>
+                                        <option value="Cotovelo Direito">Cotovelo Direito</option>
+                                        <option value="Cotovelo Esquerdo">Cotovelo Esquerdo</option>
+                                        <option value="Antebraço Direito">Antebraço Direito</option>
+                                        <option value="Antebraço Esquerdo">Antebraço Esquerdo</option>
+                                        <option value="Pulso Direito">Pulso Direito</option>
+                                        <option value="Pulso Esquerdo">Pulso Esquerdo</option>
+                                        <option value="Mão Direita">Mão Direita</option>
+                                        <option value="Mão Esquerda">Mão Esquerda</option>
+                                        <option value="Dedos da Mão Direita">Dedos da Mão Direita</option>
+                                        <option value="Dedos da Mão Esquerda">Dedos da Mão Esquerda</option>
+                                        <option value="Peito">Peito</option>
+                                        <option value="Costas">Costas</option>
+                                        <option value="Barriga">Barriga</option>
+                                        <option value="Quadril">Quadril</option>
+                                        <option value="Glúteo Direito">Glúteo Direito</option>
+                                        <option value="Glúteo Esquerdo">Glúteo Esquerdo</option>
+                                        <option value="Perna Direita">Perna Direita</option>
+                                        <option value="Perna Esquerda">Perna Esquerda</option>
+                                        <option value="Coxa Direita">Coxa Direita</option>
+                                        <option value="Coxa Esquerda">Coxa Esquerda</option>
+                                        <option value="Joelho Direito">Joelho Direito</option>
+                                        <option value="Joelho Esquerdo">Joelho Esquerdo</option>
+                                        <option value="Panturrilha Direita">Panturrilha Direita</option>
+                                        <option value="Panturrilha Esquerda">Panturrilha Esquerda</option>
+                                        <option value="Tornozelo Direito">Tornozelo Direito</option>
+                                        <option value="Tornozelo Esquerdo">Tornozelo Esquerdo</option>
+                                        <option value="Pé Direito">Pé Direito</option>
+                                        <option value="Pé Esquerdo">Pé Esquerdo</option>
+                                        <option value="Dedos do Pé Direito">Dedos do Pé Direito</option>
+                                        <option value="Dedos do Pé Esquerdo">Dedos do Pé Esquerdo</option>
+                                        <option value="Outros">Outros</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="form-group">
-                            <label for="clienteEnvolvido">🏢 Cliente envolvido:</label>
-                            <input type="text" class="form-control" id="clienteEnvolvido" name="clienteEnvolvido" required>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="horario" class="form-label">Horário:</label>
+                                    <input type="time" class="form-control" id="horario" name="horario" required>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
-                    <!-- Seção 2: Tipo de Serviço Realizado -->
-                    <div class="checklist-section">
-                        <h3>2. Tipo de Serviço Realizado (marque um ou mais)</h3>
+                    <div class="section-divider"></div>
+                    
+                    <!-- Seção 3: Descrição da Ocorrência -->
+                    <div class="form-section">
+                        <h3>Descrição da Ocorrência</h3>
+                        <div class="form-group">
+                            <textarea class="form-control" id="descricaoOcorrencia" name="descricaoOcorrencia" rows="5" required></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="section-divider"></div>
+                    
+                    <!-- Seção 4: Fotos da Ocorrência -->
+                    <div class="form-section">
+                        <h3>Fotos da Ocorrência</h3>
+                        <div class="form-group">
+                            <label for="fotosOcorrencia" class="form-label">Adicionar Fotos:</label>
+                            <input type="file" class="form-control" id="fotosOcorrencia" name="fotosOcorrencia" multiple accept="image/*">
+                            <small class="text-muted">Selecione uma ou mais fotos para anexar ao relatório</small>
+                        </div>
+                        <div class="photo-preview" id="photoPreview"></div>
+                    </div>
+                    
+                    <div class="section-divider"></div>
+                    
+                    <!-- Seção 5: Condição Típica da Ocorrência -->
+                    <div class="form-section">
+                        <h3>Condição Típica da Ocorrência</h3>
                         
                         <div class="checkbox-group">
                             <div class="checkbox-item">
-                                <input type="checkbox" id="segurancaSaude" name="tipoServico" value="Segurança e Saúde do Trabalho">
-                                <label for="segurancaSaude">Segurança e Saúde do Trabalho</label>
+                                <input type="checkbox" id="pressa" name="condicaoTipica" value="Pressa">
+                                <label for="pressa">Pressa</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="manutencao" name="tipoServico" value="Serviço de manutenção (pintura, elétrica, pedreiros)">
-                                <label for="manutencao">Serviço de manutenção (pintura, elétrica, pedreiros)</label>
+                                <input type="checkbox" id="alteracaoEmocional" name="condicaoTipica" value="Alteração emocional">
+                                <label for="alteracaoEmocional">Alteração emocional</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="amarração" name="tipoServico" value="Amarração de carga">
-                                <label for="amarração">Amarração de carga</label>
+                                <input type="checkbox" id="olhosNaTarefa" name="condicaoTipica" value="Olhos na tarefa">
+                                <label for="olhosNaTarefa">Olhos na tarefa</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="enlonamento" name="tipoServico" value="Enlonamento">
-                                <label for="enlonamento">Enlonamento</label>
+                                <input type="checkbox" id="menteNaTarefa" name="condicaoTipica" value="Mente na tarefa">
+                                <label for="menteNaTarefa">Mente na tarefa</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="movimentacao" name="tipoServico" value="Movimentação de produtos no estoque">
-                                <label for="movimentacao">Movimentação de produtos no estoque</label>
+                                <input type="checkbox" id="linhaDeFogo" name="condicaoTipica" value="Linha de fogo">
+                                <label for="linhaDeFogo">Linha de fogo</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="carregamento" name="tipoServico" value="Carregamento">
-                                <label for="carregamento">Carregamento</label>
+                                <input type="checkbox" id="zonaDeRisco" name="condicaoTipica" value="Zona de risco">
+                                <label for="zonaDeRisco">Zona de risco</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="facilities" name="tipoServico" value="Facilities (áreas comuns/administrativas)">
-                                <label for="facilities">Facilities (áreas comuns/administrativas)</label>
+                                <input type="checkbox" id="faltaEquilibrio" name="condicaoTipica" value="Falta de equilíbrio">
+                                <label for="faltaEquilibrio">Falta de equilíbrio</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="retrabalho" name="tipoServico" value="Retrabalho de produtos">
-                                <label for="retrabalho">Retrabalho de produtos</label>
+                                <input type="checkbox" id="falhaMaquina" name="condicaoTipica" value="Falha de máquina">
+                                <label for="falhaMaquina">Falha de máquina</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="pallets" name="tipoServico" value="Conserto/Recuperação/Inspeção de Pallets">
-                                <label for="pallets">Conserto/Recuperação/Inspeção de Pallets</label>
+                                <input type="checkbox" id="procedimento" name="condicaoTipica" value="Procedimento">
+                                <label for="procedimento">Procedimento</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="limpezaEquipamento" name="tipoServico" value="Limpeza com equipamento">
-                                <label for="limpezaEquipamento">Limpeza com equipamento</label>
+                                <input type="checkbox" id="cansaço" name="condicaoTipica" value="Cansaço">
+                                <label for="cansaço">Cansaço</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="limpezaManual" name="tipoServico" value="Limpeza manual">
-                                <label for="limpezaManual">Limpeza manual</label>
+                                <input type="checkbox" id="excessoConfianca" name="condicaoTipica" value="Excesso de confiança">
+                                <label for="excessoConfianca">Excesso de confiança</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="peacao" name="tipoServico" value="Peação de container">
-                                <label for="peacao">Peação de container</label>
+                                <input type="checkbox" id="faltaConhecimento" name="condicaoTipica" value="Falta de conhecimento">
+                                <label for="faltaConhecimento">Falta de conhecimento</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="descarregamento" name="tipoServico" value="Descarregamento">
-                                <label for="descarregamento">Descarregamento</label>
+                                <input type="checkbox" id="falhaProcesso" name="condicaoTipica" value="Falha de processo">
+                                <label for="falhaProcesso">Falha de processo</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="conferencia" name="tipoServico" value="Conferência">
-                                <label for="conferencia">Conferência</label>
+                                <input type="checkbox" id="causaTerceiros" name="condicaoTipica" value="Causa de terceiros">
+                                <label for="causaTerceiros">Causa de terceiros</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="complacencia" name="condicaoTipica" value="Complacência">
+                                <label for="complacencia">Complacência</label>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Seção 3: Natureza da Ocorrência -->
-                    <div class="checklist-section">
-                        <h3>3. Natureza da Ocorrência</h3>
+
+                    <!-- Nova Seção: Ações Imediatas -->
+                    <div class="form-section">
+                        <h3>Ações Imediatas</h3>
                         
-                        <div class="checkbox-group">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="avariaEquipamento" name="naturezaOcorrencia" value="Avaria em equipamento">
-                                <label for="avariaEquipamento">Avaria em equipamento</label>
+                        <div class="actions-container">
+                            <div class="action-form">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="acaoDescricao" class="form-label">Descrição:</label>
+                                            <textarea class="form-control" id="acaoDescricao" rows="3" placeholder="Descreva a ação imediata"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="acaoData" class="form-label">Data:</label>
+                                            <input type="date" class="form-control" id="acaoData">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="acaoResponsavel" class="form-label">Responsável:</label>
+                                            <input type="text" class="form-control" id="acaoResponsavel" placeholder="Nome do responsável">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="acaoArea" class="form-label">Área:</label>
+                                            <input type="text" class="form-control" id="acaoArea" placeholder="Área responsável">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="acaoCargo" class="form-label">Cargo:</label>
+                                            <input type="text" class="form-control" id="acaoCargo" placeholder="Cargo do responsável">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <button type="button" class="btn btn-add" id="btnAddAcao">
+                                    <i class="fas fa-plus"></i> Adicionar Ação
+                                </button>
                             </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="avariaProduto" name="naturezaOcorrencia" value="Avaria em produto">
-                                <label for="avariaProduto">Avaria em produto</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="condicaoInsegura" name="naturezaOcorrencia" value="Condição insegura">
-                                <label for="condicaoInsegura">Condição insegura</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="acessoNaoAutorizado" name="naturezaOcorrencia" value="Acesso não autorizado">
-                                <label for="acessoNaoAutorizado">Acesso não autorizado</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="falhaProcesso" name="naturezaOcorrencia" value="Falha no processo">
-                                <label for="falhaProcesso">Falha no processo</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="faltaEPIs" name="naturezaOcorrencia" value="Falta de EPIs">
-                                <label for="faltaEPIs">Falta de EPIs</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="comportamentoInadequado" name="naturezaOcorrencia" value="Comportamento inadequado">
-                                <label for="comportamentoInadequado">Comportamento inadequado</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="ausenciaCliente" name="naturezaOcorrencia" value="Ausência de cliente ou responsável">
-                                <label for="ausenciaCliente">Ausência de cliente ou responsável</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="faltaMateriais" name="naturezaOcorrencia" value="Falta de materiais">
-                                <label for="faltaMateriais">Falta de materiais</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="faltaMateriais" name="naturezaOcorrencia" value="Falta de materiais">
-                                <label for="Acidente">Acidente</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="faltaMateriais" name="naturezaOcorrencia" value="Falta de materiais">
-                                <label for="Incidente">Incidente</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="outrasNaturezas" name="naturezaOcorrencia" value="Outras">
-                                <label for="outrasNaturezas">Outras (especificar):</label>
-                                <input type="text" id="outrasNaturezasText" name="outrasNaturezasText" class="form-control" style="width: 200px; display: none;">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Seção 4: Descrição da Ocorrência -->
-                    <div class="checklist-section">
-                        <h3>4. Descrição da Ocorrência</h3>
-                        <p>Detalhe claramente o que aconteceu, com nomes, horários e fatos observados:</p>
-                        <div class="form-group">
-                            <textarea class="form-control" id="descricaoOcorrencia" name="descricaoOcorrencia" rows="3" required></textarea>
-                        </div>
-                    </div>
-                    
-                    <!-- Seção 5: Ações Tomadas -->
-                    <div class="checklist-section">
-                        <h3>5. Ações Tomadas</h3>
-                        <div class="form-group">
-                            <label>O que foi feito para conter ou corrigir a situação?</label>
-                            <textarea class="form-control" id="acoesTomadas" name="acoesTomadas" rows="2" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Quem foi informado?</label>
-                            <textarea class="form-control" id="quemFoiInformado" name="quemFoiInformado" rows="2" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Foi necessário interromper o serviço?</label>
-                            <textarea class="form-control" id="interrupcaoServico" name="interrupcaoServico" rows="2" required></textarea>
-                        </div>
-                    </div>
-                    
-                    <!-- Seção 6: Evidências -->
-                    <div class="checklist-section">
-                        <h3>6. Evidências</h3>
-                        
-                        <div class="checkbox-group">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="fotosTiradas" name="evidencias" value="Fotos tiradas">
-                                <label for="fotosTiradas">Fotos tiradas</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="videosGravados" name="evidencias" value="Vídeos gravados">
-                                <label for="videosGravados">Vídeos gravados</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="relatorioTecnico" name="evidencias" value="Relatório técnico anexo">
-                                <label for="relatorioTecnico">Relatório técnico anexo</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="testemunhas" name="evidencias" value="Testemunhas">
-                                <label for="testemunhas">Testemunhas:</label>
-                                <input type="text" id="testemunhasText" name="testemunhasText" class="form-control" style="width: 200px; display: none;">
-                            </div>
-                        </div>
-                        
-                        <div class="image-upload-container">
-                            <label for="imagensOcorrencia">Adicionar imagens:</label>
-                            <input type="file" id="imagensOcorrencia" name="imagensOcorrencia" class="form-control" accept="image/*" multiple>
-                            <button type="button" class="btn btn-primary btn-sm btn-add-image mt-2" id="btnAddMoreImages">
-                                <i class="fas fa-plus"></i> Adicionar mais imagens
-                            </button>
                             
-                            <div class="image-preview" id="imagePreview"></div>
-                        </div>
-                    </div>
-                    
-                    <!-- Seção 7: Situação Atual -->
-                    <div class="checklist-section">
-                        <h3>7. Situação Atual</h3>
-                        
-                        <div class="checkbox-group">
-                            <div class="checkbox-item">
-                                <input type="radio" id="ocorrenciaResolvida" name="situacaoAtual" value="Ocorrência resolvida no local" required>
-                                <label for="ocorrenciaResolvida">Ocorrência resolvida no local</label>
+                            <div class="action-list" id="acoesList">
+                                <!-- As ações adicionadas aparecerão aqui -->
                             </div>
-                            <div class="checkbox-item">
-                                <input type="radio" id="precisaAcompanhamento" name="situacaoAtual" value="Ocorrência precisa de acompanhamento">
-                                <label for="precisaAcompanhamento">Ocorrência precisa de acompanhamento</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="radio" id="servicoInterrompido" name="situacaoAtual" value="Serviço foi interrompido">
-                                <label for="servicoInterrompido">Serviço foi interrompido</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="radio" id="aguardarOrientacao" name="situacaoAtual" value="Aguardar orientação do superior">
-                                <label for="aguardarOrientacao">Aguardar orientação do superior</label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Seção 8: Assinatura -->
-                    <div class="checklist-section">
-                        <h3>8. Assinatura do Técnico</h3>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="nomeCompleto">🖊️ Nome completo:</label>
-                                    <input type="text" class="form-control" id="nomeCompleto" name="nomeCompleto"  required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="dataHoraEnvio">📅 Data/Hora do envio:</label>
-                                    <input type="text" class="form-control" id="dataHoraEnvio" name="dataHoraEnvio" readonly>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Seção de Emails -->
-                    <div class="checklist-section">
-                        <h3>9. Envio por Email</h3>
-                        <div class="form-group">
-                            <label for="emailsDestinatarios">Enviar para (principal):</label>
-                            <input type="email" class="form-control" id="emailsDestinatarios" name="emailsDestinatarios" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="emailsCopia">Cópia (CC - separar por vírgula):</label>
-                            <textarea class="form-control" id="emailsCopia" name="emailsCopia" rows="2" placeholder="email1@exemplo.com, email2@exemplo.com"></textarea>
                         </div>
                     </div>
                     
                     <div class="text-end mt-4">
                         <button type="submit" class="btn btn-submit" id="btnSubmit">
-                            <i class="fas fa-paper-plane"></i> Enviar Comunicação
+                            <i class="fas fa-paper-plane"></i> Enviar Investigação
                         </button>
                     </div>
                 </form>
@@ -644,12 +461,11 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Comunicação Enviada</h5>
+                    <h5 class="modal-title">Investigação Enviada</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Sua comunicação de ocorrência foi enviada com sucesso e salva no sistema.</p>
-                    <p>Um email foi enviado para os destinatários informados.</p>
+                    <p>Sua investigação de ocorrência foi enviada com sucesso and salva no sistema.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
@@ -661,6 +477,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/auth.js"></script>
     <script src="../js/home.js"></script>
@@ -668,207 +485,226 @@
     <script>
         // Inicializa Firebase com as configurações do auth.js
         document.addEventListener('DOMContentLoaded', function() {
-            // Configura a data/hora atual
-            const now = new Date();
-            document.getElementById('dataHoraEnvio').value = now.toLocaleString('pt-BR');
-            
-            // Preenche automaticamente o nome do técnico e email se o usuário estiver logado
+            // Preenche automaticamente a unidade se o usuário estiver logado
             firebase.auth().onAuthStateChanged((user) => {
                 if (user) {
-                    document.getElementById('emailUsuario').value = user.email || '';
+                    firebase.firestore().collection('users').doc(user.uid).get()
+                        .then(doc => {
+                            if (doc.exists) {
+                                const userData = doc.data();
+                                document.getElementById('unidade').value = userData.unit || '';
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Erro ao buscar unidade:", error);
+                        });
                 }
             });
-                firebase.auth().onAuthStateChanged((user) => {
-                    if (user) {
-                        firebase.firestore().collection('users').doc(user.uid).get()
-                            .then(doc => {
-                                if (doc.exists) {
-                                    const userData = doc.data();
-                                    document.getElementById('localServico').value = userData.unit || '';
-                                }
-                            })
-                            .catch(error => {
-                                console.error("Erro ao buscar unidade:", error);
-                            });
-                    }
-                });
 
-                firebase.auth().onAuthStateChanged((user) => {
-                    if (user) {
-                        firebase.firestore().collection('users').doc(user.uid).get()
-                            .then(doc => {
-                                if (doc.exists) {
-                                    const userData = doc.data();
-                                    document.getElementById('nomeTecnico').value = userData.name || '';
-                                    document.getElementById('nomeCompleto').value = userData.name || '';
-                                }
-                            })
-                            .catch(error => {
-                                console.error("Erro ao buscar unidade:", error);
-                            });
-                    }
-                });
+            // Gera ID único baseado na data e número aleatório
+            function generateUniqueId() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const randomNum = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+                return `${year}${month}${day}${randomNum}`;
+            }
+
+            // Manipulação de fotos
+            const photoInput = document.getElementById('fotosOcorrencia');
+            const photoPreview = document.getElementById('photoPreview');
+            const fotosBase64 = [];
             
-            // Mostra campo de texto quando "Outras" for selecionada
-            document.getElementById('outrasNaturezas').addEventListener('change', function() {
-                document.getElementById('outrasNaturezasText').style.display = this.checked ? 'inline-block' : 'none';
-                if (!this.checked) {
-                    document.getElementById('outrasNaturezasText').value = '';
-                }
-            });
-            
-            // Mostra campo de texto quando "Testemunhas" for selecionada
-            document.getElementById('testemunhas').addEventListener('change', function() {
-                document.getElementById('testemunhasText').style.display = this.checked ? 'inline-block' : 'none';
-                if (!this.checked) {
-                    document.getElementById('testemunhasText').value = '';
-                }
-            });
-            
-            // Preview de imagens
-            document.getElementById('imagensOcorrencia').addEventListener('change', function(e) {
-                const preview = document.getElementById('imagePreview');
-                preview.innerHTML = '';
+            photoInput.addEventListener('change', function(e) {
+                const files = e.target.files;
+                photoPreview.innerHTML = '';
+                fotosBase64.length = 0;
                 
-                if (this.files) {
-                    [].forEach.call(this.files, readAndPreview);
-                }
-                
-                function readAndPreview(file) {
-                    if (!/\.(jpe?g|png|gif)$/i.test(file.name)) {
-                        return alert(file.name + " não é uma imagem válida.");
-                    }
-                    
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
                     const reader = new FileReader();
                     
-                    reader.addEventListener("load", function() {
-                        const previewItem = document.createElement('div');
-                        previewItem.className = 'image-preview-item';
+                    reader.onload = function(event) {
+                        const photoDiv = document.createElement('div');
+                        photoDiv.className = 'photo-preview-item';
+                        photoDiv.innerHTML = `
+                            <img src="${event.target.result}" alt="Preview">
+                            <button type="button" class="remove-photo" data-index="${i}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `;
+                        photoPreview.appendChild(photoDiv);
                         
-                        const img = document.createElement('img');
-                        img.src = this.result;
-                        
-                        const removeBtn = document.createElement('button');
-                        removeBtn.className = 'remove-image';
-                        removeBtn.innerHTML = '&times;';
-                        removeBtn.addEventListener('click', function() {
-                            previewItem.remove();
+                        // Adiciona evento de remoção
+                        photoDiv.querySelector('.remove-photo').addEventListener('click', function() {
+                            photoDiv.remove();
+                            fotosBase64.splice(i, 1);
                         });
                         
-                        previewItem.appendChild(img);
-                        previewItem.appendChild(removeBtn);
-                        preview.appendChild(previewItem);
-                    });
+                        // Armazena a imagem como base64
+                        fotosBase64.push(event.target.result.split(',')[1]);
+                    };
                     
                     reader.readAsDataURL(file);
                 }
             });
+
+            // Gerenciamento de Ações Imediatas
+            const acoesList = document.getElementById('acoesList');
+            const acoes = [];
             
-            // Adicionar mais imagens
-            document.getElementById('btnAddMoreImages').addEventListener('click', function() {
-                document.getElementById('imagensOcorrencia').click();
+            document.getElementById('btnAddAcao').addEventListener('click', function() {
+                const descricao = document.getElementById('acaoDescricao').value;
+                const data = document.getElementById('acaoData').value;
+                const responsavel = document.getElementById('acaoResponsavel').value;
+                const area = document.getElementById('acaoArea').value;
+                const cargo = document.getElementById('acaoCargo').value;
+                
+                if (!descricao || !data || !responsavel || !area || !cargo) {
+                    alert('Por favor, preencha todos os campos da ação.');
+                    return;
+                }
+                
+                // Cria um ID único para a ação
+                const acaoId = Date.now().toString();
+                
+                // Adiciona a ação à lista
+                acoes.push({
+                    id: acaoId,
+                    descricao: descricao,
+                    data: data,
+                    responsavel: responsavel,
+                    area: area,
+                    cargo: cargo
+                });
+                
+                // Atualiza a visualização
+                renderAcoes();
+                
+                // Limpa os campos do formulário
+                document.getElementById('acaoDescricao').value = '';
+                document.getElementById('acaoData').value = '';
+                document.getElementById('acaoResponsavel').value = '';
+                document.getElementById('acaoArea').value = '';
+                document.getElementById('acaoCargo').value = '';
             });
             
+            function renderAcoes() {
+                acoesList.innerHTML = '';
+                
+                acoes.forEach(acao => {
+                    const acaoElement = document.createElement('div');
+                    acaoElement.className = 'action-card';
+                    acaoElement.innerHTML = `
+                        <div class="action-card-header">
+                            <h4 class="action-title">Ação</h4>
+                            <button type="button" class="btn-remove remove-acao" data-id="${acao.id}">
+                                <i class="fas fa-trash"></i> Remover
+                            </button>
+                        </div>
+                        <div class="action-details">
+                            <p><strong>Descrição:</strong> ${acao.descricao}</p>
+                        </div>
+                        <div class="action-meta">
+                            <span><i class="fas fa-calendar"></i> <strong>Data:</strong> ${formatDate(acao.data)}</span>
+                            <span><i class="fas fa-user"></i> <strong>Responsável:</strong> ${acao.responsavel}</span>
+                            <span><i class="fas fa-building"></i> <strong>Área:</strong> ${acao.area}</span>
+                            <span><i class="fas fa-briefcase"></i> <strong>Cargo:</strong> ${acao.cargo}</span>
+                        </div>
+                    `;
+                    acoesList.appendChild(acaoElement);
+                });
+                
+                // Adiciona eventos de remoção
+                document.querySelectorAll('.remove-acao').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        const index = acoes.findIndex(a => a.id === id);
+                        if (index !== -1) {
+                            acoes.splice(index, 1);
+                            renderAcoes();
+                        }
+                    });
+                });
+            }
+            
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('pt-BR');
+            }
+
             // Envio do formulário
-            document.getElementById('ocorrenciaForm').addEventListener('submit', function(e) {
+            document.getElementById('investigacaoForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 
                 const submitBtn = document.getElementById('btnSubmit');
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
 
+                // Gera ID único para a investigação
+                const investigacaoId = generateUniqueId();
+
                 // Coleta todos os dados do formulário
                 const formData = new FormData(this);
-                const ocorrenciaData = {
-                    dataOcorrencia: formData.get('dataOcorrencia'),
-                    horarioOcorrencia: formData.get('horarioOcorrencia'),
-                    nomeTecnico: formData.get('nomeTecnico'),
-                    emailUsuario: formData.get('emailUsuario'),
-                    localServico: formData.get('localServico'),
-                    clienteEnvolvido: formData.get('clienteEnvolvido'),
-                    tipoServico: Array.from(document.querySelectorAll('input[name="tipoServico"]:checked')).map(el => el.value),
-                    naturezaOcorrencia: Array.from(document.querySelectorAll('input[name="naturezaOcorrencia"]:checked')).map(el => {
-                        return el.id === 'outrasNaturezas' ? 
-                            `Outras: ${document.getElementById('outrasNaturezasText').value}` : 
-                            el.value;
-                    }),
+                const investigacaoData = {
+                    id: investigacaoId,
+                    unidade: formData.get('unidade'),
+                    dataOcorrido: formData.get('dataOcorrido'),
+                    diaSemana: formData.get('diaSemana'),
+                    reincidente: formData.get('reincidente'),
+                    nivel: formData.get('nivel'),
+                    nomeEnvolvido: formData.get('nomeEnvolvido'),
+                    tipoOcorrencia: formData.get('tipoOcorrencia'),
+                    tempoEmpresa: formData.get('tempoEmpresa'),
+                    jornadaTrabalho: formData.get('jornadaTrabalho'),
+                    tipoColaborador: formData.get('tipoColaborador'),
+                    lesao: formData.get('lesao'),
+                    parteAtingida: formData.get('parteAtingida'),
+                    horario: formData.get('horario'),
                     descricaoOcorrencia: formData.get('descricaoOcorrencia'),
-                    acoesTomadas: formData.get('acoesTomadas'),
-                    quemFoiInformado: formData.get('quemFoiInformado'),
-                    interrupcaoServico: formData.get('interrupcaoServico'),
-                    evidencias: Array.from(document.querySelectorAll('input[name="evidencias"]:checked')).map(el => {
-                        return el.id === 'testemunhas' ? 
-                            `Testemunhas: ${document.getElementById('testemunhasText').value}` : 
-                            el.value;
-                    }),
-                    situacaoAtual: document.querySelector('input[name="situacaoAtual"]:checked').value,
-                    nomeCompleto: formData.get('nomeCompleto'),
-                    dataHoraEnvio: formData.get('dataHoraEnvio'),
-                    emailsDestinatarios: formData.get('emailsDestinatarios'),
-                    emailsCopia: formData.get('emailsCopia'),
+                    condicaoTipica: Array.from(document.querySelectorAll('input[name="condicaoTipica"]:checked')).map(el => el.value),
+                    acoesImediatas: acoes,
+                    fotos: fotosBase64,
                     userId: firebase.auth().currentUser.uid,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
-                // Processa as imagens
-                const files = document.getElementById('imagensOcorrencia').files;
-                const imagensPromises = [];
-                
-                if (files && files.length > 0) {
-                    for (let i = 0; i < files.length; i++) {
-                        const file = files[i];
-                        imagensPromises.push(new Promise((resolve) => {
-                            const reader = new FileReader();
-                            reader.onload = (e) => {
-                                resolve(e.target.result);
-                            };
-                            reader.readAsDataURL(file);
-                        }));
-                    }
-                }
-
-                // Aguarda todas as imagens serem processadas
-                Promise.all(imagensPromises).then((imagensBase64) => {
-                    ocorrenciaData.imagens = imagensBase64;
-                    
-                    // Salva no Firestore
-                    firebase.firestore().collection('comunicacao').add(ocorrenciaData)
-                        .then((docRef) => {
-                            console.log('Documento salvo com ID:', docRef.id);
-                            
-                            // Envia o email via FormSubmit SEM redirecionamento
-                            const emailFormData = new FormData(document.getElementById('ocorrenciaForm'));
-                            emailFormData.append('_captcha', 'false');
-                            emailFormData.append('_template', 'table');
-                            
-                            fetch('https://formsubmit.co/ajax/pedrogaspar443@gmail.com', {
-                                method: 'POST',
-                                body: emailFormData
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                // Mostra modal de confirmação
-                                const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
-                                modal.show();
-                                
-                                // Limpa o formulário
-                                document.getElementById('ocorrenciaForm').reset();
-                                document.getElementById('imagePreview').innerHTML = '';
-                            })
-                            .catch(error => {
-                                console.error('Erro ao enviar email:', error);
-                                alert('Ocorreu um erro ao enviar o email, mas os dados foram salvos.');
-                            });
+                // Salva no Firestore
+                firebase.firestore().collection('investigacoes').doc(investigacaoId).set(investigacaoData)
+                    .then(() => {
+                        console.log('Documento salvo com ID:', investigacaoId);
+                        
+                        // Envia o email via FormSubmit
+                        fetch('https://formsubmit.co/ajax/seu-email@exemplo.com', {
+                            method: 'POST',
+                            body: new FormData(document.getElementById('investigacaoForm'))
                         })
-                        .catch((error) => {
-                            console.error('Erro ao salvar documento:', error);
-                            alert('Ocorreu um erro ao salvar a comunicação. Por favor, tente novamente.');
+                        .then(response => response.json())
+                        .then(data => {
+                            // Mostra modal de confirmação
+                            const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                            modal.show();
+                            
+                            // Limpa o formulário
+                            document.getElementById('investigacaoForm').reset();
+                            document.getElementById('photoPreview').innerHTML = '';
+                            acoes.length = 0;
+                            renderAcoes();
                         })
-                        .finally(() => {
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Comunicação';
+                        .catch(error => {
+                            console.error('Erro ao enviar email:', error);
+                            alert('Ocorreu um erro ao enviar o email, mas os dados foram salvos.');
                         });
-                });
+                    })
+                    .catch((error) => {
+                        console.error('Erro ao salvar documento:', error);
+                        alert('Ocorreu um erro ao salvar a investigação. Por favor, tente novamente.');
+                    })
+                    .finally(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Investigação';
+                    });
             });
         });
     </script>
