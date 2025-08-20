@@ -7,6 +7,63 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../css/Investigacao.css">
+    <style>
+        /* Estilos CSS existentes (mantidos por brevidade) */
+       
+        
+       
+        
+        .download-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            margin-left: 10px;
+        }
+        
+        .download-btn i {
+            margin-right: 5px;
+        }
+        
+        .download-btn:hover {
+            background: #388E3C;
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .sidebar-toggle {
+                display: block;
+            }
+            
+            .action-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        /* Estilo para o botão de download na lista de ocorrências */
+        .occurrence-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
     <button class="sidebar-toggle" id="sidebarToggle">
@@ -378,13 +435,19 @@
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="../js/auth.js"></script>
     
     <script>
+        // Inicializa o jsPDF
+        window.jsPDF = window.jspdf.jsPDF;
+
         document.addEventListener('DOMContentLoaded', function() {
             const db = firebase.firestore();
             const editModal = new bootstrap.Modal(document.getElementById('editModal'));
@@ -480,9 +543,22 @@
                                 <span class="status-badge ${statusClass}">${statusText}</span>
                                 ${classificacaoHtml}
                             </div>
+                            <div class="occurrence-actions">
+                                <button class="download-btn" data-id="${occurrenceId}">
+                                    <i class="fas fa-download"></i> Baixar PDF
+                                </button>
+                            </div>
                         `;
                         
-                        occurrenceItem.addEventListener('click', () => openEditModal(occurrenceId, data));
+                        // Adiciona evento para abrir modal de edição
+                        occurrenceItem.querySelector('h5, .occurrence-meta').addEventListener('click', () => openEditModal(occurrenceId, data));
+                        
+                        // Adiciona evento para download do PDF
+                        occurrenceItem.querySelector('.download-btn').addEventListener('click', (e) => {
+                            e.stopPropagation(); // Impede que o evento propague para o item pai
+                            generatePDF(occurrenceId, data);
+                        });
+                        
                         resultsContainer.appendChild(occurrenceItem);
                     });
 
@@ -493,6 +569,205 @@
                     console.error("Erro ao carregar ocorrências:", error);
                     resultsContainer.innerHTML = '<p class="text-center py-5 text-danger">Erro ao carregar ocorrências</p>';
                 });
+            }
+
+            // Função para gerar PDF da ocorrência
+            async function generatePDF(occurrenceId, data) {
+                try {
+                    console.log("Iniciando geração de PDF para ocorrência:", occurrenceId);
+                    
+                    // Cria uma instância do jsPDF
+                    const doc = new jsPDF();
+                    
+                    // Adiciona título
+                    doc.setFontSize(18);
+                    doc.text('Relatório de Ocorrência', 105, 15, { align: 'center' });
+                    doc.setFontSize(12);
+                    doc.text(`ID: ${occurrenceId}`, 105, 22, { align: 'center' });
+                    
+                    // Adiciona linha separadora
+                    doc.line(10, 25, 200, 25);
+                    
+                    let yPosition = 35;
+                    
+                    // Informações básicas
+                    doc.setFontSize(14);
+                    doc.setTextColor(40, 40, 40);
+                    doc.text('Informações Básicas', 14, yPosition);
+                    yPosition += 10;
+                    
+                    doc.setFontSize(10);
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(`Unidade: ${data.unidade || 'N/A'}`, 14, yPosition);
+                    doc.text(`Envolvido: ${data.nomeEnvolvido || 'N/A'}`, 14, yPosition + 5);
+                    doc.text(`Data do Ocorrido: ${data.dataOcorrido || 'N/A'}`, 14, yPosition + 10);
+                    doc.text(`Status: ${data.status === 'closed' ? 'Finalizado' : 'Aberto'}`, 14, yPosition + 15);
+                    doc.text(`Classificação: ${data.classificacao || 'N/A'}`, 14, yPosition + 20);
+                    yPosition += 30;
+                    
+                    // Descrição da ocorrência
+                    if (data.descricaoOcorrencia) {
+                        doc.setFontSize(14);
+                        doc.setTextColor(40, 40, 40);
+                        doc.text('Descrição da Ocorrência', 14, yPosition);
+                        yPosition += 7;
+                        
+                        doc.setFontSize(10);
+                        doc.setTextColor(0, 0, 0);
+                        const splitDesc = doc.splitTextToSize(data.descricaoOcorrencia, 180);
+                        doc.text(splitDesc, 14, yPosition);
+                        yPosition += (splitDesc.length * 5) + 10;
+                    }
+                    
+                    // Análise de Causa Raiz
+                    if (data.causasRaizes || data.processo || data.maoDeObra || data.metodo || 
+                        data.material || data.meioAmbiente || data.localAreaTrabalho || 
+                        data.gestao || data.maquina) {
+                        doc.setFontSize(14);
+                        doc.setTextColor(40, 40, 40);
+                        doc.text('Análise de Causa Raiz', 14, yPosition);
+                        yPosition += 10;
+                        
+                        doc.setFontSize(10);
+                        doc.setTextColor(0, 0, 0);
+                        
+                        if (data.causasRaizes) {
+                            doc.text('Causa Raiz:', 14, yPosition);
+                            const splitCausas = doc.splitTextToSize(data.causasRaizes, 180);
+                            doc.text(splitCausas, 20, yPosition + 5);
+                            yPosition += (splitCausas.length * 5) + 10;
+                        }
+                        
+                        // Adiciona outras análises se existirem
+                        const analises = [
+                            { title: 'Medição/Quantificação', value: data.processo },
+                            { title: 'Mão de Obra', value: data.maoDeObra },
+                            { title: 'Método', value: data.metodo },
+                            { title: 'Material', value: data.material },
+                            { title: 'Meio Ambiente', value: data.meioAmbiente },
+                            { title: 'Local/Área de trabalho', value: data.localAreaTrabalho },
+                            { title: 'Gestão', value: data.gestao },
+                            { title: 'Máquina/Ferramenta/Equipamento', value: data.maquina }
+                        ];
+                        
+                        for (const analise of analises) {
+                            if (analise.value) {
+                                doc.text(`${analise.title}:`, 14, yPosition);
+                                const splitText = doc.splitTextToSize(analise.value, 180);
+                                doc.text(splitText, 20, yPosition + 5);
+                                yPosition += (splitText.length * 5) + 10;
+                                
+                                // Verifica se precisa de nova página
+                                if (yPosition > 250) {
+                                    doc.addPage();
+                                    yPosition = 20;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Grupo de Investigação
+                    if (data.membrosInvestigacao && data.membrosInvestigacao.length > 0) {
+                        doc.setFontSize(14);
+                        doc.setTextColor(40, 40, 40);
+                        doc.text('Grupo de Investigação', 14, yPosition);
+                        yPosition += 10;
+                        
+                        // Prepara dados para a tabela
+                        const tableData = data.membrosInvestigacao.map(membro => [
+                            membro.nome || 'N/A',
+                            membro.funcao || 'N/A',
+                            membro.empresa || 'N/A',
+                            membro.cipa || 'N/A'
+                        ]);
+                        
+                        // Adiciona tabela
+                        doc.autoTable({
+                            startY: yPosition,
+                            head: [['Nome', 'Função', 'Empresa', 'CIPA']],
+                            body: tableData,
+                            theme: 'grid',
+                            headStyles: { fillColor: [52, 152, 219] },
+                            styles: { fontSize: 8 }
+                        });
+                        
+                        yPosition = doc.lastAutoTable.finalY + 10;
+                    }
+                    
+                    // Plano de Ação
+                    if (data.acoesImediatas && data.acoesImediatas.length > 0) {
+                        doc.setFontSize(14);
+                        doc.setTextColor(40, 40, 40);
+                        doc.text('Plano de Ação', 14, yPosition);
+                        yPosition += 10;
+                        
+                        // Prepara dados para a tabela
+                        const tableData = data.acoesImediatas.map(acao => [
+                            acao.classificacao || 'N/A',
+                            acao.causa || 'N/A',
+                            acao.whatToDo || 'N/A',
+                            acao.responsavel || 'N/A',
+                            acao.prazo || 'N/A',
+                            acao.status === 'finalizado' ? 'Finalizado' : 
+                            acao.status === 'atrasado' ? 'Atrasado' : 'Em andamento'
+                        ]);
+                        
+                        // Adiciona tabela
+                        doc.autoTable({
+                            startY: yPosition,
+                            head: [['Classificação', 'Causa', 'O que fazer', 'Responsável', 'Prazo', 'Status']],
+                            body: tableData,
+                            theme: 'grid',
+                            headStyles: { fillColor: [52, 152, 219] },
+                            styles: { fontSize: 7 },
+                            columnStyles: {
+                                2: { cellWidth: 40 }, // O que fazer
+                                5: { cellWidth: 20 }  // Status
+                            }
+                        });
+                        
+                        yPosition = doc.lastAutoTable.finalY + 10;
+                    }
+                    
+                    // Verifica se há fotos para adicionar
+                    if (data.fotos && data.fotos.length > 0) {
+                        // Adiciona nova página para fotos
+                        doc.addPage();
+                        yPosition = 20;
+                        
+                        doc.setFontSize(14);
+                        doc.setTextColor(40, 40, 40);
+                        doc.text('Fotos da Ocorrência', 14, yPosition);
+                        yPosition += 10;
+                        
+                        doc.setFontSize(10);
+                        doc.setTextColor(0, 0, 0);
+                        doc.text(`Total de fotos: ${data.fotos.length}`, 14, yPosition);
+                        yPosition += 10;
+                        
+                        // Adiciona informações sobre as fotos
+                        doc.text('As fotos em formato base64 estão associadas a esta ocorrência.', 14, yPosition);
+                        yPosition += 10;
+                        
+                        // Adiciona nota sobre como acessar as fotos
+                        doc.text('Nota: Para visualizar as imagens, acesse o sistema online.', 14, yPosition);
+                    }
+                    
+                    // Adiciona data e hora de geração
+                    doc.addPage();
+                    doc.setFontSize(10);
+                    doc.setTextColor(100, 100, 100);
+                    const now = new Date();
+                    doc.text(`Relatório gerado em: ${now.toLocaleDateString()} às ${now.toLocaleTimeString()}`, 14, 20);
+                    
+                    // Salva o PDF
+                    doc.save(`ocorrencia_${occurrenceId}.pdf`);
+                    console.log("PDF gerado com sucesso!");
+                    
+                } catch (error) {
+                    console.error("Erro ao gerar PDF:", error);
+                    alert("Erro ao gerar o PDF. Por favor, tente novamente.");
+                }
             }
 
             // Adicionar membro ao grupo de investigação
