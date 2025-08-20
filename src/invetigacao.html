@@ -7,63 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../css/Investigacao.css">
-    <style>
-        /* Estilos CSS existentes (mantidos por brevidade) */
-       
-        
-       
-        
-        .download-btn {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            margin-left: 10px;
-        }
-        
-        .download-btn i {
-            margin-right: 5px;
-        }
-        
-        .download-btn:hover {
-            background: #388E3C;
-        }
-        
-        @media (max-width: 992px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-            }
-            
-            .sidebar-toggle {
-                display: block;
-            }
-            
-            .action-row {
-                flex-direction: column;
-                gap: 10px;
-            }
-        }
-
-        /* Estilo para o botão de download na lista de ocorrências */
-        .occurrence-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 10px;
-        }
-    </style>
 </head>
 <body>
     <button class="sidebar-toggle" id="sidebarToggle">
@@ -242,6 +185,7 @@
                                             <option value="CAF">CAF</option>
                                             <option value="SAF">SAF</option>
                                             <option value="OSA">OSA</option>
+                                            <option value="DANOS MATERIAIS">DANOS MATERIAIS</option>
                                             <option value="INCIDENTE">INCIDENTE</option>
                                         </select>
                                     </div>
@@ -397,22 +341,76 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Data de Nascimento:</label>
+                                        <input type="text" class="form-control" name="dataNascimento" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Faixa Etária:</label>
+                                        <input type="text" class="form-control" name="faixaEtaria" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Função:</label>
+                                        <input type="text" class="form-control" name="funcao" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Data de Admissão:</label>
+                                        <input type="text" class="form-control" name="dataAdmissao" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="form-label">Tempo de Empresa:</label>
                                         <input type="text" class="form-control" name="tempoEmpresa" readonly>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Horas Trabalhadas:</label>
+                                        <input type="text" class="form-control" name="horasTrabalhadas" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="form-label">Jornada:</label>
                                         <input type="text" class="form-control" name="jornadaTrabalho" readonly>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="form-label">Tipo Colaborador:</label>
                                         <input type="text" class="form-control" name="tipoColaborador" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Horário do Ocorrido:</label>
+                                        <input type="text" class="form-control" name="horario" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Lesão:</label>
+                                        <input type="text" class="form-control" name="lesao" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Parte Atingida:</label>
+                                        <input type="text" class="form-control" name="parteAtingida" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -442,9 +440,23 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    <script src="../js/auth.js"></script>
     
     <script>
+        // Inicialização do Firebase (substitua com suas configurações)
+        const firebaseConfig = {
+        apiKey: "AIzaSyDZwa4XNqlupNDLs7-CRQbhr5pRT4NyFBA",
+        authDomain: "application-gzl.firebaseapp.com",
+        databaseURL: "https://application-gzl-default-rtdb.firebaseio.com",
+        projectId: "application-gzl",
+        storageBucket: "application-gzl.appspot.com",
+        messagingSenderId: "319900903265",
+        appId: "1:319900903265:web:a8f400aeb7a697fc168720",
+        measurementId: "G-ZRRFQZXT54"
+        };
+        
+        // Inicializa o Firebase
+        firebase.initializeApp(firebaseConfig);
+
         // Inicializa o jsPDF
         window.jsPDF = window.jspdf.jsPDF;
 
@@ -540,6 +552,7 @@
                                 <span><i class="fas fa-building"></i> <strong>Unidade:</strong> ${data.unidade}</span>
                                 <span><i class="fas fa-user"></i> <strong>Envolvido:</strong> ${data.nomeEnvolvido}</span>
                                 <span><i class="fas fa-calendar"></i> <strong>Data:</strong> ${data.dataOcorrido}</span>
+                                <span><i class="fas fa-id-badge"></i> <strong>Função:</strong> ${data.funcao || 'N/A'}</span>
                                 <span class="status-badge ${statusClass}">${statusText}</span>
                                 ${classificacaoHtml}
                             </div>
@@ -601,9 +614,15 @@
                     doc.text(`Unidade: ${data.unidade || 'N/A'}`, 14, yPosition);
                     doc.text(`Envolvido: ${data.nomeEnvolvido || 'N/A'}`, 14, yPosition + 5);
                     doc.text(`Data do Ocorrido: ${data.dataOcorrido || 'N/A'}`, 14, yPosition + 10);
-                    doc.text(`Status: ${data.status === 'closed' ? 'Finalizado' : 'Aberto'}`, 14, yPosition + 15);
-                    doc.text(`Classificação: ${data.classificacao || 'N/A'}`, 14, yPosition + 20);
-                    yPosition += 30;
+                    doc.text(`Data de Nascimento: ${data.dataNascimento || 'N/A'}`, 14, yPosition + 15);
+                    doc.text(`Faixa Etária: ${data.faixaEtaria || 'N/A'}`, 14, yPosition + 20);
+                    doc.text(`Função: ${data.funcao || 'N/A'}`, 14, yPosition + 25);
+                    doc.text(`Data de Admissão: ${data.dataAdmissao || 'N/A'}`, 14, yPosition + 30);
+                    doc.text(`Tempo de Empresa: ${data.tempoEmpresa || 'N/A'}`, 14, yPosition + 35);
+                    doc.text(`Horas Trabalhadas: ${data.horasTrabalhadas || 'N/A'}`, 14, yPosition + 40);
+                    doc.text(`Status: ${data.status === 'closed' ? 'Finalizado' : 'Aberto'}`, 14, yPosition + 45);
+                    doc.text(`Classificação: ${data.classificacao || 'N/A'}`, 14, yPosition + 50);
+                    yPosition += 60;
                     
                     // Descrição da ocorrência
                     if (data.descricaoOcorrencia) {
@@ -949,9 +968,17 @@
                 form.elements['unidade'].value = data.unidade || '';
                 form.elements['dataOcorrido'].value = data.dataOcorrido || '';
                 form.elements['nomeEnvolvido'].value = data.nomeEnvolvido || '';
+                form.elements['dataNascimento'].value = data.dataNascimento || '';
+                form.elements['faixaEtaria'].value = data.faixaEtaria || '';
+                form.elements['funcao'].value = data.funcao || '';
+                form.elements['dataAdmissao'].value = data.dataAdmissao || '';
                 form.elements['tempoEmpresa'].value = data.tempoEmpresa || '';
+                form.elements['horasTrabalhadas'].value = data.horasTrabalhadas || '';
                 form.elements['jornadaTrabalho'].value = data.jornadaTrabalho || '';
                 form.elements['tipoColaborador'].value = data.tipoColaborador || '';
+                form.elements['horario'].value = data.horario || '';
+                form.elements['lesao'].value = data.lesao || '';
+                form.elements['parteAtingida'].value = data.parteAtingida || '';
                 form.elements['descricaoOcorrencia'].value = data.descricaoOcorrencia || '';
 
                 // Preenche membros da investigação (editáveis)

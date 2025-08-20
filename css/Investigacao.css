@@ -692,6 +692,57 @@
             margin-bottom: var(--spacer);
         }
 
+         .download-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            margin-left: 10px;
+        }
+        
+        .download-btn i {
+            margin-right: 5px;
+        }
+        
+        .download-btn:hover {
+            background: #388E3C;
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .sidebar-toggle {
+                display: block;
+            }
+            
+            .action-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        /* Estilo para o botão de download na lista de ocorrências */
+        .occurrence-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
         .action-item .form-label {
             font-weight: var(--font-weight-semibold);
             margin-bottom: var(--spacer-sm);

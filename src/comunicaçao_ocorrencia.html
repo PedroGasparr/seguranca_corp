@@ -170,12 +170,42 @@
                                         <option value="">Selecione</option>
                                         <option value="Típico">Típico</option>
                                         <option value="Trajeto">Trajeto</option>
+                                        <option value="Colisão de estrutura">Colisão de Máquina</option>
+                                        <option value="Colisão em estrutura">Colisão em estrutura</option>
+                                        <option value="Acidente de transito">Acidente de trânsito</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="dataNascimento" class="form-label">Data de Nascimento:</label>
+                                    <input type="date" class="form-control" id="dataNascimento" name="dataNascimento" required onchange="calcularIdade()">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="faixaEtaria" class="form-label">Faixa Etária:</label>
+                                    <input type="text" class="form-control" id="faixaEtaria" name="faixaEtaria" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="funcao" class="form-label">Função:</label>
+                                    <input type="text" class="form-control" id="funcao" name="funcao" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="dataAdmissao" class="form-label">Data de Admissão:</label>
+                                    <input type="date" class="form-control" id="dataAdmissao" name="dataAdmissao" required onchange="calcularTempoEmpresa()">
+                                </div>
+                            </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="tempoEmpresa" class="form-label">Tempo de Empresa:</label>
@@ -191,6 +221,15 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="horasTrabalhadas" class="form-label">Horas Trabalhadas até o Ocorrido:</label>
+                                    <input type="number" class="form-control" id="horasTrabalhadas" name="horasTrabalhadas" min="0" step="0.5" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="form-label">Jornada de Trabalho:</label>
@@ -219,6 +258,12 @@
                                             <label for="colaboradorIntermitente">Intermitente</label>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="horario" class="form-label">Horário do Ocorrido:</label>
+                                    <input type="time" class="form-control" id="horario" name="horario" required>
                                 </div>
                             </div>
                         </div>
@@ -283,15 +328,6 @@
                                         <option value="Dedos do Pé Esquerdo">Dedos do Pé Esquerdo</option>
                                         <option value="Outros">Outros</option>
                                     </select>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="horario" class="form-label">Horário:</label>
-                                    <input type="time" class="form-control" id="horario" name="horario" required>
                                 </div>
                             </div>
                         </div>
@@ -448,7 +484,7 @@
                     
                     <div class="text-end mt-4">
                         <button type="submit" class="btn btn-submit" id="btnSubmit">
-                            <i class="fas fa-paper-plane"></i> Enviar Investigação
+                            <i class="fas fa-paper-plane"></i> Enviar Comunicação
                         </button>
                     </div>
                 </form>
@@ -461,11 +497,11 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Investigação Enviada</h5>
+                    <h5 class="modal-title">Comunicação Enviada</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Sua investigação de ocorrência foi enviada com sucesso and salva no sistema.</p>
+                    <p>Sua Comunicação de ocorrência foi enviada com sucesso e salva no sistema.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
@@ -479,11 +515,87 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../js/auth.js"></script>
-    <script src="../js/home.js"></script>
     
     <script>
-        // Inicializa Firebase com as configurações do auth.js
+        // Inicialização do Firebase (substitua com suas configurações)
+        const firebaseConfig = {
+        apiKey: "AIzaSyDZwa4XNqlupNDLs7-CRQbhr5pRT4NyFBA",
+        authDomain: "application-gzl.firebaseapp.com",
+        databaseURL: "https://application-gzl-default-rtdb.firebaseio.com",
+        projectId: "application-gzl",
+        storageBucket: "application-gzl.appspot.com",
+        messagingSenderId: "319900903265",
+        appId: "1:319900903265:web:a8f400aeb7a697fc168720",
+        measurementId: "G-ZRRFQZXT54"
+        };
+        
+        // Inicializa o Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Função para calcular a idade com base na data de nascimento
+        function calcularIdade() {
+            const dataNascimento = new Date(document.getElementById('dataNascimento').value);
+            const hoje = new Date();
+            
+            if (isNaN(dataNascimento.getTime())) return;
+            
+            let idade = hoje.getFullYear() - dataNascimento.getFullYear();
+            const mesAtual = hoje.getMonth();
+            const diaAtual = hoje.getDate();
+            const mesNascimento = dataNascimento.getMonth();
+            const diaNascimento = dataNascimento.getDate();
+            
+            if (mesAtual < mesNascimento || (mesAtual === mesNascimento && diaAtual < diaNascimento)) {
+                idade--;
+            }
+            
+            let faixaEtaria = "";
+            if (idade < 18) faixaEtaria = "Menor de 18 anos";
+            else if (idade >= 18 && idade <= 24) faixaEtaria = "18-24 anos";
+            else if (idade >= 25 && idade <= 34) faixaEtaria = "25-34 anos";
+            else if (idade >= 35 && idade <= 44) faixaEtaria = "35-44 anos";
+            else if (idade >= 45 && idade <= 54) faixaEtaria = "45-54 anos";
+            else if (idade >= 55 && idade <= 64) faixaEtaria = "55-64 anos";
+            else faixaEtaria = "65 anos ou mais";
+            
+            document.getElementById('faixaEtaria').value = faixaEtaria + ` (${idade} anos)`;
+        }
+        
+        // Função para calcular o tempo de empresa
+        function calcularTempoEmpresa() {
+            const dataAdmissao = new Date(document.getElementById('dataAdmissao').value);
+            const hoje = new Date();
+            
+            if (isNaN(dataAdmissao.getTime())) return;
+            
+            const diffTime = Math.abs(hoje - dataAdmissao);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            const diffMonths = Math.floor(diffDays / 30);
+            const diffYears = Math.floor(diffMonths / 12);
+            
+            let tempoEmpresa = "";
+            if (diffDays < 90) tempoEmpresa = "0 a 3 meses";
+            else if (diffDays >= 90 && diffDays < 180) tempoEmpresa = "3 a 6 meses";
+            else if (diffDays >= 180 && diffDays < 365) tempoEmpresa = "6 meses a 1 ano";
+            else if (diffYears >= 1 && diffYears < 2) tempoEmpresa = "1 a 2 anos";
+            else if (diffYears >= 2 && diffYears < 5) tempoEmpresa = "2 a 5 anos";
+            else if (diffYears >= 5 && diffYears < 10) tempoEmpresa = "5 a 10 anos";
+            else tempoEmpresa = "Mais de 10 anos";
+            
+            document.getElementById('tempoEmpresa').value = tempoEmpresa;
+        }
+        
+        // Função para gerar ID único
+        function generateUniqueId() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const randomNum = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+            return `${year}${month}${day}${randomNum}`;
+        }
+        
+        // Inicialização quando o documento estiver carregado
         document.addEventListener('DOMContentLoaded', function() {
             // Preenche automaticamente a unidade se o usuário estiver logado
             firebase.auth().onAuthStateChanged((user) => {
@@ -500,16 +612,6 @@
                         });
                 }
             });
-
-            // Gera ID único baseado na data e número aleatório
-            function generateUniqueId() {
-                const now = new Date();
-                const year = now.getFullYear();
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                const day = String(now.getDate()).padStart(2, '0');
-                const randomNum = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
-                return `${year}${month}${day}${randomNum}`;
-            }
 
             // Manipulação de fotos
             const photoInput = document.getElementById('fotosOcorrencia');
@@ -656,7 +758,12 @@
                     nivel: formData.get('nivel'),
                     nomeEnvolvido: formData.get('nomeEnvolvido'),
                     tipoOcorrencia: formData.get('tipoOcorrencia'),
+                    dataNascimento: formData.get('dataNascimento'),
+                    faixaEtaria: formData.get('faixaEtaria'),
+                    funcao: formData.get('funcao'),
+                    dataAdmissao: formData.get('dataAdmissao'),
                     tempoEmpresa: formData.get('tempoEmpresa'),
+                    horasTrabalhadas: formData.get('horasTrabalhadas'),
                     jornadaTrabalho: formData.get('jornadaTrabalho'),
                     tipoColaborador: formData.get('tipoColaborador'),
                     lesao: formData.get('lesao'),
