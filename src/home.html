@@ -3,12 +3,890 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Home - Cultura de Segurança</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="icon" href="../img/engenheiro.png" type="image/x-icon">
-    <link rel="stylesheet" href="../css/home.css">
+    <style>
+        /* Variáveis CSS - Tema principal */
+        :root {
+            /* Cores principais */
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --primary-light: #627efe;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --success-dark: #3ab7de;
+            --info: #4895ef;
+            --warning: #f72585;
+            --danger: #e63946;
+            --danger-dark: #d42a3a;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-400: #ced4da;
+            --gray-500: #adb5bd;
+            --gray-600: #6c757d;
+            --gray-700: #495057;
+            --gray-800: #343a40;
+            --gray-900: #212529;
+            
+            /* Específicos do layout */
+            --sidebar-width: 280px;
+            --sidebar-bg: #2c3e50;
+            --sidebar-color: #ecf0f1;
+            --sidebar-active-bg: rgba(67, 97, 238, 0.2);
+            --sidebar-hover-bg: #34495e;
+            --transition-speed: 0.3s;
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --box-shadow-lg: 0 15px 35px rgba(0, 0, 0, 0.15);
+            --card-bg: #ffffff;
+            
+            /* Fontes */
+            --font-family-sans: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --font-size-base: 1rem;
+            --font-size-sm: 0.875rem;
+            --font-size-lg: 1.125rem;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            
+            /* Espaçamentos */
+            --spacer: 1rem;
+            --spacer-sm: 0.5rem;
+            --spacer-lg: 1.5rem;
+            --spacer-xl: 2rem;
+        }
+
+        /* Reset e estilos base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-sans);
+            background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
+            color: var(--gray-700);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Layout Principal */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        /* Sidebar Estilizado */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            color: var(--sidebar-color);
+            display: flex;
+            flex-direction: column;
+            transition: all var(--transition-speed);
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: var(--spacer-lg) var(--spacer);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: var(--spacer);
+            animation: fadeIn 0.8s ease;
+        }
+
+        .user-avatar {
+            font-size: 2.8rem;
+            color: var(--info);
+            transition: transform var(--transition-speed) ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: var(--font-weight-semibold);
+            font-size: 1rem;
+            margin-bottom: 3px;
+        }
+
+        .user-unit {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: var(--spacer-lg) 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: var(--spacer-sm);
+            padding: 0 calc(var(--spacer) - 5px);
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: var(--spacer) var(--spacer-lg);
+            color: var(--sidebar-color);
+            text-decoration: none;
+            transition: all var(--transition-speed);
+            font-size: var(--font-size-base);
+            border-radius: var(--border-radius-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-menu li a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--primary);
+            opacity: 0;
+            transition: opacity var(--transition-speed) ease;
+        }
+
+        .sidebar-menu a:hover {
+            background: var(--sidebar-hover-bg);
+            color: white;
+            padding-left: calc(var(--spacer-lg) + 5px);
+            transform: translateX(5px);
+        }
+
+        .sidebar-menu a:hover::before {
+            opacity: 1;
+        }
+
+        .sidebar-menu li.active a {
+            background: var(--sidebar-active-bg);
+            color: white;
+            padding-left: calc(var(--spacer-lg) + 5px);
+        }
+
+        .sidebar-menu li.active a::before {
+            opacity: 1;
+        }
+
+        .sidebar-menu li.active2 a {
+            background: rgba(72, 149, 239, 0.2);
+            color: white;
+            padding-left: calc(var(--spacer-lg) + 5px);
+        }
+
+        .sidebar-menu li.active2 a::before {
+            opacity: 1;
+            background: var(--info);
+        }
+
+        .sidebar-menu i {
+            margin-right: var(--spacer);
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: var(--spacer);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacer);
+            flex-shrink: 0;
+        }
+
+        /* Unit Selector */
+        #unit-selector-container {
+            margin-bottom: var(--spacer);
+        }
+
+        #unit-selector-container label {
+            font-size: var(--font-size-sm);
+            color: var(--sidebar-color);
+            margin-bottom: var(--spacer-sm);
+            display: block;
+        }
+
+        .form-select {
+            background-color: #34495e;
+            color: white;
+            border: 1px solid #4a6278;
+            margin-bottom: var(--spacer-sm);
+            padding: var(--spacer-sm);
+            border-radius: var(--border-radius-sm);
+            width: 100%;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--info);
+            box-shadow: 0 0 0 0.2rem rgba(72, 149, 239, 0.25);
+        }
+
+        /* Conteúdo Principal */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: var(--spacer-xl);
+            min-height: 100vh;
+            width: calc(100% - var(--sidebar-width));
+            overflow-x: hidden;
+        }
+
+        .content-header {
+            margin-bottom: var(--spacer-xl);
+            padding-bottom: var(--spacer);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            animation: slideDown 0.5s ease;
+        }
+
+        .content-header h1 {
+            font-size: 2.2rem;
+            margin: 0;
+            color: var(--dark);
+            font-weight: var(--font-weight-bold);
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .breadcrumb {
+            font-size: var(--font-size-sm);
+            color: var(--gray-600);
+            margin-top: var(--spacer-sm);
+        }
+
+        /* Banner com Slider */
+        .banner-container {
+            width: 100%;
+            height: 450px;
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: var(--spacer-xl);
+        }
+        
+        .banner-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            padding: 0 60px;
+        }
+        
+        .banner-slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.2) 100%);
+        }
+        
+        .banner-slide.active {
+            opacity: 1;
+        }
+        
+        .banner-content {
+            position: relative;
+            color: white;
+            max-width: 600px;
+            z-index: 2;
+            transform: translateY(50px);
+            opacity: 0;
+            transition: all 1s ease;
+        }
+        
+        .banner-slide.active .banner-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .banner-title {
+            font-size: 2.5rem;
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacer);
+            line-height: 1.2;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .banner-text {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            margin-bottom: var(--spacer-xl);
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.3);
+        }
+        
+        .banner-btn {
+            display: inline-block;
+            padding: var(--spacer) var(--spacer-xl);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: var(--font-weight-semibold);
+            transition: all var(--transition-speed);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+        }
+        
+        .banner-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.6);
+        }
+        
+        .banner-indicators {
+            position: absolute;
+            bottom: 25px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            z-index: 10;
+        }
+        
+        .banner-indicator {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+        }
+        
+        .banner-indicator.active {
+            background-color: white;
+            transform: scale(1.3);
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        
+        .banner-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 10;
+            transition: all var(--transition-speed);
+            backdrop-filter: blur(5px);
+        }
+        
+        .banner-nav:hover {
+            background-color: rgba(255,255,255,0.3);
+        }
+        
+        .banner-prev {
+            left: 20px;
+        }
+        
+        .banner-next {
+            right: 20px;
+        }
+
+        /* Seção de título com impacto */
+        .impact-header {
+            text-align: center;
+            margin: var(--spacer-xl) 0;
+            position: relative;
+            padding-bottom: 25px;
+        }
+        
+        .impact-header h2 {
+            font-size: 2.2rem;
+            font-weight: var(--font-weight-bold);
+            color: var(--dark);
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .impact-header h2:after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 3px;
+        }
+        
+        .impact-header p {
+            font-size: 1.1rem;
+            color: var(--gray-600);
+            max-width: 700px;
+            margin: 25px auto 0;
+            line-height: 1.6;
+        }
+
+        /* Cards de valores com design especial */
+        .values-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--spacer-xl);
+            margin-bottom: 70px;
+        }
+        
+        .value-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: all var(--transition-speed) ease;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+        }
+        
+        .value-card:hover {
+            transform: translateY(-12px);
+            box-shadow: var(--box-shadow-lg);
+        }
+        
+        .card-image {
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s ease;
+        }
+        
+        .value-card:hover .card-image img {
+            transform: scale(1.1);
+        }
+        
+        .card-image::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
+            opacity: 0.7;
+        }
+        
+        .card-icon {
+            position: absolute;
+            bottom: -30px;
+            right: 25px;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 18px;
+            font-size: 30px;
+            color: white;
+            box-shadow: var(--box-shadow);
+            z-index: 2;
+            transform: rotate(0deg);
+            transition: all var(--transition-speed) ease;
+        }
+        
+        .value-card:hover .card-icon {
+            transform: rotate(15deg) scale(1.1);
+        }
+        
+        .value-card:nth-child(1) .card-icon {
+            background: linear-gradient(135deg, var(--danger), var(--danger-dark));
+        }
+        
+        .value-card:nth-child(2) .card-icon {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+        
+        .value-card:nth-child(3) .card-icon {
+            background: linear-gradient(135deg, var(--success), var(--success-dark));
+        }
+        
+        .value-card:nth-child(4) .card-icon {
+            background: linear-gradient(135deg, var(--warning), #c81e70);
+        }
+        
+        .value-card:nth-child(5) .card-icon {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+        
+        .card-body {
+            padding: var(--spacer-xl);
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .value-card h5 {
+            font-size: 1.4rem;
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--spacer);
+            color: var(--dark);
+            position: relative;
+            padding-bottom: 12px;
+        }
+        
+        .value-card h5:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 4px;
+            border-radius: 2px;
+            background: linear-gradient(to right, var(--primary), transparent);
+        }
+        
+        .value-card p {
+            color: var(--gray-600);
+            line-height: 1.7;
+            margin-bottom: var(--spacer-xl);
+            flex-grow: 1;
+            font-size: 1rem;
+        }
+        
+        .card-footer {
+            padding: var(--spacer-lg) var(--spacer-xl);
+            background-color: var(--gray-100);
+            border-top: 1px solid var(--gray-200);
+        }
+        
+        .quote-text {
+            font-style: italic;
+            color: var(--gray-600);
+            font-size: 0.95rem;
+            text-align: center;
+            margin: 0;
+            position: relative;
+            padding: 0 20px;
+        }
+        
+        .quote-text:before, .quote-text:after {
+            content: '"';
+            font-size: 1.5rem;
+            color: var(--primary);
+            position: absolute;
+        }
+        
+        .quote-text:before {
+            left: 0;
+            top: -5px;
+        }
+        
+        .quote-text:after {
+            right: 0;
+            bottom: -15px;
+        }
+
+        /* Buttons */
+        .btn {
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacer) var(--spacer-lg);
+            font-weight: var(--font-weight-semibold);
+            transition: all var(--transition-speed) ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacer-sm);
+            border: none;
+            cursor: pointer;
+            font-size: var(--font-size-base);
+            box-sizing: border-box;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, var(--info) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 201, 240, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76, 201, 240, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger) 0%, var(--danger-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(230, 57, 70, 0.4);
+        }
+
+        .btn-sm {
+            padding: var(--spacer-sm) var(--spacer);
+            font-size: var(--font-size-sm);
+        }
+
+        /* Animações suaves */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .value-card {
+            animation: fadeInUp 0.8s ease forwards;
+            opacity: 0;
+        }
+        
+        .value-card:nth-child(1) { animation-delay: 0.1s; }
+        .value-card:nth-child(2) { animation-delay: 0.2s; }
+        .value-card:nth-child(3) { animation-delay: 0.3s; }
+        .value-card:nth-child(4) { animation-delay: 0.4s; }
+        .value-card:nth-child(5) { animation-delay: 0.5s; }
+        
+        /* Efeito de revelação ao scroll */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease;
+        }
+        
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsividade */
+        @media (max-width: 1200px) {
+            .banner-title {
+                font-size: 2.2rem;
+            }
+            
+            .banner-text {
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+                z-index: 1050;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: var(--spacer);
+                width: 100%;
+            }
+            
+            .sidebar-toggle {
+                display: block;
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1060;
+                background: var(--primary);
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+
+            .banner-container {
+                height: 400px;
+            }
+            
+            .banner-content {
+                padding: 0 20px;
+                text-align: center;
+            }
+            
+            .banner-title {
+                font-size: 1.8rem;
+            }
+            
+            .banner-text {
+                font-size: 1rem;
+            }
+            
+            .banner-slide {
+                padding: 0 30px;
+            }
+            
+            .impact-header h2 {
+                font-size: 1.8rem;
+            }
+            
+            .values-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .card-body {
+                padding: var(--spacer-lg);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .content-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .banner-container {
+                height: 350px;
+            }
+            
+            .banner-title {
+                font-size: 1.6rem;
+            }
+            
+            .banner-nav {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+            
+            .impact-header h2 {
+                font-size: 1.6rem;
+            }
+            
+            .impact-header p {
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .banner-container {
+                height: 300px;
+            }
+            
+            .banner-title {
+                font-size: 1.4rem;
+            }
+            
+            .banner-text {
+                font-size: 0.95rem;
+            }
+            
+            .impact-header h2 {
+                font-size: 1.4rem;
+            }
+        }
+
+        /* Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Scrollbar personalizado */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--gray-200);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+        
+    </style>
 </head>
 <body>
     <div class="app-container">
@@ -18,8 +896,8 @@
                 <div class="user-profile">
                     <i class="fas fa-user-circle user-avatar"></i>
                     <div class="user-info">
-                        <span class="user-name" id="sidebar-user-name"></span>
-                        <span class="user-unit" id="sidebar-user-unit"></span>
+                        <span class="user-name" id="sidebar-user-name">Usuário</span>
+                        <span class="user-unit" id="sidebar-user-unit">Unidade</span>
                     </div>
                 </div>
             </div>
@@ -30,6 +908,12 @@
                         <a href="home.html">
                             <i class="fas fa-home"></i>
                             <span>Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="old_home.html">
+                            <i class="fas fa-gauge"></i>
+                            <span>Dashboard</span>
                         </a>
                     </li>
                     <li>
@@ -62,13 +946,13 @@
                             <span>Investigação de Ocorrencia</span>
                         </a>
                     </li>
-                    <li class="active2">
+                    <li>
                         <a href="gerenciamento_user_units.html">
                             <i class="fas fa-users"></i>
                             <span>Gerenciamento de Unidades</span>
                         </a>
                     </li>
-                    <li class="active2">
+                    <li>
                         <a href="documentos_desativados.html">
                             <i class="fas fa-paste"></i>
                             <span>Documentos Desativados</span>
@@ -77,145 +961,157 @@
                 </ul>
             </nav>
 
-
-            <div class="modal fade" id="senhaModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">🔒 Acesso Restrito</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <p>Por favor, insira a senha para acessar o Gerenciamento de Unidades:</p>
-                            <input type="password" id="senhaInput" class="form-control" placeholder="Digite a senha">
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="button" class="btn btn-primary" id="confirmarSenha">Acessar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div class="sidebar-footer">
-            <!-- Seletor de Unidades com Botão de Confirmação -->
-            <div id="unit-selector-container" style="display: none; margin-bottom: 10px;">
-                <label for="unit-selector" style="font-size: 0.8rem; color: #ecf0f1;">Alternar Unidade</label>
-                <select class="form-select form-select-sm" id="unit-selector" style="background-color: #34495e; color: white; border: 1px solid #4a6278; margin-bottom: 5px;">
-                    <option value="">Selecione uma unidade</option>
-                </select>
-                <button id="confirm-unit-change" class="btn btn-sm btn-success w-100" style="display: none;">
-                    <i class="fas fa-check"></i> Confirmar
+                <button class="btn btn-danger btn-sm w-100" id="sidebar-logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Sair</span>
                 </button>
             </div>
-            
-            <button class="btn btn-danger btn-sm w-100" id="sidebar-logout-btn">
-                <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Sair</span>
-            </button>
-        </div>
-            
         </aside>
 
         <!-- Conteúdo Principal -->
         <main class="main-content">
             <header class="content-header">
-                <h1 id="content-title">Visualizações e Gráficos</h1>
+                <h1 id="content-title">Nossa Cultura de Segurança</h1>
                 <div class="breadcrumb">
-                    <span>Gráficos</span>
+                    <span>Valores e Compromissos</span>
                 </div>
             </header>
             
-            <!-- Seção de Filtros -->
-            <div class="filter-section">
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <label for="filter-unit" class="form-label">Unidade</label>
-                        <select class="form-select" id="filter-unit">
-                            <option value="">Todas as unidades</option>
-                            <!-- Opções serão carregadas dinamicamente -->
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="filter-type" class="form-label">Tipo</label>
-                        <select class="form-select" id="filter-type">
-                            <option value="">Todos os tipos</option>
-                            <!-- Opções serão carregadas dinamicamente -->
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="filter-status" class="form-label">Status</label>
-                        <select class="form-select" id="filter-status">
-                            <option value="">Todos os status</option>
-                            <option value="valido">Válido</option>
-                            <option value="vencido">Vencido</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3 d-flex align-items-end">
-                        <button class="btn btn-primary" id="apply-filters">Aplicar Filtros</button>
-                    </div>
+            <!-- Banner Rotativo com Imagens -->
+            <div class="banner-container">
+                <!-- Slides serão inseridos via JavaScript -->
+                <div class="banner-nav banner-prev">
+                    <i class="fas fa-chevron-left"></i>
+                </div>
+                <div class="banner-nav banner-next">
+                    <i class="fas fa-chevron-right"></i>
                 </div>
             </div>
             
-            <!-- Primeira Linha de Gráficos -->
-            <div class="chart-row">
-                <div class="chart-col">
-                    <div class="chart-container">
-                        <h4>Documentos por Tipo</h4>
-                        <canvas id="typeChart"></canvas>
-                    </div>
-                </div>
-                <div class="chart-col">
-                    <div class="chart-container">
-                        <h4>Documentos por Unidade</h4>
-                        <canvas id="unitChart"></canvas>
-                    </div>
-                </div>
+            <!-- Seção de título impactante -->
+            <div class="impact-header reveal">
+                <h2>Por que somos focados em segurança?</h2>
+                <p>Nossa dedicação à segurança vai além dos protocolos - é um valor fundamental que guia cada decisão e ação em nossa organização.</p>
             </div>
             
-            <!-- Segunda Linha de Gráficos -->
-            <div class="chart-row">
-                <div class="chart-col">
-                    <div class="chart-container">
-                        <h4>Status dos Documentos</h4>
-                        <canvas id="statusChart"></canvas>
+            <!-- Cards de valores com design especial -->
+            <div class="values-container">
+                <!-- Card 1 -->
+                <div class="value-card reveal">
+                    <div class="card-image">
+                        <img src="../img/card_1.jpeg" alt="Acesso Restrito">
+                        <div class="card-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5>Acesso Restrito</h5>
+                        <p>Acessar espaços caracterizados como restrito sem autorização é proibido. Apenas profissionais autorizados podem entrar em locais como salas elétricas, espaços confinados e áreas de armazenamento de combustíveis.</p>
+                    </div>
+                    <div class="card-footer">
+                        <p class="quote-text">Respeitar limites é proteger vidas</p>
                     </div>
                 </div>
-                <div class="chart-col">
-                    <div class="chart-container">
-                        <h4>Vencimento por Mês</h4>
-                        <canvas id="expirationChart"></canvas>
+
+                <!-- Regra 2 -->
+                <div class="value-card reveal">
+                    <div class="card-image">
+                        <img src="../img/card_2.jpeg" alt="Trabalho em Altura">
+                        <div class="card-icon">
+                            <i class="fas fa-hard-hat"></i>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5>Trabalho em Altura</h5>
+                        <p>É proibido realizar trabalhos em altura sem utilizar todos os dispositivos de segurança contra queda.</p>
+                    </div>
+                    <div class="card-footer">
+                        <p class="quote-text">Segurança em altura é vida garantida</p>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Terceira Linha de Gráficos -->
-            <div class="chart-row">
-                <div class="chart-col">
-                    <div class="chart-container">
-                        <h4>Distribuição Temporal</h4>
-                        <canvas id="timelineChart"></canvas>
+
+                <!-- Regra 3 -->
+                <div class="value-card reveal">
+                    <div class="card-image">
+                        <img src="../img/card_3.jpeg" alt="Uso de Álcool e Drogas">
+                        <div class="card-icon">
+                            <i class="fas fa-ban"></i>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5>Álcool e Drogas</h5>
+                        <p>É proibido trabalhar sob a influência ou posse de bebidas alcoólicas ou drogas ilícitas.</p>
+                    </div>
+                    <div class="card-footer">
+                        <p class="quote-text">Consciência limpa é segurança garantida</p>
                     </div>
                 </div>
-                <div class="chart-col">
-                    <div class="chart-container">
-                        <h4>Status por Unidade</h4>
-                        <canvas id="unitStatusChart"></canvas>
+
+                <!-- Regra 4 -->
+                <div class="value-card reveal">
+                    <div class="card-image">
+                        <img src="../img/card_4.jpeg" alt="Substâncias Perigosas">
+                        <div class="card-icon">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5>Substâncias Perigosas</h5>
+                        <p>É proibido trabalhar com substâncias perigosas sem autorização, capacitação e proteção adequada.</p>
+                    </div>
+                    <div class="card-footer">
+                        <p class="quote-text">Conhecimento e proteção salvam vidas</p>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Quarta Linha de Gráficos -->
-            <div class="chart-row">
-                <div class="chart-col">
-                    <div class="chart-container">
-                        <h4>Documentos Criados por Mês</h4>
-                        <canvas id="creationChart"></canvas>
+
+                <!-- Regra 5 -->
+                <div class="value-card reveal">
+                    <div class="card-image">
+                        <img src="../img/card_5.jpeg" alt="Movimentação de Cargas">
+                        <div class="card-icon">
+                            <i class="fas fa-dolly"></i>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5>Cargas Suspensas</h5>
+                        <p>É proibido transitar em áreas onde exista movimentação de cargas suspensas.</p>
+                    </div>
+                    <div class="card-footer">
+                        <p class="quote-text">Atenção evita acidentes fatais</p>
                     </div>
                 </div>
-                <div class="chart-col">
-                    <div class="chart-container">
-                        <h4>Validade por Tipo</h4>
-                        <canvas id="typeStatusChart"></canvas>
+
+                <!-- Regra 6 -->
+                <div class="value-card reveal">
+                    <div class="card-image">
+                        <img src="../img/card_6.jpeg" alt="Máquinas em Movimento">
+                        <div class="card-icon">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5>Máquinas em Movimento</h5>
+                        <p>É proibido intervir manualmente em máquinas em movimento, como torres de empilhadeiras, partes móveis de plataformas aéreas, rolos e engrenagens.</p>
+                    </div>
+                    <div class="card-footer">
+                        <p class="quote-text">Nunca coloque a mão em risco</p>
+                    </div>
+                </div>
+
+                <!-- Card 7 -->
+                <div class="value-card reveal">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Comunicação Transparente">
+                        <div class="card-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5>Comunicação Transparente</h5>
+                        <p>Encorajamos o diálogo aberto sobre segurança e a reportagem de quaisquer preocupações ou incidentes, sem medo de represálias. Acreditamos que a comunicação clara e honesta é fundamental para prevenir acidentes e melhorar continuamente.</p>
+                    </div>
+                    <div class="card-footer">
+                        <p class="quote-text">Sua voz pode prevenir um acidente</p>
                     </div>
                 </div>
             </div>
@@ -225,6 +1121,171 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        // Dados do banner - com imagens reais
+        const bannerSlides = [
+            {
+                title: "Segurança em Primeiro Lugar",
+                text: "Nossa prioridade máxima é garantir um ambiente de trabalho seguro para todos",
+                image: "../img/banner_5.jpeg",
+                button: "Saiba Mais"
+            },
+            {
+                title: "Prevenção é Nossa Missão",
+                text: "Agir preventivamente é a melhor estratégia para evitar incidentes",
+                image: "../img/banner_4.jpeg",
+                button: "Nossos Protocolos"
+            },
+            {
+                title: "Compromisso com a Vida",
+                text: "Cada medida de segurança é um compromisso com o valor da vida",
+                image: "../img/banner_3.jpeg",
+                button: "Conheça Mais"
+            },
+            {
+                title: "Todos pela Segurança",
+                text: "A segurança é responsabilidade de cada um de nós, todos os dias",
+                image: "../img/banner_2.jpeg",
+                button: "Junte-se a Nós"
+            },
+            {
+                title: "Excelência Operacional",
+                text: "Procedimentos seguros resultam em operações de excelência",
+                image: "../img/banner_1.jpeg",
+                button: "Nossos Resultados"
+            }
+            
+        ];
+
+        // Inicialização do banner rotativo
+        document.addEventListener('DOMContentLoaded', function() {
+            initBanner();
+            initScrollReveal();
+            setupAuth(); // Simulação de autenticação para demonstração
+            
+            // Event listeners para navegação do banner
+            document.querySelector('.banner-prev').addEventListener('click', () => navigateBanner(-1));
+            document.querySelector('.banner-next').addEventListener('click', () => navigateBanner(1));
+            
+        });
+
+        // Função para inicializar o banner
+        function initBanner() {
+            const bannerContainer = document.querySelector('.banner-container');
+            const indicatorsContainer = document.createElement('div');
+            indicatorsContainer.className = 'banner-indicators';
+            
+            // Cria os slides e indicadores
+            bannerSlides.forEach((slide, index) => {
+                // Cria o slide
+                const slideElement = document.createElement('div');
+                slideElement.className = 'banner-slide';
+                slideElement.style.backgroundImage = `url('${slide.image}')`;
+                
+                // Adiciona conteúdo ao slide
+                const content = document.createElement('div');
+                content.className = 'banner-content';
+                
+                const title = document.createElement('div');
+                title.className = 'banner-title';
+                title.textContent = slide.title;
+                
+                const text = document.createElement('div');
+                text.className = 'banner-text';
+                text.textContent = slide.text;
+                
+                const button = document.createElement('a');
+                button.href = '#';
+                button.className = 'banner-btn';
+                button.textContent = slide.button;
+                
+                content.appendChild(title);
+                content.appendChild(text);
+                content.appendChild(button);
+                slideElement.appendChild(content);
+                
+                bannerContainer.insertBefore(slideElement, bannerContainer.firstChild);
+                
+                // Cria indicador
+                const indicator = document.createElement('div');
+                indicator.className = 'banner-indicator';
+                indicator.dataset.index = index;
+                indicatorsContainer.appendChild(indicator);
+            });
+            
+            bannerContainer.appendChild(indicatorsContainer);
+            
+            // Inicia a rotação
+            let currentSlide = 0;
+            showSlide(currentSlide);
+            
+            // Configura a rotação automática
+            setInterval(() => {
+                currentSlide = (currentSlide + 1) % bannerSlides.length;
+                showSlide(currentSlide);
+            }, 6000);
+            
+            // Adiciona eventos de clique aos indicadores
+            const indicators = document.querySelectorAll('.banner-indicator');
+            indicators.forEach(indicator => {
+                indicator.addEventListener('click', function() {
+                    const slideIndex = parseInt(this.dataset.index);
+                    currentSlide = slideIndex;
+                    showSlide(currentSlide);
+                });
+            });
+        }
+        
+        // Função para mostrar um slide específico
+        function showSlide(index) {
+            const slides = document.querySelectorAll('.banner-slide');
+            const indicators = document.querySelectorAll('.banner-indicator');
+            
+            // Oculta todos os slides e desativa indicadores
+            slides.forEach(slide => slide.classList.remove('active'));
+            indicators.forEach(indicator => indicator.classList.remove('active'));
+            
+            // Mostra o slide selecionado e ativa o indicador correspondente
+            slides[index].classList.add('active');
+            indicators[index].classList.add('active');
+        }
+        
+        // Função para navegar entre os slides
+        function navigateBanner(direction) {
+            const slides = document.querySelectorAll('.banner-slide');
+            const currentSlide = Array.from(slides).findIndex(slide => slide.classList.contains('active'));
+            let newSlide = currentSlide + direction;
+            
+            if (newSlide < 0) newSlide = slides.length - 1;
+            if (newSlide >= slides.length) newSlide = 0;
+            
+            showSlide(newSlide);
+        }
+        
+        // Função para revelar elementos ao scroll
+        function initScrollReveal() {
+            const elements = document.querySelectorAll('.reveal');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            elements.forEach(element => {
+                observer.observe(element);
+            });
+        }
+        
+        // Simulação de autenticação para demonstração
+        function setupAuth() {
+            document.getElementById('sidebar-user-name').textContent = 'Carlos Silva';
+            document.getElementById('sidebar-user-unit').textContent = 'Unidade São Paulo';
+        }
+    </script>
     <script src="../js/auth.js"></script>
     <script src="../js/home.js"></script>
 </body>

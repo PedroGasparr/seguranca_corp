@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" href="../img/engenheiro.png" type="image/x-icon">
+    <link rel="stylesheet" href="../css/home.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Menu Lateral -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <i class="fas fa-user-circle user-avatar"></i>
+                    <div class="user-info">
+                        <span class="user-name" id="sidebar-user-name"></span>
+                        <span class="user-unit" id="sidebar-user-unit"></span>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <ul>
+                    <li>
+                        <a href="home.html">
+                            <i class="fas fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="old_home.html">
+                            <i class="fas fa-gauge"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="documentos.html">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Documentos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="validades.html">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Validades</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="procedimentos_operacionais.html">
+                            <i class="fas fa-book"></i>
+                            <span>Procedimentos Operacionais</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="comunicaçao_ocorrencia.html">
+                            <i class="fas fa-bullhorn"></i>
+                            <span>Comunicação de Ocorrencia</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="invetigacao.html">
+                            <i class="fas fa-search"></i>
+                            <span>Investigação de Ocorrencia</span>
+                        </a>
+                    </li>
+                    <li class="active2">
+                        <a href="gerenciamento_user_units.html">
+                            <i class="fas fa-users"></i>
+                            <span>Gerenciamento de Unidades</span>
+                        </a>
+                    </li>
+                    <li class="active2">
+                        <a href="documentos_desativados.html">
+                            <i class="fas fa-paste"></i>
+                            <span>Documentos Desativados</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+
+            <div class="modal fade" id="senhaModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">🔒 Acesso Restrito</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Por favor, insira a senha para acessar o Gerenciamento de Unidades:</p>
+                            <input type="password" id="senhaInput" class="form-control" placeholder="Digite a senha">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-primary" id="confirmarSenha">Acessar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+            <!-- Seletor de Unidades com Botão de Confirmação -->
+            <div id="unit-selector-container" style="display: none; margin-bottom: 10px;">
+                <label for="unit-selector" style="font-size: 0.8rem; color: #ecf0f1;">Alternar Unidade</label>
+                <select class="form-select form-select-sm" id="unit-selector" style="background-color: #34495e; color: white; border: 1px solid #4a6278; margin-bottom: 5px;">
+                    <option value="">Selecione uma unidade</option>
+                </select>
+                <button id="confirm-unit-change" class="btn btn-sm btn-success w-100" style="display: none;">
+                    <i class="fas fa-check"></i> Confirmar
+                </button>
+            </div>
+            
+            <button class="btn btn-danger btn-sm w-100" id="sidebar-logout-btn">
+                <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Sair</span>
+            </button>
+        </div>
+            
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1 id="content-title">Visualizações e Gráficos</h1>
+                <div class="breadcrumb">
+                    <span>Gráficos</span>
+                </div>
+            </header>
+            
+            <!-- Seção de Filtros -->
+            <div class="filter-section">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="filter-unit" class="form-label">Unidade</label>
+                        <select class="form-select" id="filter-unit">
+                            <option value="">Todas as unidades</option>
+                            <!-- Opções serão carregadas dinamicamente -->
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filter-type" class="form-label">Tipo</label>
+                        <select class="form-select" id="filter-type">
+                            <option value="">Todos os tipos</option>
+                            <!-- Opções serão carregadas dinamicamente -->
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filter-status" class="form-label">Status</label>
+                        <select class="form-select" id="filter-status">
+                            <option value="">Todos os status</option>
+                            <option value="valido">Válido</option>
+                            <option value="vencido">Vencido</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button class="btn btn-primary" id="apply-filters">Aplicar Filtros</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Primeira Linha de Gráficos -->
+            <div class="chart-row">
+                <div class="chart-col">
+                    <div class="chart-container">
+                        <h4>Documentos por Tipo</h4>
+                        <canvas id="typeChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-col">
+                    <div class="chart-container">
+                        <h4>Documentos por Unidade</h4>
+                        <canvas id="unitChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Segunda Linha de Gráficos -->
+            <div class="chart-row">
+                <div class="chart-col">
+                    <div class="chart-container">
+                        <h4>Status dos Documentos</h4>
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-col">
+                    <div class="chart-container">
+                        <h4>Vencimento por Mês</h4>
+                        <canvas id="expirationChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Terceira Linha de Gráficos -->
+            <div class="chart-row">
+                <div class="chart-col">
+                    <div class="chart-container">
+                        <h4>Distribuição Temporal</h4>
+                        <canvas id="timelineChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-col">
+                    <div class="chart-container">
+                        <h4>Status por Unidade</h4>
+                        <canvas id="unitStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quarta Linha de Gráficos -->
+            <div class="chart-row">
+                <div class="chart-col">
+                    <div class="chart-container">
+                        <h4>Documentos Criados por Mês</h4>
+                        <canvas id="creationChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-col">
+                    <div class="chart-container">
+                        <h4>Validade por Tipo</h4>
+                        <canvas id="typeStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/home.js"></script>
+</body>
+</html>
