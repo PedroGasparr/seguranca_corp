@@ -921,6 +921,10 @@ textarea.form-control {
     display: none;
 }
 
+.btn.btn-success1{
+    display: none;
+}
+
 .text-truncate {
     overflow: hidden;
     text-overflow: ellipsis;
