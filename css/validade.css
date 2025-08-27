@@ -852,3 +852,26 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--secondary);
 }
+.btn-view-docs {
+    background-color: #4CAF50; /* Verde moderno */
+    color: white; /* Cor do texto */
+    padding: 12px 24px; /* Espaçamento interno */
+    font-size: 16px; /* Tamanho da fonte */
+    font-weight: 600; /* Negrito leve */
+    border: none; /* Remove borda padrão */
+    border-radius: 8px; /* Bordas arredondadas */
+    cursor: pointer; /* Cursor de mão */
+    transition: all 0.3s ease; /* Transição suave */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+.btn-view-docs:hover {
+    background-color: #45a049; /* Verde mais escuro no hover */
+    transform: translateY(-2px); /* Leve movimento para cima */
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15); /* Sombra maior */
+}
+
+.btn-view-docs:active {
+    transform: translateY(1px); /* Efeito de clique */
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2); /* Sombra reduzida */
+}
