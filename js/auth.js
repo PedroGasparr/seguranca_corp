@@ -1,26 +1,168 @@
 // Configuração do Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyDZwa4XNqlupNDLs7-CRQbhr5pRT4NyFBA",
-  authDomain: "application-gzl.firebaseapp.com",
-  databaseURL: "https://application-gzl-default-rtdb.firebaseio.com",
-  projectId: "application-gzl",
-  storageBucket: "application-gzl.appspot.com",
-  messagingSenderId: "319900903265",
-  appId: "1:319900903265:web:a8f400aeb7a697fc168720",
-  measurementId: "G-ZRRFQZXT54"
+    apiKey: "AIzaSyDZwa4XNqlupNDLs7-CRQbhr5pRT4NyFBA",
+    authDomain: "application-gzl.firebaseapp.com",
+    databaseURL: "https://application-gzl-default-rtdb.firebaseio.com",
+    projectId: "application-gzl",
+    storageBucket: "application-gzl.appspot.com",
+    messagingSenderId: "319900903265",
+    appId: "1:319900903265:web:a8f400aeb7a697fc168720",
+    measurementId: "G-ZRRFQZXT54"
 };
 
-// Inicializa o Firebase
-firebase.initializeApp(firebaseConfig);
+// Inicializa o Firebase apenas se não estiver inicializado
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Verifica se está na página de login ou home
-const isLoginPage = window.location.pathname.includes('index.html') || 
-                    window.location.pathname === '/' || 
-                    window.location.pathname === '/index.html';
+// Sistema de autenticação universal
+class AuthSystem {
+    constructor() {
+        this.user = null;
+        this.userData = null;
+        this.init();
+    }
 
-const isHomePage = window.location.pathname.includes('./src/home.html');
+    async init() {
+        this.setupAuthStateListener();
+        this.checkAuthState();
+        this.setupGlobalEventListeners();
+    }
+
+    setupAuthStateListener() {
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                this.user = user;
+                await this.loadUserData(user.uid);
+                this.updateUI(true);
+                console.log('Usuário autenticado:', user.email);
+                
+                // Se estiver na página de login, redireciona para home
+                if (this.isLoginPage()) {
+                    setTimeout(() => {
+                        window.location.href = './src/home.html';
+                    }, 1000);
+                }
+            } else {
+                this.user = null;
+                this.userData = null;
+                this.updateUI(false);
+                console.log('Usuário não autenticado');
+                
+                // Se não estiver na página de login e não for página pública, redireciona
+                if (!this.isLoginPage() && !this.isPublicRoute()) {
+                    this.redirectToLogin();
+                }
+            }
+        });
+    }
+
+    async checkAuthState() {
+        try {
+            const user = auth.currentUser;
+            if (user) {
+                await this.loadUserData(user.uid);
+                this.updateUI(true);
+            } else if (!this.isLoginPage() && !this.isPublicRoute()) {
+                this.redirectToLogin();
+            }
+        } catch (error) {
+            console.error('Erro ao verificar autenticação:', error);
+            if (!this.isLoginPage() && !this.isPublicRoute()) {
+                this.redirectToLogin();
+            }
+        }
+    }
+
+    async loadUserData(uid) {
+        try {
+            const userDoc = await db.collection('users').doc(uid).get();
+            if (userDoc.exists) {
+                this.userData = userDoc.data();
+                this.updateUserInfo();
+            }
+        } catch (error) {
+            console.error('Erro ao carregar dados do usuário:', error);
+        }
+    }
+
+    updateUI(isAuthenticated) {
+        // Atualiza elementos da interface baseado no estado de autenticação
+        const authElements = document.querySelectorAll('[data-auth]');
+        const unauthElements = document.querySelectorAll('[data-unauth]');
+
+        if (isAuthenticated) {
+            authElements.forEach(el => el.style.display = '');
+            unauthElements.forEach(el => el.style.display = 'none');
+        } else {
+            authElements.forEach(el => el.style.display = 'none');
+            unauthElements.forEach(el => el.style.display = '');
+        }
+    }
+
+    updateUserInfo() {
+        // Atualiza informações do usuário na UI
+        const userNameElements = document.querySelectorAll('[data-user-name]');
+        const userUnitElements = document.querySelectorAll('[data-user-unit]');
+        const userEmailElements = document.querySelectorAll('[data-user-email]');
+
+        if (this.userData && this.user) {
+            userNameElements.forEach(el => {
+                el.textContent = this.userData.name || this.user.email;
+            });
+            
+            userUnitElements.forEach(el => {
+                el.textContent = this.userData.unit || 'N/A';
+            });
+
+            userEmailElements.forEach(el => {
+                el.textContent = this.user.email;
+            });
+        }
+    }
+
+    isLoginPage() {
+        return window.location.pathname.includes('index.html') || 
+               window.location.pathname === '/' || 
+               window.location.pathname.endsWith('/');
+    }
+
+    isPublicRoute() {
+        const publicRoutes = ['index.html', 'login.html', 'register.html', 'forgot-password.html'];
+        return publicRoutes.some(route => window.location.pathname.includes(route));
+    }
+
+    redirectToLogin() {
+        if (!this.isLoginPage()) {
+            console.log('Redirecionando para login...');
+            window.location.href = 'index.html';
+        }
+    }
+
+    async logout() {
+        try {
+            await auth.signOut();
+            console.log('Usuário deslogado com sucesso');
+            window.location.href = 'index.html';
+        } catch (error) {
+            console.error('Erro ao fazer logout:', error);
+        }
+    }
+
+    setupGlobalEventListeners() {
+        // Configura todos os botões de logout
+        const logoutButtons = document.querySelectorAll('[data-logout]');
+        logoutButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.logout();
+            });
+        });
+    }
+}
 
 // Funções compartilhadas
 function showMessage(elementId, message, type) {
@@ -60,11 +202,11 @@ function toggleLoading(buttonId, isLoading) {
         
         if (isLoading) {
             button.disabled = true;
-            spinner.classList.remove('hidden');
+            if (spinner) spinner.classList.remove('hidden');
             if (buttonText) buttonText.classList.add('hidden');
         } else {
             button.disabled = false;
-            spinner.classList.add('hidden');
+            if (spinner) spinner.classList.add('hidden');
             if (buttonText) buttonText.classList.remove('hidden');
         }
     }
@@ -74,25 +216,30 @@ function toggleAuthForms() {
     const loginContainer = document.getElementById('login-container');
     const registerContainer = document.getElementById('register-container');
     
-    if (loginContainer.classList.contains('hidden')) {
-        loginContainer.classList.remove('hidden');
-        registerContainer.classList.add('hidden');
-    } else {
-        loginContainer.classList.add('hidden');
-        registerContainer.classList.remove('hidden');
+    if (loginContainer && registerContainer) {
+        if (loginContainer.classList.contains('hidden')) {
+            loginContainer.classList.remove('hidden');
+            registerContainer.classList.add('hidden');
+        } else {
+            loginContainer.classList.add('hidden');
+            registerContainer.classList.remove('hidden');
+        }
     }
 }
 
-// Lógica da página de login
-if (isLoginPage) {
+// Lógica específica da página de login
+if (window.location.pathname.includes('index.html') || 
+    window.location.pathname === '/' || 
+    window.location.pathname.endsWith('/')) {
+    
     // Alternar entre login e registro
     document.getElementById('show-register-link')?.addEventListener('click', (e) => {
         e.preventDefault();
         toggleAuthForms();
         
         // Preenche o email se já estiver preenchido no login
-        const loginEmail = document.getElementById('login-email').value;
-        if (loginEmail) {
+        const loginEmail = document.getElementById('login-email')?.value;
+        if (loginEmail && document.getElementById('register-email')) {
             document.getElementById('register-email').value = loginEmail;
         }
     });
@@ -118,7 +265,7 @@ if (isLoginPage) {
                 });
             })
             .then(() => {
-                window.location.href = './src/home.html';
+                showMessage('login-message', 'Login realizado com sucesso! Redirecionando...', 'success');
             })
             .catch((error) => {
                 let errorMessage = error.message;
@@ -205,7 +352,6 @@ if (isLoginPage) {
             })
             .then(() => {
                 showMessage('register-message', 'Conta criada com sucesso! Redirecionando...', 'success');
-                setTimeout(() => window.location.href = './src/home.html', 2000);
             })
             .catch((error) => {
                 let errorMessage = error.message;
@@ -224,64 +370,44 @@ if (isLoginPage) {
     });
 }
 
-// Lógica da página home
-if (isHomePage) {
-    const loadUserData = (user) => {
-        db.collection('users').doc(user.uid).get()
-            .then((doc) => {
-                if (!doc.exists) {
-                    console.log("Documento do usuário não encontrado");
-                    return;
-                }
-                
-                const userData = doc.data();
-                
-                // Atualiza a interface
-                document.getElementById('sidebar-user-name').textContent =
-                    userData?.name || user.displayName || "Usuário";
-                document.getElementById('home-user-unit').textContent = 
-                    userData?.unit || "Não definida";
-                document.getElementById('home-user-unit-detail').textContent = 
-                    userData?.unit || "Não definida";
-                document.getElementById('home-user-email').textContent = user.email;
-                
-                if (userData?.createdAt) {
-                    const date = userData.createdAt.toDate();
-                    document.getElementById('home-user-created-at').textContent = 
-                        date.toLocaleDateString('pt-BR') + ' às ' + date.toLocaleTimeString('pt-BR');
-                }
-                
-                if (userData?.lastLogin) {
-                    const lastLoginDate = userData.lastLogin.toDate();
-                    document.getElementById('home-user-last-login').textContent = 
-                        lastLoginDate.toLocaleDateString('pt-BR') + ' às ' + lastLoginDate.toLocaleTimeString('pt-BR');
-                }
-            })
-            .catch((error) => {
-                console.log("Erro ao carregar dados:", error);
-                document.getElementById('home-user-name').textContent = 
-                    user.displayName || "Usuário";
-                document.getElementById('home-user-unit').textContent = "Não definida";
-                document.getElementById('home-user-email').textContent = user.email;
-            });
-    };
+// Inicialização do sistema de autenticação
+document.addEventListener('DOMContentLoaded', function() {
+    window.authSystem = new AuthSystem();
+    
+    // Adiciona classe de carregamento
+    document.body.classList.add('auth-loading');
 
-    // Logout
-    document.getElementById('sidebar-logout-btn')?.addEventListener('click', logoutUser);
+    // Remove classe de carregamento após 2 segundos
+    setTimeout(() => {
+        document.body.classList.remove('auth-loading');
+    }, 2000);
+});
 
-    // Verifica autenticação ao carregar a home
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            loadUserData(user);
-        } else {
-            window.location.href = 'index.html';
-        }
-    });
+// Estilos CSS para estados de carregamento
+const authStyles = `
+<style>
+.auth-loading {
+    opacity: 0.7;
+    pointer-events: none;
 }
-function logoutUser() {
-            firebase.auth().signOut().then(() => {
-                window.location.href = 'index.html';
-            }).catch(error => {
-                console.error('Erro ao fazer logout:', error);
-            });
-        }
+
+.auth-loading::after {
+    content: 'Verificando autenticação...';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    z-index: 10000;
+}
+
+[data-auth] { display: none; }
+[data-unauth] { display: none; }
+</style>
+`;
+
+// Adiciona os estilos ao documento
+document.head.insertAdjacentHTML('beforeend', authStyles);
