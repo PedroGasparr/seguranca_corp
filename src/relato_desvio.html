@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investigação de Ocorrência</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/comunicaçãao_ocorrencia.css">
+    <style>
+        /* Estilos adicionais para melhorar a aparência dos campos calculados */
+        .calculated-field {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+        }
+        
+        /* Estilo para seções dinâmicas */
+        .dynamic-section {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hamburger Menu Button (visível apenas em mobile) -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <div class="app-container">
+        <!-- Menu Lateral -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <i class="fas fa-user-circle user-avatar"></i>
+                    <div class="user-info">
+                        <span class="user-name" id="sidebar-user-name"></span>
+                        <span class="user-unit" id="sidebar-user-unit"></span>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <ul>
+                    <li>
+                        <a href="home.html">
+                            <i class="fas fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="old_home.html">
+                            <i class="fas fa-gauge"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="documentos.html">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Documentos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="validades.html">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Validades</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="procedimentos_operacionais.html">
+                            <i class="fas fa-book"></i>
+                            <span>Procedimentos Operacionais</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="comunicaçao_ocorrencia.html">
+                            <i class="fas fa-bullhorn"></i>
+                            <span>Comunicação de Ocorrência</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="invetigacao.html">
+                            <i class="fas fa-search"></i>
+                            <span>Investigação de Ocorrência</span>
+                        </a>
+                    </li>
+                    <!-- Nova Aba - Relatos de Desvio -->
+                    <li>
+                        <a class="active" href="relato_desvio.html">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>Relatos de Desvio</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="confirm-unit-change" class="btn btn-sm btn-success w-100" style="display: none;">
+                    <i class="fas fa-check"></i> Confirmar
+                </button>
+            </div>
+            
+            <button class="btn btn-danger btn-sm w-100" id="sidebar-logout-btn">
+                <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Sair</span>
+            </button>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>Relatos de Desvio</h1>
+                <div class="breadcrumb">Formulário • Relatos de Desvio</div>
+            </div>
+
+            <div class="form-container">
+                <form id="relatoDesvioForm">
+                    <!-- Seção 1: Informações Gerais -->
+                    <div class="form-section">
+                        <h3>Informações Gerais</h3>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="dataRelato" class="form-label">Data:</label>
+                                    <input type="date" class="form-control" id="dataRelato" name="dataRelato" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="abertoPara" class="form-label">Aberto Para:</label>
+                                    <select class="form-control" id="abertoPara" name="abertoPara" required>
+                                        <option value="">Selecione</option>
+                                        <option value="COLABORADOR GZL">COLABORADOR GZL</option>
+                                        <option value="CLIENTE">CLIENTE</option>
+                                        <option value="MOTORISTA">MOTORISTA</option>
+                                        <option value="TERCEIROS">TERCEIROS</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="tipoDesvio" class="form-label">Tipo de Desvio:</label>
+                                    <select class="form-control" id="tipoDesvio" name="tipoDesvio" required onchange="mostrarSecaoEspecifica()">
+                                        <option value="">Selecione</option>
+                                        <option value="BOM_SENSO">BOM SENSO</option>
+                                        <option value="COMPORTAMENTAL">COMPORTAMENTAL</option>
+                                        <option value="ESTRUTURAL">ESTRUTURAL</option>
+                                        <option value="PROCESSO">PROCESSO</option>
+                                        <option value="INCIDENTE">INCIDENTE</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção 2: BOM SENSO (Dinâmica) -->
+                    <div id="secaoBomSenso" class="form-section dynamic-section">
+                        <h3>Detalhes - Bom Senso</h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Tipo:</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="areaSuja" name="bomSenso" value="ÁREA SUJA">
+                                    <label for="areaSuja">ÁREA SUJA</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="areaDesorganizada" name="bomSenso" value="ÁREA DESORGANIZADA">
+                                    <label for="areaDesorganizada">ÁREA DESORGANIZADA</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="materiaisDesnecessarios" name="bomSenso" value="MATERIAIS/FERRAMENTAS DESNECESSÁRIOS NA ÁREA DE TRABALHO">
+                                    <label for="materiaisDesnecessarios">MATERIAIS/FERRAMENTAS DESNECESSÁRIOS NA ÁREA DE TRABALHO</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="produtosMalEmpilhados" name="bomSenso" value="PRODUTOS MAL EMPILHADOS">
+                                    <label for="produtosMalEmpilhados">PRODUTOS MAL EMPILHADOS</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção 3: COMPORTAMENTAL (Dinâmica) -->
+                    <div id="secaoComportamental" class="form-section dynamic-section">
+                        <h3>Detalhes - Comportamental</h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Categoria:</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="faltaUsoEPI" name="categoriaComportamental" value="FALTA DO USO DO EPI" onchange="mostrarSubsecaoComportamental()">
+                                    <label for="faltaUsoEPI">FALTA DO USO DO EPI</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="usoIncorretoEPI" name="categoriaComportamental" value="USO INCORRETO DO EPI" onchange="mostrarSubsecaoComportamental()">
+                                    <label for="usoIncorretoEPI">USO INCORRETO DO EPI</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="descumprimentoProcedimento" name="categoriaComportamental" value="DESCUMPRIMENTO DO PROCEDIMENTO" onchange="mostrarSubsecaoComportamental()">
+                                    <label for="descumprimentoProcedimento">DESCUMPRIMENTO DO PROCEDIMENTO</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Subseção para EPI -->
+                        <div id="subsecaoEPI" class="dynamic-section">
+                            <div class="form-group">
+                                <label class="form-label">Itens:</label>
+                                <div class="checkbox-group">
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="capacete" name="itensEPI" value="CAPACETE OU BONÉ COM CASQUETE">
+                                        <label for="capacete">CAPACETE OU BONÉ COM CASQUETE</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="oculos" name="itensEPI" value="ÓCULOS">
+                                        <label for="oculos">ÓCULOS</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="protetorAuricular" name="itensEPI" value="PROTETOR AURICULAR">
+                                        <label for="protetorAuricular">PROTETOR AURICULAR</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="protetorFacial" name="itensEPI" value="PROTETOR FACIAL">
+                                        <label for="protetorFacial">PROTETOR FACIAL</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="mascaraRespiratoria" name="itensEPI" value="MÁSCARA RESPIRATÓRIA">
+                                        <label for="mascaraRespiratoria">MÁSCARA RESPIRATÓRIA</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="uniformeRefletivo" name="itensEPI" value="UNIFORME COM REFLETIVO">
+                                        <label for="uniformeRefletivo">UNIFORME COM REFLETIVO</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="mangote" name="itensEPI" value="MANGOTE">
+                                        <label for="mangote">MANGOTE</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="luva" name="itensEPI" value="LUVA">
+                                        <label for="luva">LUVA</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="cintoSeguranca" name="itensEPI" value="CINTO DE SEGURANÇA">
+                                        <label for="cintoSeguranca">CINTO DE SEGURANÇA</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="perneira" name="itensEPI" value="PERNEIRA">
+                                        <label for="perneira">PERNEIRA</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="calcadoSeguranca" name="itensEPI" value="CALÇADO DE SEGURANÇA">
+                                        <label for="calcadoSeguranca">CALÇADO DE SEGURANÇA</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="outrosEPI" name="itensEPI" value="OUTROS">
+                                        <label for="outrosEPI">OUTROS</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Subseção para Procedimentos -->
+                        <div id="subsecaoProcedimento" class="dynamic-section">
+                            <div class="form-group">
+                                <label class="form-label">Procedimentos:</label>
+                                <div class="checkbox-group">
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="aberturaVeiculos" name="procedimentos" value="ABERTURA DE VEÍCULOS">
+                                        <label for="aberturaVeiculos">ABERTURA DE VEÍCULOS</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="amarracaoCarga" name="procedimentos" value="AMARRAÇÃO DE CARGA">
+                                        <label for="amarracaoCarga">AMARRAÇÃO DE CARGA</label>
+                                    </div>
+                                    <!-- Adicione os outros procedimentos seguindo o mesmo padrão -->
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="outrosProcedimentos" name="procedimentos" value="OUTROS">
+                                        <label for="outrosProcedimentos">OUTROS</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção 4: ESTRUTURAL (Dinâmica) -->
+                    <div id="secaoEstrutural" class="form-section dynamic-section">
+                        <h3>Detalhes - Estrutural</h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Itens:</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="iluminacaoInsuficiente" name="estrutural" value="ÁREA COM ILUMINAÇÃO INSUFICIENTE">
+                                    <label for="iluminacaoInsuficiente">ÁREA COM ILUMINAÇÃO INSUFICIENTE</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="ventilacaoInadequada" name="estrutural" value="ÁREA COM VENTILAÇÃO INADEQUADA">
+                                    <label for="ventilacaoInadequada">ÁREA COM VENTILAÇÃO INADEQUADA</label>
+                                </div>
+                                <!-- Adicione os outros itens estruturais seguindo o mesmo padrão -->
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="outrosEstrutural" name="estrutural" value="OUTROS">
+                                    <label for="outrosEstrutural">OUTROS</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção 5: PROCESSO (Dinâmica) -->
+                    <div id="secaoProcesso" class="form-section dynamic-section">
+                        <h3>Detalhes - Processo</h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Itens:</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="atividadeSemTreinamento" name="processo" value="ATIVIDADE REALIZADA SEM TREINAMENTO">
+                                    <label for="atividadeSemTreinamento">ATIVIDADE REALIZADA SEM TREINAMENTO</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="atividadesSemMapaRisco" name="processo" value="ATIVIDADES SEM MAPA DE RISCO ATUALIZADO">
+                                    <label for="atividadesSemMapaRisco">ATIVIDADES SEM MAPA DE RISCO ATUALIZADO</label>
+                                </div>
+                                <!-- Adicione os outros itens de processo seguindo o mesmo padrão -->
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="outrosProcesso" name="processo" value="OUTRO">
+                                    <label for="outrosProcesso">OUTRO</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção 6: INCIDENTE (Dinâmica) -->
+                    <div id="secaoIncidente" class="form-section dynamic-section">
+                        <h3>Detalhes - Incidente</h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Itens:</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="quedaObjeto" name="incidente" value="QUEDA DE OBJETO EM ÁREA DE CIRCULAÇÃO">
+                                    <label for="quedaObjeto">QUEDA DE OBJETO EM ÁREA DE CIRCULAÇÃO</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="escapamentoQuimico" name="incidente" value="ESCAPAMENTO DE PRODUTO QUÍMICO">
+                                    <label for="escapamentoQuimico">ESCAPAMENTO DE PRODUTO QUÍMICO</label>
+                                </div>
+                                
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="outrosIncidente" name="incidente" value="OUTROS">
+                                    <label for="outrosIncidente">OUTROS</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção 7: Medidas Imediatas -->
+                    <div class="form-section">
+                        <h3>Medidas Imediatas</h3>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Houve medida imediata?</label>
+                                    <div class="checkbox-group">
+                                        <div class="checkbox-item">
+                                            <input type="radio" id="medidaImediataSim" name="medidaImediata" value="Sim" required onchange="toggleDescricaoMedida()">
+                                            <label for="medidaImediataSim">Sim</label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="radio" id="medidaImediataNao" name="medidaImediata" value="Não" onchange="toggleDescricaoMedida()">
+                                            <label for="medidaImediataNao">Não</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="descricaoMedida" class="form-label">Descrição:</label>
+                                    <textarea class="form-control" id="descricaoMedida" name="descricaoMedida" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção 8: Aberto Por -->
+                    <div class="form-section">
+                        <h3>Aberto Por</h3>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="abertoPor" class="form-label">Cargo:</label>
+                                    <select class="form-control" id="abertoPor" name="abertoPor" required>
+                                        <option value="">Selecione</option>
+                                        <option value="TÉCNICO EM SEGURANÇA DO TRABALHO">TÉCNICO EM SEGURANÇA DO TRABALHO</option>
+                                        <option value="ANALISTA DE SSMA">ANALISTA DE SSMA</option>
+                                        <option value="ESPECIALISTA DE SSMA">ESPECIALISTA DE SSMA</option>
+                                        <option value="COORDENADOR DE SEGURANÇA DO TRABALHO">COORDENADOR DE SEGURANÇA DO TRABALHO</option>
+                                        <option value="ENCARREGADO LOGISTICO">ENCARREGADO LOGISTICO</option>
+                                        <option value="LIDER LOGISTICO">LIDER LOGISTICO</option>
+                                        <option value="SUPERVISOR LOGISTICO">SUPERVISOR LOGISTICO</option>
+                                        <option value="COORDENADOR LOGISTICO">COORDENADOR LOGISTICO</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-end mt-4">
+                        <button type="submit" class="btn btn-submit" id="btnSubmitRelato">
+                            <i class="fas fa-paper-plane"></i> Enviar Relato
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Relato Enviado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Seu relato de desvio foi enviado com sucesso e salvo no sistema.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Inicialização do Firebase (substitua com suas configurações)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDZwa4XNqlupNDLs7-CRQbhr5pRT4NyFBA",
+            authDomain: "application-gzl.firebaseapp.com",
+            databaseURL: "https://application-gzl-default-rtdb.firebaseio.com",
+            projectId: "application-gzl",
+            storageBucket: "application-gzl.appspot.com",
+            messagingSenderId: "319900903265",
+            appId: "1:319900903265:web:a8f400aeb7a697fc168720",
+            measurementId: "G-ZRRFQZXT54"
+        };
+        
+        // Inicializa o Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Função para mostrar a seção específica baseada no tipo de desvio selecionado
+        function mostrarSecaoEspecifica() {
+            // Oculta todas as seções dinâmicas primeiro
+            document.querySelectorAll('.dynamic-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Mostra a seção correspondente ao tipo selecionado
+            const tipoDesvio = document.getElementById('tipoDesvio').value;
+            if (tipoDesvio === 'BOM_SENSO') {
+                document.getElementById('secaoBomSenso').style.display = 'block';
+            } else if (tipoDesvio === 'COMPORTAMENTAL') {
+                document.getElementById('secaoComportamental').style.display = 'block';
+                // Esconde as subseções iniciais
+                document.getElementById('subsecaoEPI').style.display = 'none';
+                document.getElementById('subsecaoProcedimento').style.display = 'none';
+            } else if (tipoDesvio === 'ESTRUTURAL') {
+                document.getElementById('secaoEstrutural').style.display = 'block';
+            } else if (tipoDesvio === 'PROCESSO') {
+                document.getElementById('secaoProcesso').style.display = 'block';
+            } else if (tipoDesvio === 'INCIDENTE') {
+                document.getElementById('secaoIncidente').style.display = 'block';
+            }
+        }
+        
+        // Função para mostrar a subseção específica no comportamento
+        function mostrarSubsecaoComportamental() {
+            // Oculta todas as subseções primeiro
+            document.getElementById('subsecaoEPI').style.display = 'none';
+            document.getElementById('subsecaoProcedimento').style.display = 'none';
+            
+            // Mostra a subseção correspondente à categoria selecionada
+            const categoria = document.querySelector('input[name="categoriaComportamental"]:checked').value;
+            if (categoria === 'FALTA DO USO DO EPI' || categoria === 'USO INCORRETO DO EPI') {
+                document.getElementById('subsecaoEPI').style.display = 'block';
+            } else if (categoria === 'DESCUMPRIMENTO DO PROCEDIMENTO') {
+                document.getElementById('subsecaoProcedimento').style.display = 'block';
+            }
+        }
+        
+        // Função para habilitar/desabilitar a descrição da medida imediata
+        function toggleDescricaoMedida() {
+            const descricaoMedida = document.getElementById('descricaoMedida');
+            const medidaSelecionada = document.querySelector('input[name="medidaImediata"]:checked');
+            
+            if (medidaSelecionada) {
+                descricaoMedida.disabled = false;
+                descricaoMedida.required = true;
+            } else {
+                descricaoMedida.disabled = true;
+                descricaoMedida.required = false;
+            }
+        }
+        
+        // Função para gerar ID único
+        function generateUniqueId() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const randomNum = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+            return `${year}${month}${day}${randomNum}`;
+        }
+        
+        // Inicialização quando o documento estiver carregado
+        document.addEventListener('DOMContentLoaded', function() {
+            // Preenche automaticamente a data atual
+            const hoje = new Date();
+            const dataFormatada = hoje.toISOString().split('T')[0];
+            document.getElementById('dataRelato').value = dataFormatada;
+            
+            // Envio do formulário
+            document.getElementById('relatoDesvioForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const submitBtn = document.getElementById('btnSubmitRelato');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+                
+                // Coleta todos os dados do formulário
+                const tipoDesvio = document.getElementById('tipoDesvio').value;
+                const relatoData = {
+                    id: generateUniqueId(),
+                    data: document.getElementById('dataRelato').value,
+                    abertoPara: document.getElementById('abertoPara').value,
+                    tipoDesvio: tipoDesvio,
+                    medidaImediata: document.querySelector('input[name="medidaImediata"]:checked').value,
+                    descricaoMedida: document.getElementById('descricaoMedida').value,
+                    abertoPor: document.getElementById('abertoPor').value,
+                    userId: firebase.auth().currentUser.uid,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                // Adiciona dados específicos baseados no tipo de desvio
+                if (tipoDesvio === 'BOM_SENSO') {
+                    relatoData.detalhes = Array.from(document.querySelectorAll('input[name="bomSenso"]:checked')).map(el => el.value);
+                } else if (tipoDesvio === 'COMPORTAMENTAL') {
+                    relatoData.categoria = document.querySelector('input[name="categoriaComportamental"]:checked').value;
+                    
+                    if (relatoData.categoria === 'FALTA DO USO DO EPI' || relatoData.categoria === 'USO INCORRETO DO EPI') {
+                        relatoData.itensEPI = Array.from(document.querySelectorAll('input[name="itensEPI"]:checked')).map(el => el.value);
+                    } else if (relatoData.categoria === 'DESCUMPRIMENTO DO PROCEDIMENTO') {
+                        relatoData.procedimentos = Array.from(document.querySelectorAll('input[name="procedimentos"]:checked')).map(el => el.value);
+                    }
+                } else if (tipoDesvio === 'ESTRUTURAL') {
+                    relatoData.detalhes = Array.from(document.querySelectorAll('input[name="estrutural"]:checked')).map(el => el.value);
+                } else if (tipoDesvio === 'PROCESSO') {
+                    relatoData.detalhes = Array.from(document.querySelectorAll('input[name="processo"]:checked')).map(el => el.value);
+                } else if (tipoDesvio === 'INCIDENTE') {
+                    relatoData.detalhes = Array.from(document.querySelectorAll('input[name="incidente"]:checked')).map(el => el.value);
+                }
+                
+                // Determina a coleção baseada no tipo de desvio
+                let colecao = '';
+                if (tipoDesvio === 'BOM_SENSO') colecao = 'rdbom_senso';
+                else if (tipoDesvio === 'COMPORTAMENTAL') colecao = 'rd_comportamental';
+                else if (tipoDesvio === 'ESTRUTURAL') colecao = 'rd_estrutural';
+                else if (tipoDesvio === 'PROCESSO') colecao = 'rd_processo';
+                else if (tipoDesvio === 'INCIDENTE') colecao = 'rd_incidente';
+                
+                // Salva no Firestore na coleção apropriada
+                firebase.firestore().collection(colecao).doc(relatoData.id).set(relatoData)
+                    .then(() => {
+                        console.log('Documento salvo com ID:', relatoData.id);
+                        
+                        // Mostra modal de confirmação
+                        const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                        modal.show();
+                        
+                        // Limpa o formulário
+                        document.getElementById('relatoDesvioForm').reset();
+                        document.querySelectorAll('.dynamic-section').forEach(section => {
+                            section.style.display = 'none';
+                        });
+                    })
+                    .catch((error) => {
+                        console.error('Erro ao salvar documento:', error);
+                        alert('Ocorreu um erro ao salvar o relato. Por favor, tente novamente.');
+                    })
+                    .finally(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Relato';
+                    });
+            });
+        });
+    </script>
+    <script src="../js/hamb.js"></script>
+</body>
+</html>
