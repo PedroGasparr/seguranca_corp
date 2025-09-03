@@ -1,3 +1,5 @@
+<!--VERSION 3.7a-->
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -104,9 +106,9 @@
                             <span>Investigação de Ocorrência</span>
                         </a>
                     </li>
-                    <!-- Nova Aba - Relatos de Desvio -->
-                    <li>
-                        <a class="active" href="relato_desvio.html">
+                    
+                    <li class="active">
+                        <a href="relato_desvio.html">
                             <i class="fas fa-clipboard-list"></i>
                             <span>Relatos de Desvio</span>
                         </a>
@@ -295,7 +297,204 @@
                                         <input type="checkbox" id="amarracaoCarga" name="procedimentos" value="AMARRAÇÃO DE CARGA">
                                         <label for="amarracaoCarga">AMARRAÇÃO DE CARGA</label>
                                     </div>
-                                    <!-- Adicione os outros procedimentos seguindo o mesmo padrão -->
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="carregamentoEmpilhadeira" name="procedimentos" value="CARREGAMENTO COM EMPILHADEIRA">
+                                        <label for="carregamentoEmpilhadeira">CARREGAMENTO COM EMPILHADEIRA</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="carregamentodecargabatida" name="procedimentos" value="CARREGAMENTO DE CARGA BATIDA">
+                                        <label for="carregamentodecargabatida">CARREGAMENTO DE CARGA BATIDA</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="conducaodecaminhao" name="procedimentos" value="CONDUÇÃO DE CAMINHÃO">
+                                        <label for="conducaodecaminhao">CONDUÇÃO DE CAMINHÃO</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="descargadecaminhaotanque" name="procedimentos" value="DESCARGA DE CAMINHÃO TANQUE">
+                                        <label for="descargadecaminhaotanque">DESCARGA DE CAMINHÃO TANQUE</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="descarregamentocomempilhadeira" name="procedimentos" value="DESCARREGAMENTO COM EMPILHADEIRA">
+                                        <label for="descarregamentocomempilhadeira">DESCARREGAMENTO COM EMPILHADEIRA</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="enlonamentodecarga" name="procedimentos" value="ENLONAMENTO DE CARGA">
+                                        <label for="enlonamentodecarga">ENLONAMENTO DE CARGA</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="fechamentodeveiculos" name="procedimentos" value="FECHAMENTO DE VEÍCULOS">
+                                        <label for="fechamentodeveiculos">FECHAMENTO DE VEÍCULOS</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="limpezapredialouindustrial" name="procedimentos" value="LIMPEZA PREDIAL OU INDUSTRIAL">
+                                        <label for="limpezapredialouindustrial">LIMPEZA PREDIAL OU INDUSTRIAL</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="linhadeproducao" name="procedimentos" value="LINHA DE PRODUÇÃO">
+                                        <label for="linhadeproducao">LINHA DE PRODUÇÃO</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="manobrista" name="procedimentos" value="MANOBRISTA">
+                                        <label for="manobrista">MANOBRISTA</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="manutencaocivil" name="procedimentos" value="MANUTENÇÃO CIVIL">
+                                        <label for="manutencaocivil">MANUTENÇÃO CIVIL</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="manutencaodeempilhadeiras" name="procedimentos" value="MANUTENÇÃO DE EMPILHADEIRAS">
+                                        <label for="manutencaodeempilhadeiras">MANUTENÇÃO DE EMPILHADEIRAS</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="manutencaodepaleteiraetranspaleteiraeletrica" name="procedimentos" value="MANUTENÇÃO DE PALETEIRA E TRANSPALETEIRA ELÉTRICA">
+                                        <label for="manutencaodepaleteiraetranspaleteiraeletrica">MANUTENÇÃO DE PALETEIRA E TRANSPALETEIRA ELÉTRICA</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="operacaodebobcat" name="procedimentos" value="OPERAÇÃO DE BOBCAT">
+                                        <label for="operacaodebobcat">OPERAÇÃO DE BOBCAT</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="operacaodeempilhadeira" name="procedimentos" value="OPERAÇÃO DE EMPILHADEIRA">
+                                        <label for="operacaodeempilhadeira">OPERAÇÃO DE EMPILHADEIRA</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="operacaodelavadeiradepiso" name="procedimentos" value="OPERAÇÃO DE LAVADEIRA DE PISO">
+                                        <label for="operacaodelavadeiradepiso">OPERAÇÃO DE LAVADEIRA DE PISO</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="operacaodepaleteiraoutranspaleteira" name="procedimentos" value="OPERAÇÃO DE PALETEIRA OU TRANSPALETEIRA">
+                                        <label for="operacaodepaleteiraoutranspaleteira">OPERAÇÃO DE PALETEIRA OU TRANSPALETEIRA</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="operacaodepemt" name="procedimentos" value="OPERAÇÃO DE PEMT">
+                                        <label for="operacaodepemt">OPERAÇÃO DE PEMT</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="retrabalhodematerial" name="procedimentos" value="RETRABALHO DE MATERIAL">
+                                        <label for="retrabalhodematerial">RETRABALHO DE MATERIAL</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="vistoria" name="procedimentos" value="VISTORIA">
+                                        <label for="vistoria">VISTORIA</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="outros" name="procedimentos" value="OUTROS">
+                                        <label for="outros">OUTROS</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="conducaodecaminhao" name="procedimentos" value="CONDUÇÃO DE CAMINHÃO">
+                                        <label for="conducaodecaminhao">CONDUÇÃO DE CAMINHÃO</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="descargadecaminhaotanque" name="procedimentos" value="DESCARGA DE CAMINHÃO TANQUE">
+                                        <label for="descargadecaminhaotanque">DESCARGA DE CAMINHÃO TANQUE</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="descarregamentocomempilhadeira" name="procedimentos" value="DESCARREGAMENTO COM EMPILHADEIRA">
+                                        <label for="descarregamentocomempilhadeira">DESCARREGAMENTO COM EMPILHADEIRA</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="enlonamentodecarga" name="procedimentos" value="ENLONAMENTO DE CARGA">
+                                        <label for="enlonamentodecarga">ENLONAMENTO DE CARGA</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="fechamentodeveiculos" name="procedimentos" value="FECHAMENTO DE VEÍCULOS">
+                                        <label for="fechamentodeveiculos">FECHAMENTO DE VEÍCULOS</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="limpezapredialouindustrial" name="procedimentos" value="LIMPEZA PREDIAL OU INDUSTRIAL">
+                                        <label for="limpezapredialouindustrial">LIMPEZA PREDIAL OU INDUSTRIAL</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="linhadeproducao" name="procedimentos" value="LINHA DE PRODUÇÃO">
+                                        <label for="linhadeproducao">LINHA DE PRODUÇÃO</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="manobrista" name="procedimentos" value="MANOBRISTA">
+                                        <label for="manobrista">MANOBRISTA</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="manutencaocivil" name="procedimentos" value="MANUTENÇÃO CIVIL">
+                                        <label for="manutencaocivil">MANUTENÇÃO CIVIL</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="manutencaodeempilhadeiras" name="procedimentos" value="MANUTENÇÃO DE EMPILHADEIRAS">
+                                        <label for="manutencaodeempilhadeiras">MANUTENÇÃO DE EMPILHADEIRAS</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="manutencaodepaleteiraetranspaleteiraeletrica" name="procedimentos" value="MANUTENÇÃO DE PALETEIRA E TRANSPALETEIRA ELÉTRICA">
+                                        <label for="manutencaodepaleteiraetranspaleteiraeletrica">MANUTENÇÃO DE PALETEIRA E TRANSPALETEIRA ELÉTRICA</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="operacaodebobcat" name="procedimentos" value="OPERAÇÃO DE BOBCAT">
+                                        <label for="operacaodebobcat">OPERAÇÃO DE BOBCAT</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="operacaodeempilhadeira" name="procedimentos" value="OPERAÇÃO DE EMPILHADEIRA">
+                                        <label for="operacaodeempilhadeira">OPERAÇÃO DE EMPILHADEIRA</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="operacaodelavadeiradepiso" name="procedimentos" value="OPERAÇÃO DE LAVADEIRA DE PISO">
+                                        <label for="operacaodelavadeiradepiso">OPERAÇÃO DE LAVADEIRA DE PISO</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="operacaodepaleteiraoutranspaleteira" name="procedimentos" value="OPERAÇÃO DE PALETEIRA OU TRANSPALETEIRA">
+                                        <label for="operacaodepaleteiraoutranspaleteira">OPERAÇÃO DE PALETEIRA OU TRANSPALETEIRA</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="operacaodepemt" name="procedimentos" value="OPERAÇÃO DE PEMT">
+                                        <label for="operacaodepemt">OPERAÇÃO DE PEMT</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="retrabalhodematerial" name="procedimentos" value="RETRABALHO DE MATERIAL">
+                                        <label for="retrabalhodematerial">RETRABALHO DE MATERIAL</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="vistoria" name="procedimentos" value="VISTORIA">
+                                        <label for="vistoria">VISTORIA</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="outros" name="procedimentos" value="OUTROS">
+                                        <label for="outros">OUTROS</label>
+                                    </div>
+
+                                    
                                     <div class="checkbox-item">
                                         <input type="checkbox" id="outrosProcedimentos" name="procedimentos" value="OUTROS">
                                         <label for="outrosProcedimentos">OUTROS</label>
@@ -320,7 +519,81 @@
                                     <input type="checkbox" id="ventilacaoInadequada" name="estrutural" value="ÁREA COM VENTILAÇÃO INADEQUADA">
                                     <label for="ventilacaoInadequada">ÁREA COM VENTILAÇÃO INADEQUADA</label>
                                 </div>
-                                <!-- Adicione os outros itens estruturais seguindo o mesmo padrão -->
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="armazensOuPrateleirasDanificadas" name="estrutural" value="ARMAZÉNS OU PRATELEIRAS DANIFICADAS">
+                                    <label for="armazensOuPrateleirasDanificadas">ARMAZÉNS OU PRATELEIRAS DANIFICADAS</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="caixaDePassagemOuCabosEletricosSemTampa" name="estrutural" value="CAIXA DE PASSAGEM OU CABOS ELÉTRICOS SEM TAMPA">
+                                    <label for="caixaDePassagemOuCabosEletricosSemTampa">CAIXA DE PASSAGEM OU CABOS ELÉTRICOS SEM TAMPA</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="coberturaDanificadaComRiscoDeQueda" name="estrutural" value="COBERTURA DANIFICADA COM RISCO DE QUEDA">
+                                    <label for="coberturaDanificadaComRiscoDeQueda">COBERTURA DANIFICADA COM RISCO DE QUEDA</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="defeitoEmEquipamentosDeSeguranca" name="estrutural" value="DEFEITO EM EQUIPAMENTOS DE SEGURANÇA (alarme, sensor, trava)">
+                                    <label for="defeitoEmEquipamentosDeSeguranca">DEFEITO EM EQUIPAMENTOS DE SEGURANÇA (alarme, sensor, trava)</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="defeitoOuAusenciaDeGuardaCorpoCorrimao" name="estrutural" value="DEFEITO OU AUSÊNCIA DE GUARDA-CORPO / CORRIMÃO">
+                                    <label for="defeitoOuAusenciaDeGuardaCorpoCorrimao">DEFEITO OU AUSÊNCIA DE GUARDA-CORPO / CORRIMÃO</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="empilhamentoAcimaDaAlturaPermitida" name="estrutural" value="EMPILHAMENTO ACIMA DA ALTURA PERMITIDA">
+                                    <label for="empilhamentoAcimaDaAlturaPermitida">EMPILHAMENTO ACIMA DA ALTURA PERMITIDA</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="equipamentosOuMaquinasSemProtecaoAdequada" name="estrutural" value="EQUIPAMENTOS OU MÁQUINAS SEM PROTEÇÃO ADEQUADA">
+                                    <label for="equipamentosOuMaquinasSemProtecaoAdequada">EQUIPAMENTOS OU MÁQUINAS SEM PROTEÇÃO ADEQUADA</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="faltaDeSinalizacaoDeSeguranca" name="estrutural" value="FALTA DE SINALIZAÇÃO DE SEGURANÇA (piso, parede, máquinas)">
+                                    <label for="faltaDeSinalizacaoDeSeguranca">FALTA DE SINALIZAÇÃO DE SEGURANÇA (piso, parede, máquinas)</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="fiacaoExpostaInstalacoesEletricasIrregulares" name="estrutural" value="FIAÇÃO EXPOSTA / INSTALAÇÕES ELÉTRICAS IRREGULARES">
+                                    <label for="fiacaoExpostaInstalacoesEletricasIrregulares">FIAÇÃO EXPOSTA / INSTALAÇÕES ELÉTRICAS IRREGULARES</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="maSinalizacaoDeTrafegoInterno" name="estrutural" value="MÁ SINALIZAÇÃO DE TRÁFEGO INTERNO">
+                                    <label for="maSinalizacaoDeTrafegoInterno">MÁ SINALIZAÇÃO DE TRÁFEGO INTERNO</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="obstrucaoDeExtintoresOuHidrantes" name="estrutural" value="OBSTRUÇÃO DE EXTINTORES OU HIDRANTES">
+                                    <label for="obstrucaoDeExtintoresOuHidrantes">OBSTRUÇÃO DE EXTINTORES OU HIDRANTES</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="obstrucaoDeRotasDeFuga" name="estrutural" value="OBSTRUÇÃO DE ROTAS DE FUGA">
+                                    <label for="obstrucaoDeRotasDeFuga">OBSTRUÇÃO DE ROTAS DE FUGA</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="paletesDanificadosEmUso" name="estrutural" value="PALETES DANIFICADOS EM USO">
+                                    <label for="paletesDanificadosEmUso">PALETES DANIFICADOS EM USO</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="pisoIrregularOuDanificado" name="estrutural" value="PISO IRREGULAR OU DANIFICADO">
+                                    <label for="pisoIrregularOuDanificado">PISO IRREGULAR OU DANIFICADO</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="pisoSemFaixaDePedestreDelimitada" name="estrutural" value="PISO SEM FAIXA DE PEDESTRE DELIMITADA">
+                                    <label for="pisoSemFaixaDePedestreDelimitada">PISO SEM FAIXA DE PEDESTRE DELIMITADA</label>
+                                </div>
+
                                 <div class="checkbox-item">
                                     <input type="checkbox" id="outrosEstrutural" name="estrutural" value="OUTROS">
                                     <label for="outrosEstrutural">OUTROS</label>
@@ -344,7 +617,103 @@
                                     <input type="checkbox" id="atividadesSemMapaRisco" name="processo" value="ATIVIDADES SEM MAPA DE RISCO ATUALIZADO">
                                     <label for="atividadesSemMapaRisco">ATIVIDADES SEM MAPA DE RISCO ATUALIZADO</label>
                                 </div>
-                                <!-- Adicione os outros itens de processo seguindo o mesmo padrão -->
+                                
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="ausenciaDeAprPtAntesDaAtividade" name="processo" value="AUSÊNCIA DE APR/PT ANTES DA ATIVIDADE">
+                                    <label for="ausenciaDeAprPtAntesDaAtividade">AUSÊNCIA DE APR/PT ANTES DA ATIVIDADE</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="checklistDeEpiNaoRealizado" name="processo" value="CHECKLIST DE EPI NÃO REALIZADO">
+                                    <label for="checklistDeEpiNaoRealizado">CHECKLIST DE EPI NÃO REALIZADO</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="checklistDeVeiculoNaoRealizado" name="processo" value="CHECKLIST DE VEÍCULO NÃO REALIZADO">
+                                    <label for="checklistDeVeiculoNaoRealizado">CHECKLIST DE VEÍCULO NÃO REALIZADO</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="falhaEmAuditoriaDeRotina" name="processo" value="FALHA EM AUDITORIA DE ROTINA">
+                                    <label for="falhaEmAuditoriaDeRotina">FALHA EM AUDITORIA DE ROTINA</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="falhaEmInspecaoPreUsoDeEquipamentos" name="processo" value="FALHA EM INSPEÇÃO PRÉ-USO DE EQUIPAMENTOS">
+                                    <label for="falhaEmInspecaoPreUsoDeEquipamentos">FALHA EM INSPEÇÃO PRÉ-USO DE EQUIPAMENTOS</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="faltaDePadronizacaoNoCarregamento" name="processo" value="FALTA DE PADRONIZAÇÃO NO CARREGAMENTO">
+                                    <label for="faltaDePadronizacaoNoCarregamento">FALTA DE PADRONIZAÇÃO NO CARREGAMENTO</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="inicioDeAtividadeSemAutorizacaoFormal" name="processo" value="INÍCIO DE ATIVIDADE SEM AUTORIZAÇÃO FORMAL">
+                                    <label for="inicioDeAtividadeSemAutorizacaoFormal">INÍCIO DE ATIVIDADE SEM AUTORIZAÇÃO FORMAL</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="instrucoesDeTrabalhoDesatualizadas" name="processo" value="INSTRUÇÕES DE TRABALHO DESATUALIZADAS">
+                                    <label for="instrucoesDeTrabalhoDesatualizadas">INSTRUÇÕES DE TRABALHO DESATUALIZADAS</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="manutencaoPreventivaAtrasada" name="processo" value="MANUTENÇÃO PREVENTIVA ATRASADA">
+                                    <label for="manutencaoPreventivaAtrasada">MANUTENÇÃO PREVENTIVA ATRASADA</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="misturaInadequadaDeProdutosQuimicos" name="processo" value="MISTURA INADEQUADA DE PRODUTOS QUÍMICOS">
+                                    <label for="misturaInadequadaDeProdutosQuimicos">MISTURA INADEQUADA DE PRODUTOS QUÍMICOS</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="movimentacaoDeCargaSemGuiaSinalizador" name="processo" value="MOVIMENTAÇÃO DE CARGA SEM GUIA/SINALIZADOR">
+                                    <label for="movimentacaoDeCargaSemGuiaSinalizador">MOVIMENTAÇÃO DE CARGA SEM GUIA/SINALIZADOR</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="movimentacaoManualAcimaDoLimitePermitido" name="processo" value="MOVIMENTAÇÃO MANUAL ACIMA DO LIMITE PERMITIDO">
+                                    <label for="movimentacaoManualAcimaDoLimitePermitido">MOVIMENTAÇÃO MANUAL ACIMA DO LIMITE PERMITIDO</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="naoRegistrarResultadosDeInspecoes" name="processo" value="NÃO REGISTRAR RESULTADOS DE INSPEÇÕES">
+                                    <label for="naoRegistrarResultadosDeInspecoes">NÃO REGISTRAR RESULTADOS DE INSPEÇÕES</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="operacaoSemMonitoramentoDoResponsavel" name="processo" value="OPERAÇÃO SEM MONITORAMENTO DO RESPONSÁVEL">
+                                    <label for="operacaoSemMonitoramentoDoResponsavel">OPERAÇÃO SEM MONITORAMENTO DO RESPONSÁVEL</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="procedimentoNaoDivulgadoATodos" name="processo" value="PROCEDIMENTO NÃO DIVULGADO A TODOS">
+                                    <label for="procedimentoNaoDivulgadoATodos">PROCEDIMENTO NÃO DIVULGADO A TODOS</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="processoDeDescarteNaoConforme" name="processo" value="PROCESSO DE DESCARTE NÃO CONFORME">
+                                    <label for="processoDeDescarteNaoConforme">PROCESSO DE DESCARTE NÃO CONFORME</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="produtoArmazenadoEmLocalIncorreto" name="processo" value="PRODUTO ARMAZENADO EM LOCAL INCORRETO">
+                                    <label for="produtoArmazenadoEmLocalIncorreto">PRODUTO ARMAZENADO EM LOCAL INCORRETO</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="produtoQuimicoSemFdsDisponivel" name="processo" value="PRODUTO QUÍMICO SEM FDS DISPONÍVEL">
+                                    <label for="produtoQuimicoSemFdsDisponivel">PRODUTO QUÍMICO SEM FDS DISPONÍVEL</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="trabalhoEmAlturaSemPt" name="processo" value="TRABALHO EM ALTURA SEM PT">
+                                    <label for="trabalhoEmAlturaSemPt">TRABALHO EM ALTURA SEM PT</label>
+                                </div>
+
+
                                 <div class="checkbox-item">
                                     <input type="checkbox" id="outrosProcesso" name="processo" value="OUTRO">
                                     <label for="outrosProcesso">OUTRO</label>
@@ -368,7 +737,92 @@
                                     <input type="checkbox" id="escapamentoQuimico" name="incidente" value="ESCAPAMENTO DE PRODUTO QUÍMICO">
                                     <label for="escapamentoQuimico">ESCAPAMENTO DE PRODUTO QUÍMICO</label>
                                 </div>
-                                
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="derramamentoDeOleoCombustivel" name="incidente" value="DERRAMAMENTO DE ÓLEO COMBUSTÍVEL">
+                                    <label for="derramamentoDeOleoCombustivel">DERRAMAMENTO DE ÓLEO COMBUSTÍVEL</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="principioDeIncendio" name="incidente" value="PRINCÍPIO DE INCÊNDIO">
+                                    <label for="principioDeIncendio">PRINCÍPIO DE INCÊNDIO</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="colisaoDeVeiculosInternos" name="incidente" value="COLISÃO DE VEÍCULOS INTERNOS">
+                                    <label for="colisaoDeVeiculosInternos">COLISÃO DE VEÍCULOS INTERNOS</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="atropelamentoPorEmpilhadeiraSemLesao" name="incidente" value="ATROPELAMENTO POR EMPILHADEIRA (SEM LESÃO)">
+                                    <label for="atropelamentoPorEmpilhadeiraSemLesao">ATROPELAMENTO POR EMPILHADEIRA (SEM LESÃO)</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="tombamentoDeCarga" name="incidente" value="TOMBAMENTO DE CARGA">
+                                    <label for="tombamentoDeCarga">TOMBAMENTO DE CARGA</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="rompimentoDeMangueiraHidraulica" name="incidente" value="ROMPIMENTO DE MANGUEIRA HIDRÁULICA">
+                                    <label for="rompimentoDeMangueiraHidraulica">ROMPIMENTO DE MANGUEIRA HIDRÁULICA</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="falhaEmTravaDeSeguranca" name="incidente" value="FALHA EM TRAVA DE SEGURANÇA">
+                                    <label for="falhaEmTravaDeSeguranca">FALHA EM TRAVA DE SEGURANÇA</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="projecaoDeParticulasEmOperadorSemLesao" name="incidente" value="PROJEÇÃO DE PARTÍCULAS EM OPERADOR (SEM LESÃO)">
+                                    <label for="projecaoDeParticulasEmOperadorSemLesao">PROJEÇÃO DE PARTÍCULAS EM OPERADOR (SEM LESÃO)</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="falhaEmSistemaDeVentilacaoComRisco" name="incidente" value="FALHA EM SISTEMA DE VENTILAÇÃO COM RISCO">
+                                    <label for="falhaEmSistemaDeVentilacaoComRisco">FALHA EM SISTEMA DE VENTILAÇÃO COM RISCO</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="falhaEmSistemaDeAlarmeSemAlertaSonoro" name="incidente" value="FALHA EM SISTEMA DE ALARME SEM ALERTA SONORO">
+                                    <label for="falhaEmSistemaDeAlarmeSemAlertaSonoro">FALHA EM SISTEMA DE ALARME SEM ALERTA SONORO</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="derrapagemDeVeiculoEmPatio" name="incidente" value="DERRAPAGEM DE VEÍCULO EM PÁTIO">
+                                    <label for="derrapagemDeVeiculoEmPatio">DERRAPAGEM DE VEÍCULO EM PÁTIO</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="acidenteComMaterialCortanteSemAfastamento" name="incidente" value="ACIDENTE COM MATERIAL CORTANTE (SEM AFASTAMENTO)">
+                                    <label for="acidenteComMaterialCortanteSemAfastamento">ACIDENTE COM MATERIAL CORTANTE (SEM AFASTAMENTO)</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="contatoLeveComSuperficieQuente" name="incidente" value="CONTATO LEVE COM SUPERFÍCIE QUENTE">
+                                    <label for="contatoLeveComSuperficieQuente">CONTATO LEVE COM SUPERFÍCIE QUENTE</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="tombamentoDePaleteEmMovimentacao" name="incidente" value="TOMBAMENTO DE PALETE EM MOVIMENTAÇÃO">
+                                    <label for="tombamentoDePaleteEmMovimentacao">TOMBAMENTO DE PALETE EM MOVIMENTAÇÃO</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="avariaEmEquipamentoDeProtecaoColetiva" name="incidente" value="AVARIA EM EQUIPAMENTO DE PROTEÇÃO COLETIVA">
+                                    <label for="avariaEmEquipamentoDeProtecaoColetiva">AVARIA EM EQUIPAMENTO DE PROTEÇÃO COLETIVA</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="vazamentoDeGasControlado" name="incidente" value="VAZAMENTO DE GÁS CONTROLADO">
+                                    <label for="vazamentoDeGasControlado">VAZAMENTO DE GÁS CONTROLADO</label>
+                                </div>
+
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="exposicaoARuidoExtremoSemDanosImediato" name="incidente" value="EXPOSIÇÃO A RUÍDO EXTREMO SEM DANOS IMEDIATO">
+                                    <label for="exposicaoARuidoExtremoSemDanosImediato">EXPOSIÇÃO A RUÍDO EXTREMO SEM DANOS IMEDIATO</label>
+                                </div>
+
                                 <div class="checkbox-item">
                                     <input type="checkbox" id="outrosIncidente" name="incidente" value="OUTROS">
                                     <label for="outrosIncidente">OUTROS</label>
