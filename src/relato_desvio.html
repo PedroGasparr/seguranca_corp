@@ -40,9 +40,34 @@
         .checkbox-item input[type="checkbox"] {
             margin-right: 5px;
         }
+        
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
     </style>
 </head>
 <body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Carregando...</span>
+        </div>
+    </div>
+
     <!-- Hamburger Menu Button (visível apenas em mobile) -->
     <button class="sidebar-toggle" id="sidebarToggle">
         <span></span>
@@ -521,7 +546,7 @@
                                 </div>
                                 <div class="checkbox-item">
                                     <input type="checkbox" id="armazensOuPrateleirasDanificadas" name="estrutural" value="ARMAZÉNS OU PRATELEIRAS DANIFICADAS">
-                                    <label for="armazensOuPrateleirasDanificadas">ARMAZÉNS OU PRATELEIRAS DANIFICADAS</label>
+                                    <label for="armazensOuPrateleirasDanificadas">ARMAZÉNS OU PRATELEIRAS DANIFICADas</label>
                                 </div>
 
                                 <div class="checkbox-item">
@@ -744,7 +769,7 @@
                                 </div>
 
                                 <div class="checkbox-item">
-                                    <input type="checkbox" id="principioDeIncendio" name="incidente" value="PRINCÍPIO DE INCÊNDIO">
+                                    <input type="checkbox" id="principioDeIncendio" name="incidente" value="PRINCÍPIO DE INCêNDIO">
                                     <label for="principioDeIncendio">PRINCÍPIO DE INCÊNDIO</label>
                                 </div>
 
@@ -766,7 +791,7 @@
                                 <div class="checkbox-item">
                                     <input type="checkbox" id="rompimentoDeMangueiraHidraulica" name="incidente" value="ROMPIMENTO DE MANGUEIRA HIDRÁULICA">
                                     <label for="rompimentoDeMangueiraHidraulica">ROMPIMENTO DE MANGUEIRA HIDRÁULICA</label>
-                                </div>
+                                    </div>
 
                                 <div class="checkbox-item">
                                     <input type="checkbox" id="falhaEmTravaDeSeguranca" name="incidente" value="FALHA EM TRAVA DE SEGURANÇA">
@@ -937,6 +962,40 @@
         // Inicializa o Firebase
         firebase.initializeApp(firebaseConfig);
         
+        // Variável global para armazenar o usuário atual
+        let currentUser = null;
+        
+        // Verificar autenticação do usuário
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                currentUser = user;
+                console.log("Usuário autenticado:", user.uid);
+                
+                // Carregar informações do usuário no sidebar
+                carregarInformacoesUsuario(user.uid);
+            } else {
+                console.log("Usuário não autenticado. Redirecionando para login...");
+                window.location.href = "../index.html";
+            }
+        });
+        
+        // Função para carregar informações do usuário
+        function carregarInformacoesUsuario(userId) {
+            firebase.firestore().collection("users").doc(userId).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        document.getElementById("sidebar-user-name").textContent = userData.nome || "Usuário";
+                        document.getElementById("sidebar-user-unit").textContent = userData.unidade || "Unidade";
+                    } else {
+                        console.log("Documento do usuário não encontrado");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Erro ao carregar informações do usuário:", error);
+                });
+        }
+        
         // Função para mostrar a seção específica baseada no tipo de desvio selecionado
         function mostrarSecaoEspecifica() {
             // Oculta todas as seções dinâmicas primeiro
@@ -969,11 +1028,13 @@
             document.getElementById('subsecaoProcedimento').style.display = 'none';
             
             // Mostra a subseção correspondente à categoria selecionada
-            const categoria = document.querySelector('input[name="categoriaComportamental"]:checked').value;
-            if (categoria === 'FALTA DO USO DO EPI' || categoria === 'USO INCORRETO DO EPI') {
-                document.getElementById('subsecaoEPI').style.display = 'block';
-            } else if (categoria === 'DESCUMPRIMENTO DO PROCEDIMENTO') {
-                document.getElementById('subsecaoProcedimento').style.display = 'block';
+            const categoria = document.querySelector('input[name="categoriaComportamental"]:checked');
+            if (categoria) {
+                if (categoria.value === 'FALTA DO USO DO EPI' || categoria.value === 'USO INCORRETO DO EPI') {
+                    document.getElementById('subsecaoEPI').style.display = 'block';
+                } else if (categoria.value === 'DESCUMPRIMENTO DO PROCEDIMENTO') {
+                    document.getElementById('subsecaoProcedimento').style.display = 'block';
+                }
             }
         }
         
@@ -982,12 +1043,13 @@
             const descricaoMedida = document.getElementById('descricaoMedida');
             const medidaSelecionada = document.querySelector('input[name="medidaImediata"]:checked');
             
-            if (medidaSelecionada) {
+            if (medidaSelecionada && medidaSelecionada.value === 'Sim') {
                 descricaoMedida.disabled = false;
                 descricaoMedida.required = true;
             } else {
                 descricaoMedida.disabled = true;
                 descricaoMedida.required = false;
+                descricaoMedida.value = '';
             }
         }
         
@@ -1001,6 +1063,16 @@
             return `${year}${month}${day}${randomNum}`;
         }
         
+        // Função para mostrar loading
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+        
+        // Função para esconder loading
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+        
         // Inicialização quando o documento estiver carregado
         document.addEventListener('DOMContentLoaded', function() {
             // Preenche automaticamente a data atual
@@ -1008,78 +1080,109 @@
             const dataFormatada = hoje.toISOString().split('T')[0];
             document.getElementById('dataRelato').value = dataFormatada;
             
+            // Inicialmente desabilita a descrição da medida
+            document.getElementById('descricaoMedida').disabled = true;
+            document.getElementById('descricaoMedida').required = false;
+            
             // Envio do formulário
-            document.getElementById('relatoDesvioForm').addEventListener('submit', function(e) {
+            document.getElementById('relatoDesvioForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
+                
+                // Verificar se o usuário está autenticado
+                if (!currentUser) {
+                    alert("Usuário não autenticado. Por favor, faça login novamente.");
+                    window.location.href = "../index.html";
+                    return;
+                }
                 
                 const submitBtn = document.getElementById('btnSubmitRelato');
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+                showLoading();
                 
-                // Coleta todos os dados do formulário
-                const tipoDesvio = document.getElementById('tipoDesvio').value;
-                const relatoData = {
-                    id: generateUniqueId(),
-                    data: document.getElementById('dataRelato').value,
-                    abertoPara: document.getElementById('abertoPara').value,
-                    tipoDesvio: tipoDesvio,
-                    medidaImediata: document.querySelector('input[name="medidaImediata"]:checked').value,
-                    descricaoMedida: document.getElementById('descricaoMedida').value,
-                    abertoPor: document.getElementById('abertoPor').value,
-                    userId: firebase.auth().currentUser.uid,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                
-                // Adiciona dados específicos baseados no tipo de desvio
-                if (tipoDesvio === 'BOM_SENSO') {
-                    relatoData.detalhes = Array.from(document.querySelectorAll('input[name="bomSenso"]:checked')).map(el => el.value);
-                } else if (tipoDesvio === 'COMPORTAMENTAL') {
-                    relatoData.categoria = document.querySelector('input[name="categoriaComportamental"]:checked').value;
+                try {
+                    // Coleta todos os dados do formulário
+                    const tipoDesvio = document.getElementById('tipoDesvio').value;
+                    const medidaImediata = document.querySelector('input[name="medidaImediata"]:checked');
                     
-                    if (relatoData.categoria === 'FALTA DO USO DO EPI' || relatoData.categoria === 'USO INCORRETO DO EPI') {
-                        relatoData.itensEPI = Array.from(document.querySelectorAll('input[name="itensEPI"]:checked')).map(el => el.value);
-                    } else if (relatoData.categoria === 'DESCUMPRIMENTO DO PROCEDIMENTO') {
-                        relatoData.procedimentos = Array.from(document.querySelectorAll('input[name="procedimentos"]:checked')).map(el => el.value);
+                    const relatoData = {
+                        id: generateUniqueId(),
+                        data: document.getElementById('dataRelato').value,
+                        abertoPara: document.getElementById('abertoPara').value,
+                        tipoDesvio: tipoDesvio,
+                        medidaImediata: medidaImediata ? medidaImediata.value : '',
+                        descricaoMedida: document.getElementById('descricaoMedida').value,
+                        abertoPor: document.getElementById('abertoPor').value,
+                        userId: currentUser.uid,
+                        userEmail: currentUser.email,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    
+                    // Adiciona dados específicos baseados no tipo de desvio
+                    if (tipoDesvio === 'BOM_SENSO') {
+                        relatoData.detalhes = Array.from(document.querySelectorAll('input[name="bomSenso"]:checked')).map(el => el.value);
+                    } else if (tipoDesvio === 'COMPORTAMENTAL') {
+                        const categoria = document.querySelector('input[name="categoriaComportamental"]:checked');
+                        if (categoria) {
+                            relatoData.categoria = categoria.value;
+                            
+                            if (relatoData.categoria === 'FALTA DO USO DO EPI' || relatoData.categoria === 'USO INCORRETO DO EPI') {
+                                relatoData.itensEPI = Array.from(document.querySelectorAll('input[name="itensEPI"]:checked')).map(el => el.value);
+                            } else if (relatoData.categoria === 'DESCUMPRIMENTO DO PROCEDIMENTO') {
+                                relatoData.procedimentos = Array.from(document.querySelectorAll('input[name="procedimentos"]:checked')).map(el => el.value);
+                            }
+                        }
+                    } else if (tipoDesvio === 'ESTRUTURAL') {
+                        relatoData.detalhes = Array.from(document.querySelectorAll('input[name="estrutural"]:checked')).map(el => el.value);
+                    } else if (tipoDesvio === 'PROCESSO') {
+                        relatoData.detalhes = Array.from(document.querySelectorAll('input[name="processo"]:checked')).map(el => el.value);
+                    } else if (tipoDesvio === 'INCIDENTE') {
+                        relatoData.detalhes = Array.from(document.querySelectorAll('input[name="incidente"]:checked')).map(el => el.value);
                     }
-                } else if (tipoDesvio === 'ESTRUTURAL') {
-                    relatoData.detalhes = Array.from(document.querySelectorAll('input[name="estrutural"]:checked')).map(el => el.value);
-                } else if (tipoDesvio === 'PROCESSO') {
-                    relatoData.detalhes = Array.from(document.querySelectorAll('input[name="processo"]:checked')).map(el => el.value);
-                } else if (tipoDesvio === 'INCIDENTE') {
-                    relatoData.detalhes = Array.from(document.querySelectorAll('input[name="incidente"]:checked')).map(el => el.value);
-                }
-                
-                // Determina a coleção baseada no tipo de desvio
-                let colecao = '';
-                if (tipoDesvio === 'BOM_SENSO') colecao = 'rdbom_senso';
-                else if (tipoDesvio === 'COMPORTAMENTAL') colecao = 'rd_comportamental';
-                else if (tipoDesvio === 'ESTRUTURAL') colecao = 'rd_estrutural';
-                else if (tipoDesvio === 'PROCESSO') colecao = 'rd_processo';
-                else if (tipoDesvio === 'INCIDENTE') colecao = 'rd_incidente';
-                
-                // Salva no Firestore na coleção apropriada
-                firebase.firestore().collection(colecao).doc(relatoData.id).set(relatoData)
-                    .then(() => {
-                        console.log('Documento salvo com ID:', relatoData.id);
-                        
-                        // Mostra modal de confirmação
-                        const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
-                        modal.show();
-                        
-                        // Limpa o formulário
-                        document.getElementById('relatoDesvioForm').reset();
-                        document.querySelectorAll('.dynamic-section').forEach(section => {
-                            section.style.display = 'none';
-                        });
-                    })
-                    .catch((error) => {
-                        console.error('Erro ao salvar documento:', error);
-                        alert('Ocorreu um erro ao salvar o relato. Por favor, tente novamente.');
-                    })
-                    .finally(() => {
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Relato';
+                    
+                    // Determina a coleção baseada no tipo de desvio
+                    let colecao = '';
+                    if (tipoDesvio === 'BOM_SENSO') colecao = 'rdbom_senso';
+                    else if (tipoDesvio === 'COMPORTAMENTAL') colecao = 'rd_comportamental';
+                    else if (tipoDesvio === 'ESTRUTURAL') colecao = 'rd_estrutural';
+                    else if (tipoDesvio === 'PROCESSO') colecao = 'rd_processo';
+                    else if (tipoDesvio === 'INCIDENTE') colecao = 'rd_incidente';
+                    
+                    // Salva no Firestore na coleção apropriada
+                    await firebase.firestore().collection(colecao).doc(relatoData.id).set(relatoData);
+                    
+                    console.log('Documento salvo com ID:', relatoData.id);
+                    
+                    // Mostra modal de confirmação
+                    const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                    modal.show();
+                    
+                    // Limpa o formulário
+                    document.getElementById('relatoDesvioForm').reset();
+                    document.querySelectorAll('.dynamic-section').forEach(section => {
+                        section.style.display = 'none';
                     });
+                    
+                    // Restaura a data atual
+                    document.getElementById('dataRelato').value = dataFormatada;
+                    
+                } catch (error) {
+                    console.error('Erro ao salvar documento:', error);
+                    alert('Ocorreu um erro ao salvar o relato. Por favor, tente novamente.');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Relato';
+                    hideLoading();
+                }
+            });
+            
+            // Logout
+            document.getElementById('sidebar-logout-btn').addEventListener('click', function() {
+                firebase.auth().signOut().then(() => {
+                    window.location.href = "../index.html";
+                }).catch((error) => {
+                    console.error("Erro ao fazer logout:", error);
+                });
             });
         });
     </script>
