@@ -5,10 +5,10 @@
     --primary-dark: #3a56d4;
     --primary-light: #627efe;
     --secondary: #3f37c9;
-    --success: #4cc9f0;
+    --success: #0a9c0a;
     --success-dark: #3ab7de;
     --info: #4895ef;
-    --warning: #f72585;
+    --warning: #ecd608;
     --danger: #e63946;
     --danger-dark: #d42a3a;
     --light: #f8f9fa;
@@ -383,12 +383,12 @@ body {
 }
 
 .status-value.conforme {
-    background-color: rgba(76, 201, 240, 0.15);
+    background-color: rgba(3, 247, 23, 0.226);
     color: var(--success);
 }
 
 .status-value.a-vencer {
-    background-color: rgba(247, 37, 133, 0.15);
+    background-color: rgba(219, 206, 20, 0.274);
     color: var(--warning);
 }
 
