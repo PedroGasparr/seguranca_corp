@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de Relatos de Desvio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        /* Estilos consistentes com a aplicação existente */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background-color: #fff;
+        }
+        
+        .content-header {
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .badge {
+            font-size: 0.85em;
+        }
+        
+        .filter-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .action-buttons .btn {
+            margin-right: 5px;
+        }
+        
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+        
+        /* Estilo para mobile */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                padding: 10px;
+            }
+            
+            .sidebar .user-info,
+            .sidebar .sidebar-menu span,
+            .sidebar .logout-text {
+                display: none;
+            }
+            
+            .sidebar-menu {
+                text-align: center;
+            }
+            
+            .sidebar-menu i {
+                font-size: 1.5rem;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Carregando...</span>
+        </div>
+    </div>
+
+    <!-- Hamburger Menu Button (visível apenas em mobile) -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <div class="app-container">
+        <!-- Menu Lateral (mesmo menu da aplicação principal) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <i class="fas fa-user-circle user-avatar"></i>
+                    <div class="user-info">
+                        <span class="user-name" id="sidebar-user-name"></span>
+                        <span class="user-unit" id="sidebar-user-unit"></span>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <ul>
+                    <li>
+                        <a href="home.html">
+                            <i class="fas fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="old_home.html">
+                            <i class="fas fa-gauge"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="documentos.html">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Documentos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="validades.html">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Validades</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="procedimentos_operacionais.html">
+                            <i class="fas fa-book"></i>
+                            <span>Procedimentos Operacionais</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="comunicaçao_ocorrencia.html">
+                            <i class="fas fa-bullhorn"></i>
+                            <span>Comunicação de Ocorrência</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="invetigacao.html">
+                            <i class="fas fa-search"></i>
+                            <span>Investigação de Ocorrência</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="relato_desvio.html">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>Relatos de Desvio</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="historicoRD.html">
+                            <i class="fas fa-history"></i>
+                            <span>Histórico de Relatos</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="confirm-unit-change" class="btn btn-sm btn-success w-100" style="display: none;">
+                    <i class="fas fa-check"></i> Confirmar
+                </button>
+            </div>
+            
+            <button class="btn btn-danger btn-sm w-100" id="sidebar-logout-btn">
+                <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Sair</span>
+            </button>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>Histórico de Relatos de Desvio</h1>
+                <div class="breadcrumb">Relatos de Desvio • Histórico</div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="filter-section">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="filtroTipo" class="form-label">Tipo de Desvio:</label>
+                            <select class="form-control" id="filtroTipo">
+                                <option value="">Todos os tipos</option>
+                                <option value="BOM_SENSO">BOM SENSO</option>
+                                <option value="COMPORTAMENTAL">COMPORTAMENTAL</option>
+                                <option value="ESTRUTURAL">ESTRUTURAL</option>
+                                <option value="PROCESSO">PROCESSO</option>
+                                <option value="INCIDENTE">INCIDENTE</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="filtroDataInicio" class="form-label">Data Início:</label>
+                            <input type="date" class="form-control" id="filtroDataInicio">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="filtroDataFim" class="form-label">Data Fim:</label>
+                            <input type="date" class="form-control" id="filtroDataFim">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="filtroBusca" class="form-label">Buscar:</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="filtroBusca" placeholder="ID ou descrição">
+                                <button class="btn btn-outline-secondary" type="button" id="btnBuscar">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-12 text-end">
+                        <button class="btn btn-secondary" id="btnLimparFiltros">
+                            <i class="fas fa-times"></i> Limpar Filtros
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabela de Histórico -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Relatos Registrados</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="tabelaHistorico">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Data</th>
+                                    <th>Tipo</th>
+                                    <th>Aberto Para</th>
+                                    <th>Detalhes</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Os dados serão preenchidos via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="semResultados" class="alert alert-info mt-3" style="display: none;">
+                        Nenhum relato encontrado com os filtros aplicados.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paginação -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center" id="paginacao">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">Anterior</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Próxima</a>
+                    </li>
+                </ul>
+            </nav>
+        </main>
+    </div>
+
+    <!-- Modal para visualizar detalhes -->
+    <div class="modal fade" id="detalhesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detalhes do Relato</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="detalhesRelato">
+                    <!-- Conteúdo será preenchido via JavaScript -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Configuração do Firebase (usando a mesma configuração do seu código)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDZwa4XNqlupNDLs7-CRQbhr5pRT4NyFBA",
+            authDomain: "application-gzl.firebaseapp.com",
+            databaseURL: "https://application-gzl-default-rtdb.firebaseio.com",
+            projectId: "application-gzl",
+            storageBucket: "application-gzl.appspot.com",
+            messagingSenderId: "319900903265",
+            appId: "1:319900903265:web:a8f400aeb7a697fc168720",
+            measurementId: "G-ZRRFQZXT54"
+        };
+        
+        // Inicializa o Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Variável global para armazenar o usuário atual
+        let currentUser = null;
+        let todosRelatos = [];
+        
+        // Verificar autenticação do usuário
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                currentUser = user;
+                console.log("Usuário autenticado:", user.uid);
+                
+                // Carregar informações do usuário no sidebar
+                carregarInformacoesUsuario(user.uid);
+                
+                // Carregar histórico de relatos
+                carregarHistoricoRelatos();
+            } else {
+                console.log("Usuário não autenticado. Redirecionando para login...");
+                window.location.href = "../index.html";
+            }
+        });
+        
+        // Função para carregar informações do usuário
+        function carregarInformacoesUsuario(userId) {
+            firebase.firestore().collection("users").doc(userId).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        document.getElementById("sidebar-user-name").textContent = userData.nome || "Usuário";
+                        document.getElementById("sidebar-user-unit").textContent = userData.unidade || "Unidade";
+                    } else {
+                        console.log("Documento do usuário não encontrado");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Erro ao carregar informações do usuário:", error);
+                });
+        }
+        
+        // Função para carregar o histórico de relatos
+        function carregarHistoricoRelatos() {
+            showLoading();
+            
+            // Coleções que contêm os relatos
+            const colecoes = [
+                'rdbom_senso',
+                'rd_comportamental',
+                'rd_estrutural',
+                'rd_processo',
+                'rd_incidente'
+            ];
+            
+            todosRelatos = [];
+            let promises = [];
+            
+            // Buscar relatos de todas as coleções
+            colecoes.forEach(colecao => {
+                promises.push(
+                    firebase.firestore().collection(colecao)
+                        .where('userId', '==', currentUser.uid)
+                        .get()
+                        .then((querySnapshot) => {
+                            querySnapshot.forEach((doc) => {
+                                const relato = doc.data();
+                                relato.colecao = colecao; // Adiciona a coleção de origem
+                                todosRelatos.push(relato);
+                            });
+                        })
+                );
+            });
+            
+            // Quando todas as promessas forem resolvidas
+            Promise.all(promises).then(() => {
+                // Ordenar por data (mais recente primeiro)
+                todosRelatos.sort((a, b) => {
+                    if (a.createdAt && b.createdAt) {
+                        return b.createdAt.toDate() - a.createdAt.toDate();
+                    }
+                    return 0;
+                });
+                
+                aplicarFiltros();
+                hideLoading();
+            }).catch((error) => {
+                console.error("Erro ao carregar relatos:", error);
+                hideLoading();
+            });
+        }
+        
+        // Função para aplicar filtros e exibir os relatos
+        function aplicarFiltros() {
+            const tipoFiltro = document.getElementById('filtroTipo').value;
+            const dataInicio = document.getElementById('filtroDataInicio').value;
+            const dataFim = document.getElementById('filtroDataFim').value;
+            const textoBusca = document.getElementById('filtroBusca').value.toLowerCase();
+            
+            let relatosFiltrados = todosRelatos;
+            
+            // Aplicar filtros
+            if (tipoFiltro) {
+                relatosFiltrados = relatosFiltrados.filter(relato => relato.tipoDesvio === tipoFiltro);
+            }
+            
+            if (dataInicio) {
+                const inicio = new Date(dataInicio);
+                relatosFiltrados = relatosFiltrados.filter(relato => {
+                    const dataRelato = new Date(relato.data);
+                    return dataRelato >= inicio;
+                });
+            }
+            
+            if (dataFim) {
+                const fim = new Date(dataFim);
+                fim.setDate(fim.getDate() + 1); // Inclui o dia final
+                relatosFiltrados = relatosFiltrados.filter(relato => {
+                    const dataRelato = new Date(relato.data);
+                    return dataRelato < fim;
+                });
+            }
+            
+            if (textoBusca) {
+                relatosFiltrados = relatosFiltrados.filter(relato => {
+                    return (
+                        relato.id.toLowerCase().includes(textoBusca) ||
+                        (relato.descricaoMedida && relato.descricaoMedida.toLowerCase().includes(textoBusca)) ||
+                        (relato.detalhes && JSON.stringify(relato.detalhes).toLowerCase().includes(textoBusca)) ||
+                        (relato.categoria && relato.categoria.toLowerCase().includes(textoBusca))
+                    );
+                });
+            }
+            
+            // Exibir resultados
+            exibirRelatos(relatosFiltrados);
+        }
+        
+        // Função para exibir os relatos na tabela
+        function exibirRelatos(relatos) {
+            const tbody = document.querySelector('#tabelaHistorico tbody');
+            tbody.innerHTML = '';
+            
+            if (relatos.length === 0) {
+                document.getElementById('semResultados').style.display = 'block';
+                document.getElementById('paginacao').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('semResultados').style.display = 'none';
+            document.getElementById('paginacao').style.display = 'flex';
+            
+            relatos.forEach(relato => {
+                const tr = document.createElement('tr');
+                
+                // Mapear tipo para exibição amigável
+                let tipoExibicao = '';
+                switch(relato.tipoDesvio) {
+                    case 'BOM_SENSO': tipoExibicao = 'Bom Senso'; break;
+                    case 'COMPORTAMENTAL': tipoExibicao = 'Comportamental'; break;
+                    case 'ESTRUTURAL': tipoExibicao = 'Estrutural'; break;
+                    case 'PROCESSO': tipoExibicao = 'Processo'; break;
+                    case 'INCIDENTE': tipoExibicao = 'Incidente'; break;
+                    default: tipoExibicao = relato.tipoDesvio;
+                }
+                
+                // Resumo dos detalhes
+                let resumoDetalhes = '';
+                if (relato.detalhes && relato.detalhes.length > 0) {
+                    resumoDetalhes = relato.detalhes[0];
+                    if (relato.detalhes.length > 1) {
+                        resumoDetalhes += ` +${relato.detalhes.length - 1} mais`;
+                    }
+                } else if (relato.categoria) {
+                    resumoDetalhes = relato.categoria;
+                }
+                
+                tr.innerHTML = `
+                    <td>${relato.id}</td>
+                    <td>${formatarData(relato.data)}</td>
+                    <td>${tipoExibicao}</td>
+                    <td>${relato.abertoPara}</td>
+                    <td>${resumoDetalhes}</td>
+                    <td><span class="badge bg-success">Enviado</span></td>
+                    <td class="action-buttons">
+                        <button class="btn btn-sm btn-info btn-visualizar" data-id="${relato.id}" data-colecao="${relato.colecao}">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+            
+            // Adicionar event listeners aos botões de visualização
+            document.querySelectorAll('.btn-visualizar').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const colecao = this.getAttribute('data-colecao');
+                    visualizarRelato(id, colecao);
+                });
+            });
+        }
+        
+        // Função para formatar data
+        function formatarData(dataString) {
+            if (!dataString) return '-';
+            const data = new Date(dataString);
+            return data.toLocaleDateString('pt-BR');
+        }
+        
+        // Função para visualizar um relato específico
+        function visualizarRelato(id, colecao) {
+            showLoading();
+            
+            firebase.firestore().collection(colecao).doc(id).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const relato = doc.data();
+                        exibirDetalhesRelato(relato);
+                    } else {
+                        alert('Relato não encontrado!');
+                    }
+                    hideLoading();
+                })
+                .catch((error) => {
+                    console.error("Erro ao carregar relato:", error);
+                    alert('Erro ao carregar relato!');
+                    hideLoading();
+                });
+        }
+        
+        // Função para exibir os detalhes do relato no modal
+        function exibirDetalhesRelato(relato) {
+            const modalBody = document.getElementById('detalhesRelato');
+            
+            // Mapear tipo para exibição amigável
+            let tipoExibicao = '';
+            switch(relato.tipoDesvio) {
+                case 'BOM_SENSO': tipoExibicao = 'Bom Senso'; break;
+                case 'COMPORTAMENTAL': tipoExibicao = 'Comportamental'; break;
+                case 'ESTRUTURAL': tipoExibicao = 'Estrutural'; break;
+                case 'PROCESSO': tipoExibicao = 'Processo'; break;
+                case 'INCIDENTE': tipoExibicao = 'Incidente'; break;
+                default: tipoExibicao = relato.tipoDesvio;
+            }
+            
+            let html = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>ID:</strong> ${relato.id}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Data:</strong> ${formatarData(relato.data)}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Tipo de Desvio:</strong> ${tipoExibicao}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Aberto Para:</strong> ${relato.abertoPara}</p>
+                    </div>
+                </div>
+            `;
+            
+            // Detalhes específicos por tipo
+            if (relato.tipoDesvio === 'COMPORTAMENTAL' && relato.categoria) {
+                html += `<div class="row"><div class="col-md-12"><p><strong>Categoria:</strong> ${relato.categoria}</p></div></div>`;
+                
+                if (relato.categoria === 'FALTA DO USO DO EPI' || relato.categoria === 'USO INCORRETO DO EPI') {
+                    if (relato.itensEPI && relato.itensEPI.length > 0) {
+                        html += `<div class="row"><div class="col-md-12"><p><strong>Itens de EPI:</strong> ${relato.itensEPI.join(', ')}</p></div></div>`;
+                    }
+                } else if (relato.categoria === 'DESCUMPRIMENTO DO PROCEDIMENTO') {
+                    if (relato.procedimentos && relato.procedimentos.length > 0) {
+                        html += `<div class="row"><div class="col-md-12"><p><strong>Procedimentos:</strong> ${relato.procedimentos.join(', ')}</p></div></div>`;
+                    }
+                }
+            } else if (relato.detalhes && relato.detalhes.length > 0) {
+                html += `<div class="row"><div class="col-md-12"><p><strong>Detalhes:</strong> ${relato.detalhes.join(', ')}</p></div></div>`;
+            }
+            
+            // Medidas imediatas
+            html += `
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Medida Imediata:</strong> ${relato.medidaImediata || 'Não informada'}</p>
+                    </div>
+                </div>
+            `;
+            
+            if (relato.descricaoMedida) {
+                html += `
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p><strong>Descrição da Medida:</strong></p>
+                            <p>${relato.descricaoMedida}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Informações de abertura
+            html += `
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Aberto Por:</strong> ${relato.abertoPor}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Data de Envio:</strong> ${relato.createdAt ? relato.createdAt.toDate().toLocaleString('pt-BR') : 'Não disponível'}</p>
+                    </div>
+                </div>
+            `;
+            
+            modalBody.innerHTML = html;
+            
+            // Abrir o modal
+            const modal = new bootstrap.Modal(document.getElementById('detalhesModal'));
+            modal.show();
+        }
+        
+        // Função para mostrar loading
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+        
+        // Função para esconder loading
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+        
+        // Inicialização quando o documento estiver carregado
+        document.addEventListener('DOMContentLoaded', function() {
+            // Preencher data fim com a data atual
+            const hoje = new Date();
+            document.getElementById('filtroDataFim').value = hoje.toISOString().split('T')[0];
+            
+            // Preencher data início com 30 dias atrás
+            const trintaDiasAtras = new Date();
+            trintaDiasAtras.setDate(trintaDiasAtras.getDate() - 30);
+            document.getElementById('filtroDataInicio').value = trintaDiasAtras.toISOString().split('T')[0];
+            
+            // Event listeners para os filtros
+            document.getElementById('filtroTipo').addEventListener('change', aplicarFiltros);
+            document.getElementById('filtroDataInicio').addEventListener('change', aplicarFiltros);
+            document.getElementById('filtroDataFim').addEventListener('change', aplicarFiltros);
+            document.getElementById('filtroBusca').addEventListener('keyup', aplicarFiltros);
+            document.getElementById('btnBuscar').addEventListener('click', aplicarFiltros);
+            
+            // Botão para limpar filtros
+            document.getElementById('btnLimparFiltros').addEventListener('click', function() {
+                document.getElementById('filtroTipo').value = '';
+                document.getElementById('filtroDataInicio').value = '';
+                document.getElementById('filtroDataFim').value = '';
+                document.getElementById('filtroBusca').value = '';
+                aplicarFiltros();
+            });
+            
+            // Logout
+            document.getElementById('sidebar-logout-btn').addEventListener('click', function() {
+                firebase.auth().signOut().then(() => {
+                    window.location.href = "../index.html";
+                }).catch((error) => {
+                    console.error("Erro ao fazer logout:", error);
+                });
+            });
+        });
+    </script>
+    <script src="../js/hamb.js"></script>
+</body>
+</html>
