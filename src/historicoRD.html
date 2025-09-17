@@ -41,6 +41,7 @@
         
         .table-responsive {
             overflow-x: auto;
+            max-height: 600px;
         }
         
         .action-buttons .btn {
@@ -49,6 +50,12 @@
         
         #semResultados {
             display: none;
+        }
+        
+        .total-registros {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #0d6efd;
         }
     </style>
 </head>
@@ -80,64 +87,7 @@
                 </div>
             </div>
 
-            <nav class="sidebar-menu">
-                <ul>
-                    <li>
-                        <a href="home.html">
-                            <i class="fas fa-home"></i>
-                            <span>Home</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="old_home.html">
-                            <i class="fas fa-gauge"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="documentos.html">
-                            <i class="fas fa-file-alt"></i>
-                            <span>Documentos</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="validades.html">
-                            <i class="fas fa-calendar-check"></i>
-                            <span>Validades</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="procedimentos_operacionais.html">
-                            <i class="fas fa-book"></i>
-                            <span>Procedimentos Operacionais</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="comunicaçao_ocorrencia.html">
-                            <i class="fas fa-bullhorn"></i>
-                            <span>Comunicação de Ocorrência</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="invetigacao.html">
-                            <i class="fas fa-search"></i>
-                            <span>Investigação de Ocorrência</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="relato_desvio.html">
-                            <i class="fas fa-clipboard-list"></i>
-                            <span>Relatos de Desvio</span>
-                        </a>
-                    </li>
-                    <li class="active">
-                        <a href="historicoRD.html">
-                            <i class="fas fa-history"></i>
-                            <span>Histórico de Relatos</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+            
 
             <div class="sidebar-footer">
                 <button id="confirm-unit-change" class="btn btn-sm btn-success w-100" style="display: none;">
@@ -198,7 +148,12 @@
                     </div>
                 </div>
                 <div class="row mt-3">
-                    <div class="col-md-12 text-end">
+                    <div class="col-md-6">
+                        <div class="total-registros" id="totalRegistros">
+                            Total de registros: 0
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-end">
                         <button class="btn btn-secondary" id="btnLimparFiltros">
                             <i class="fas fa-times"></i> Limpar Filtros
                         </button>
@@ -235,19 +190,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Paginação -->
-            <nav aria-label="Page navigation">
-                <ul class="pagination justify-content-center" id="paginacao">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1">Anterior</a>
-                    </li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">Próxima</a>
-                    </li>
-                </ul>
-            </nav>
         </main>
     </div>
 
@@ -348,9 +290,9 @@
             colecoes.forEach(colecao => {
                 promises.push(
                     firebase.firestore().collection(colecao)
-                        .where('userId', '==', currentUser.uid)
-                        .get()
+                        .get()  // REMOVI o filtro por userId para carregar TODOS os documentos
                         .then((querySnapshot) => {
+                            console.log(`${colecao}: ${querySnapshot.size} documentos encontrados`);
                             querySnapshot.forEach((doc) => {
                                 const relato = doc.data();
                                 relato.colecao = colecao; // Adiciona a coleção de origem
@@ -446,6 +388,9 @@
                 });
             }
             
+            // Atualizar contador
+            document.getElementById('totalRegistros').textContent = `Total de registros: ${relatosFiltrados.length}`;
+            
             // Exibir resultados
             exibirRelatos(relatosFiltrados);
         }
@@ -457,12 +402,10 @@
             
             if (relatos.length === 0) {
                 document.getElementById('semResultados').style.display = 'block';
-                document.getElementById('paginacao').style.display = 'none';
                 return;
             }
             
             document.getElementById('semResultados').style.display = 'none';
-            document.getElementById('paginacao').style.display = 'flex';
             
             relatos.forEach(relato => {
                 const tr = document.createElement('tr');
