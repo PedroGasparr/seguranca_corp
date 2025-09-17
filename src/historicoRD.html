@@ -6,54 +6,12 @@
     <title>Histórico de Relatos de Desvio</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/comunicaçãao_ocorrencia.css">
     <style>
-        /* Estilos consistentes com a aplicação existente */
-        .app-container {
-            display: flex;
-            min-height: 100vh;
-        }
-        
-        .sidebar {
-            width: 250px;
+        /* Estilos adicionais para melhorar a aparência */
+        .calculated-field {
             background-color: #f8f9fa;
-            border-right: 1px solid #dee2e6;
-            padding: 20px;
-            transition: all 0.3s;
-        }
-        
-        .main-content {
-            flex: 1;
-            padding: 20px;
-            background-color: #fff;
-        }
-        
-        .content-header {
-            margin-bottom: 30px;
-        }
-        
-        .card {
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .badge {
-            font-size: 0.85em;
-        }
-        
-        .filter-section {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        
-        .table-responsive {
-            overflow-x: auto;
-        }
-        
-        .action-buttons .btn {
-            margin-right: 5px;
+            cursor: not-allowed;
         }
         
         .loading-overlay {
@@ -74,27 +32,23 @@
             height: 3rem;
         }
         
-        /* Estilo para mobile */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 70px;
-                padding: 10px;
-            }
-            
-            .sidebar .user-info,
-            .sidebar .sidebar-menu span,
-            .sidebar .logout-text {
-                display: none;
-            }
-            
-            .sidebar-menu {
-                text-align: center;
-            }
-            
-            .sidebar-menu i {
-                font-size: 1.5rem;
-                margin-bottom: 15px;
-            }
+        .filter-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .action-buttons .btn {
+            margin-right: 5px;
+        }
+        
+        #semResultados {
+            display: none;
         }
     </style>
 </head>
@@ -381,7 +335,7 @@
             // Coleções que contêm os relatos
             const colecoes = [
                 'rdbom_senso',
-                'rd_comportamental',
+                'rd_comportamental', 
                 'rd_estrutural',
                 'rd_processo',
                 'rd_incidente'
@@ -400,20 +354,30 @@
                             querySnapshot.forEach((doc) => {
                                 const relato = doc.data();
                                 relato.colecao = colecao; // Adiciona a coleção de origem
+                                relato.firebaseId = doc.id; // Adiciona o ID do documento no Firebase
                                 todosRelatos.push(relato);
                             });
+                        })
+                        .catch((error) => {
+                            console.error(`Erro ao carregar relatos da coleção ${colecao}:`, error);
                         })
                 );
             });
             
             // Quando todas as promessas forem resolvidas
             Promise.all(promises).then(() => {
+                console.log("Total de relatos carregados:", todosRelatos.length);
+                
                 // Ordenar por data (mais recente primeiro)
                 todosRelatos.sort((a, b) => {
-                    if (a.createdAt && b.createdAt) {
-                        return b.createdAt.toDate() - a.createdAt.toDate();
+                    try {
+                        const dateA = a.createdAt ? a.createdAt.toDate() : new Date(a.data);
+                        const dateB = b.createdAt ? b.createdAt.toDate() : new Date(b.data);
+                        return dateB - dateA;
+                    } catch (e) {
+                        console.error("Erro ao ordenar datas:", e);
+                        return 0;
                     }
-                    return 0;
                 });
                 
                 aplicarFiltros();
@@ -441,8 +405,13 @@
             if (dataInicio) {
                 const inicio = new Date(dataInicio);
                 relatosFiltrados = relatosFiltrados.filter(relato => {
-                    const dataRelato = new Date(relato.data);
-                    return dataRelato >= inicio;
+                    try {
+                        const dataRelato = relato.createdAt ? relato.createdAt.toDate() : new Date(relato.data);
+                        return dataRelato >= inicio;
+                    } catch (e) {
+                        console.error("Erro ao filtrar por data:", e, relato);
+                        return false;
+                    }
                 });
             }
             
@@ -450,19 +419,30 @@
                 const fim = new Date(dataFim);
                 fim.setDate(fim.getDate() + 1); // Inclui o dia final
                 relatosFiltrados = relatosFiltrados.filter(relato => {
-                    const dataRelato = new Date(relato.data);
-                    return dataRelato < fim;
+                    try {
+                        const dataRelato = relato.createdAt ? relato.createdAt.toDate() : new Date(relato.data);
+                        return dataRelato < fim;
+                    } catch (e) {
+                        console.error("Erro ao filtrar por data:", e, relato);
+                        return false;
+                    }
                 });
             }
             
             if (textoBusca) {
                 relatosFiltrados = relatosFiltrados.filter(relato => {
-                    return (
-                        relato.id.toLowerCase().includes(textoBusca) ||
-                        (relato.descricaoMedida && relato.descricaoMedida.toLowerCase().includes(textoBusca)) ||
-                        (relato.detalhes && JSON.stringify(relato.detalhes).toLowerCase().includes(textoBusca)) ||
-                        (relato.categoria && relato.categoria.toLowerCase().includes(textoBusca))
-                    );
+                    try {
+                        return (
+                            (relato.id && relato.id.toLowerCase().includes(textoBusca)) ||
+                            (relato.descricaoMedida && relato.descricaoMedida.toLowerCase().includes(textoBusca)) ||
+                            (relato.detalhes && Array.isArray(relato.detalhes) && relato.detalhes.some(d => d.toLowerCase().includes(textoBusca))) ||
+                            (relato.categoria && relato.categoria.toLowerCase().includes(textoBusca)) ||
+                            (relato.abertoPara && relato.abertoPara.toLowerCase().includes(textoBusca))
+                        );
+                    } catch (e) {
+                        console.error("Erro ao filtrar por texto:", e, relato);
+                        return false;
+                    }
                 });
             }
             
@@ -495,29 +475,55 @@
                     case 'ESTRUTURAL': tipoExibicao = 'Estrutural'; break;
                     case 'PROCESSO': tipoExibicao = 'Processo'; break;
                     case 'INCIDENTE': tipoExibicao = 'Incidente'; break;
-                    default: tipoExibicao = relato.tipoDesvio;
+                    default: tipoExibicao = relato.tipoDesvio || 'Não informado';
                 }
                 
                 // Resumo dos detalhes
                 let resumoDetalhes = '';
-                if (relato.detalhes && relato.detalhes.length > 0) {
-                    resumoDetalhes = relato.detalhes[0];
-                    if (relato.detalhes.length > 1) {
-                        resumoDetalhes += ` +${relato.detalhes.length - 1} mais`;
+                try {
+                    if (relato.detalhes && Array.isArray(relato.detalhes) && relato.detalhes.length > 0) {
+                        resumoDetalhes = relato.detalhes[0];
+                        if (relato.detalhes.length > 1) {
+                            resumoDetalhes += ` +${relato.detalhes.length - 1} mais`;
+                        }
+                    } else if (relato.categoria) {
+                        resumoDetalhes = relato.categoria;
+                        
+                        if (relato.itensEPI && Array.isArray(relato.itensEPI) && relato.itensEPI.length > 0) {
+                            resumoDetalhes += ` - ${relato.itensEPI[0]}`;
+                            if (relato.itensEPI.length > 1) {
+                                resumoDetalhes += ` +${relato.itensEPI.length - 1} mais`;
+                            }
+                        } else if (relato.procedimentos && Array.isArray(relato.procedimentos) && relato.procedimentos.length > 0) {
+                            resumoDetalhes += ` - ${relato.procedimentos[0]}`;
+                            if (relato.procedimentos.length > 1) {
+                                resumoDetalhes += ` +${relato.procedimentos.length - 1} mais`;
+                            }
+                        }
                     }
-                } else if (relato.categoria) {
-                    resumoDetalhes = relato.categoria;
+                } catch (e) {
+                    console.error("Erro ao processar detalhes:", e, relato);
+                    resumoDetalhes = "Erro ao carregar detalhes";
+                }
+                
+                // Formatar data para exibição
+                let dataFormatada = "Data inválida";
+                try {
+                    const dataRelato = relato.createdAt ? relato.createdAt.toDate() : new Date(relato.data);
+                    dataFormatada = dataRelato.toLocaleDateString('pt-BR');
+                } catch (e) {
+                    console.error("Erro ao formatar data:", e, relato);
                 }
                 
                 tr.innerHTML = `
-                    <td>${relato.id}</td>
-                    <td>${formatarData(relato.data)}</td>
+                    <td>${relato.id || 'N/A'}</td>
+                    <td>${dataFormatada}</td>
                     <td>${tipoExibicao}</td>
-                    <td>${relato.abertoPara}</td>
-                    <td>${resumoDetalhes}</td>
+                    <td>${relato.abertoPara || 'Não informado'}</td>
+                    <td>${resumoDetalhes || 'Não informado'}</td>
                     <td><span class="badge bg-success">Enviado</span></td>
                     <td class="action-buttons">
-                        <button class="btn btn-sm btn-info btn-visualizar" data-id="${relato.id}" data-colecao="${relato.colecao}">
+                        <button class="btn btn-sm btn-info btn-visualizar" data-id="${relato.firebaseId}" data-colecao="${relato.colecao}">
                             <i class="fas fa-eye"></i>
                         </button>
                     </td>
@@ -536,13 +542,6 @@
             });
         }
         
-        // Função para formatar data
-        function formatarData(dataString) {
-            if (!dataString) return '-';
-            const data = new Date(dataString);
-            return data.toLocaleDateString('pt-BR');
-        }
-        
         // Função para visualizar um relato específico
         function visualizarRelato(id, colecao) {
             showLoading();
@@ -551,6 +550,8 @@
                 .then((doc) => {
                     if (doc.exists) {
                         const relato = doc.data();
+                        relato.firebaseId = doc.id;
+                        relato.colecao = colecao;
                         exibirDetalhesRelato(relato);
                     } else {
                         alert('Relato não encontrado!');
@@ -576,16 +577,27 @@
                 case 'ESTRUTURAL': tipoExibicao = 'Estrutural'; break;
                 case 'PROCESSO': tipoExibicao = 'Processo'; break;
                 case 'INCIDENTE': tipoExibicao = 'Incidente'; break;
-                default: tipoExibicao = relato.tipoDesvio;
+                default: tipoExibicao = relato.tipoDesvio || 'Não informado';
+            }
+            
+            // Formatar data para exibição
+            let dataFormatada = "Data inválida";
+            let dataHoraFormatada = "Data/hora inválida";
+            try {
+                const dataRelato = relato.createdAt ? relato.createdAt.toDate() : new Date(relato.data);
+                dataFormatada = dataRelato.toLocaleDateString('pt-BR');
+                dataHoraFormatada = relato.createdAt ? relato.createdAt.toDate().toLocaleString('pt-BR') : 'Não disponível';
+            } catch (e) {
+                console.error("Erro ao formatar data:", e, relato);
             }
             
             let html = `
                 <div class="row">
                     <div class="col-md-6">
-                        <p><strong>ID:</strong> ${relato.id}</p>
+                        <p><strong>ID:</strong> ${relato.id || 'N/A'}</p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Data:</strong> ${formatarData(relato.data)}</p>
+                        <p><strong>Data:</strong> ${dataFormatada}</p>
                     </div>
                 </div>
                 <div class="row">
@@ -593,7 +605,7 @@
                         <p><strong>Tipo de Desvio:</strong> ${tipoExibicao}</p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Aberto Para:</strong> ${relato.abertoPara}</p>
+                        <p><strong>Aberto Para:</strong> ${relato.abertoPara || 'Não informado'}</p>
                     </div>
                 </div>
             `;
@@ -602,16 +614,12 @@
             if (relato.tipoDesvio === 'COMPORTAMENTAL' && relato.categoria) {
                 html += `<div class="row"><div class="col-md-12"><p><strong>Categoria:</strong> ${relato.categoria}</p></div></div>`;
                 
-                if (relato.categoria === 'FALTA DO USO DO EPI' || relato.categoria === 'USO INCORRETO DO EPI') {
-                    if (relato.itensEPI && relato.itensEPI.length > 0) {
-                        html += `<div class="row"><div class="col-md-12"><p><strong>Itens de EPI:</strong> ${relato.itensEPI.join(', ')}</p></div></div>`;
-                    }
-                } else if (relato.categoria === 'DESCUMPRIMENTO DO PROCEDIMENTO') {
-                    if (relato.procedimentos && relato.procedimentos.length > 0) {
-                        html += `<div class="row"><div class="col-md-12"><p><strong>Procedimentos:</strong> ${relato.procedimentos.join(', ')}</p></div></div>`;
-                    }
+                if ((relato.categoria === 'FALTA DO USO DO EPI' || relato.categoria === 'USO INCORRETO DO EPI') && relato.itensEPI && Array.isArray(relato.itensEPI) && relato.itensEPI.length > 0) {
+                    html += `<div class="row"><div class="col-md-12"><p><strong>Itens de EPI:</strong> ${relato.itensEPI.join(', ')}</p></div></div>`;
+                } else if (relato.categoria === 'DESCUMPRIMENTO DO PROCEDIMENTO' && relato.procedimentos && Array.isArray(relato.procedimentos) && relato.procedimentos.length > 0) {
+                    html += `<div class="row"><div class="col-md-12"><p><strong>Procedimentos:</strong> ${relato.procedimentos.join(', ')}</p></div></div>`;
                 }
-            } else if (relato.detalhes && relato.detalhes.length > 0) {
+            } else if (relato.detalhes && Array.isArray(relato.detalhes) && relato.detalhes.length > 0) {
                 html += `<div class="row"><div class="col-md-12"><p><strong>Detalhes:</strong> ${relato.detalhes.join(', ')}</p></div></div>`;
             }
             
@@ -639,10 +647,10 @@
             html += `
                 <div class="row">
                     <div class="col-md-6">
-                        <p><strong>Aberto Por:</strong> ${relato.abertoPor}</p>
+                        <p><strong>Aberto Por:</strong> ${relato.abertoPor || 'Não informado'}</p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Data de Envio:</strong> ${relato.createdAt ? relato.createdAt.toDate().toLocaleString('pt-BR') : 'Não disponível'}</p>
+                        <p><strong>Data de Envio:</strong> ${dataHoraFormatada}</p>
                     </div>
                 </div>
             `;
