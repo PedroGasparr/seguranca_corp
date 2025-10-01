@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Padrinhos/Apadrinhados</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/comunicaçãao_ocorrencia.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <style>
+        /* Estilos anteriores mantidos */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .content-header {
+            margin-bottom: 30px;
+        }
+        
+        .form-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .form-section h3 {
+            color: #495057;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #007bff;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .user-photo-preview {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin: 10px 0;
+        }
+        
+        .qr-code-container {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        
+        #qrcode {
+            display: inline-block;
+            margin: 10px auto;
+        }
+        
+        .btn-submit {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+        
+        .btn-submit:hover {
+            background-color: #0056b3;
+        }
+        
+        .calculated-field {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+        }
+        
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1000;
+            background: #343a40;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        
+        .qr-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .url-display {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            word-break: break-all;
+            font-size: 14px;
+        }
+        
+        .copy-btn {
+            margin-left: 10px;
+        }
+
+        .qr-data-display {
+            background-color: #e8f5e8;
+            border: 1px solid #28a745;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            display: none;
+        }
+        
+        .id-display {
+            background-color: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        /* Estilos para a impressão */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            
+            .printable-qr, .printable-qr * {
+                visibility: visible;
+            }
+            
+            .printable-qr {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 20px;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+            
+            .qr-info {
+                margin-top: 20px;
+                text-align: center;
+            }
+            
+            .qr-info h3 {
+                margin-bottom: 15px;
+                color: #333;
+            }
+            
+            .qr-details {
+                text-align: left;
+                max-width: 400px;
+                margin: 0 auto;
+                font-size: 14px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -250px;
+                height: 100%;
+                z-index: 999;
+            }
+            
+            .sidebar.active {
+                left: 0;
+            }
+            
+            .sidebar-toggle {
+                display: block;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .qr-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Carregando...</span>
+        </div>
+    </div>
+
+    <!-- Área para impressão (inicialmente oculta) -->
+    <div id="printableArea" class="printable-qr" style="display: none;">
+        <div class="text-center">
+            <h3>Programa de Padrinhos/Apadrinhados</h3>
+            <p><strong>QR Code de Identificação</strong></p>
+            <div id="printQrcode"></div>
+            <div class="qr-info">
+                <div class="qr-details">
+                    <p><strong>ID do Registro:</strong> <span id="printRecordId"></span></p>
+                    <p><strong>Padrinho:</strong> <span id="printPadrinhoNome"></span></p>
+                    <p><strong>Função:</strong> <span id="printPadrinhoFuncao"></span></p>
+                    <p><strong>Experiência:</strong> <span id="printPadrinhoExperiencia"></span></p>
+                    <p><strong>Apadrinhado:</strong> <span id="printApadrinhadoNome"></span></p>
+                    <p><strong>Função:</strong> <span id="printApadrinhadoFuncao"></span></p>
+                    <p><strong>Código GZL:</strong> <span id="printApadrinhadoCodigo"></span></p>
+                    <p><strong>Período:</strong> <span id="printPeriodo"></span></p>
+                    <p><strong>Unidade:</strong> <span id="printUnidade"></span></p>
+                    <p><strong>Data de Cadastro:</strong> <span id="printDataCadastro"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hamburger Menu Button (visível apenas em mobile) -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <div class="app-container">
+        <!-- Menu Lateral -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <i class="fas fa-user-circle user-avatar"></i>
+                    <div class="user-info">
+                        <span class="user-name" id="sidebar-user-name">Usuário</span>
+                        <span class="user-unit" id="sidebar-user-unit">Unidade</span>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <ul>
+                    <li>
+                        <a href="home.html">
+                            <i class="fas fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="old_home.html">
+                            <i class="fas fa-gauge"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="documentos.html">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Documentos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="validades.html">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Validades</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="procedimentos_operacionais.html">
+                            <i class="fas fa-book"></i>
+                            <span>Procedimentos Operacionais</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="comunicaçao_ocorrencia.html">
+                            <i class="fas fa-bullhorn"></i>
+                            <span>Comunicação de Ocorrencia</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="invetigacao.html">
+                            <i class="fas fa-search"></i>
+                            <span>Investigação de Ocorrencia</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="active" href="relato_desvio.html">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>Relatos de Desvio</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="historicoRD.html">
+                            <i class="fas fa-history"></i>
+                            <span>Histórico de Relatos</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="padrinho.html">
+                            <i class="fas fa-handshake"></i>
+                            <span>Programa Padrinhos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-face-dizzy"></i>
+                            <span>Visualização de Padrinhos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="visualizar-padrinhos.html">
+                            <i class="fas fa-qrcode"></i>
+                            <span>Leitor QR Code</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-danger btn-sm w-100" id="sidebar-logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Sair</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>Programa de Padrinhos/Apadrinhados</h1>
+                <div class="breadcrumb">Formulário • Cadastro de Padrinhos</div>
+            </div>
+
+            <div class="form-container">
+                <form id="padrinhosForm">
+                    <!-- Seção 1: Informações do Padrinho -->
+                    <div class="form-section">
+                        <h3>Informações do Padrinho</h3>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="fotoPadrinho" class="form-label">Foto do Padrinho:</label>
+                                    <input type="file" class="form-control" id="fotoPadrinho" name="fotoPadrinho" accept="image/*" required>
+                                    <img id="previewFotoPadrinho" class="user-photo-preview" style="display:none;">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="nomePadrinho" class="form-label">Nome do Padrinho:</label>
+                                    <input type="text" class="form-control" id="nomePadrinho" name="nomePadrinho" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="unidadePadrinho" class="form-label">Unidade do Padrinho:</label>
+                                    <input type="text" class="form-control calculated-field" id="unidadePadrinho" name="unidadePadrinho" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="funcaoPadrinho" class="form-label">Função do Padrinho:</label>
+                                    <input type="text" class="form-control" id="funcaoPadrinho" name="funcaoPadrinho" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="tempoExperienciaPadrinho" class="form-label">Tempo de Experiência na Função:</label>
+                                    <input type="text" class="form-control" id="tempoExperienciaPadrinho" name="tempoExperienciaPadrinho" placeholder="Ex: 2 anos e 6 meses" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção 2: Informações do Apadrinhado -->
+                    <div class="form-section">
+                        <h3>Informações do Apadrinhado</h3>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="fotoApadrinhado" class="form-label">Foto do Apadrinhado:</label>
+                                    <input type="file" class="form-control" id="fotoApadrinhado" name="fotoApadrinhado" accept="image/*" required>
+                                    <img id="previewFotoApadrinhado" class="user-photo-preview" style="display:none;">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="nomeApadrinhado" class="form-label">Nome do Apadrinhado:</label>
+                                    <input type="text" class="form-control" id="nomeApadrinhado" name="nomeApadrinhado" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="unidadeApadrinhado" class="form-label">Unidade do Apadrinhado:</label>
+                                    <input type="text" class="form-control calculated-field" id="unidadeApadrinhado" name="unidadeApadrinhado" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="funcaoApadrinhado" class="form-label">Função do Apadrinhado:</label>
+                                    <input type="text" class="form-control" id="funcaoApadrinhado" name="funcaoApadrinhado" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="codigoFuncionarioApadrinhado" class="form-label">Código de Funcionário GZL:</label>
+                                    <input type="text" class="form-control" id="codigoFuncionarioApadrinhado" name="codigoFuncionarioApadrinhado" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="dataInicio" class="form-label">Data de Início:</label>
+                                    <input type="date" class="form-control" id="dataInicio" name="dataInicio" required onchange="calcularDataTermino()">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="dataTermino" class="form-label">Data de Término (Calculada):</label>
+                                    <input type="date" class="form-control calculated-field" id="dataTermino" name="dataTermino" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção 3: QR Code -->
+                    <div class="form-section">
+                        <h3>QR Code de Identificação</h3>
+                        
+                        <!-- Display do ID Gerado -->
+                        <div class="id-display" id="idDisplay" style="display: none;">
+                            <i class="fas fa-id-card"></i> 
+                            <strong>ID do Registro:</strong> 
+                            <span id="displayRecordId"></span>
+                        </div>
+                        
+                        <div class="qr-code-container">
+                            <p>Após preencher todas as informações e salvar, clique em "Gerar QR Code" para criar o código de identificação.</p>
+                            
+                            <!-- Dados do QR Code -->
+                            <div class="qr-data-display" id="qrDataDisplay">
+                                <h6><i class="fas fa-info-circle"></i> Dados Codificados no QR Code:</h6>
+                                <div class="small">
+                                    <strong>ID:</strong> <span id="qrDataId"></span><br>
+                                    <strong>Padrinho:</strong> <span id="qrDataPadrinho"></span><br>
+                                    <strong>Apadrinhado:</strong> <span id="qrDataApadrinhado"></span>
+                                </div>
+                            </div>
+                            
+                            <div id="qrcode"></div>
+                            <div class="qr-actions">
+                                <button type="button" class="btn btn-primary" id="btnGerarQRCode">
+                                    <i class="fas fa-qrcode"></i> Gerar QR Code
+                                </button>
+                                <button type="button" class="btn btn-success" id="btnImprimirQRCode" style="display: none;">
+                                    <i class="fas fa-print"></i> Imprimir QR Code
+                                </button>
+                                <button type="button" class="btn btn-info" id="btnDownloadQRCode" style="display: none;">
+                                    <i class="fas fa-download"></i> Baixar QR Code
+                                </button>
+                                <button type="button" class="btn btn-warning" id="btnCopiarDados" style="display: none;">
+                                    <i class="fas fa-copy"></i> Copiar Dados
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-end mt-4">
+                        <button type="submit" class="btn btn-submit" id="btnSubmitPadrinhos">
+                            <i class="fas fa-save"></i> Salvar no Sistema
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cadastro Realizado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>O cadastro de padrinho/apadrinhado foi salvo com sucesso no sistema.</p>
+                    <p><strong>ID do Registro:</strong> <span id="modalRecordId"></span></p>
+                    <p>Agora você pode gerar o QR Code de identificação.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Inicialização do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDZwa4XNqlupNDLs7-CRQbhr5pRT4NyFBA",
+            authDomain: "application-gzl.firebaseapp.com",
+            databaseURL: "https://application-gzl-default-rtdb.firebaseio.com",
+            projectId: "application-gzl",
+            storageBucket: "application-gzl.appspot.com",
+            messagingSenderId: "319900903265",
+            appId: "1:319900903265:web:a8f400aeb7a697fc168720",
+            measurementId: "G-ZRRFQZXT54"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        
+        let currentUser = null;
+        let userUnit = "";
+        let currentQRCodeData = null;
+        let savedRecordId = null;
+        
+        // Verificar autenticação do usuário
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                currentUser = user;
+                console.log("Usuário autenticado:", user.uid);
+                console.log("Email do usuário:", user.email);
+                
+                carregarInformacoesUsuario(user.uid, user.email);
+            } else {
+                console.log("Usuário não autenticado. Redirecionando para login...");
+                window.location.href = "../index.html";
+            }
+        });
+        
+        // Função para carregar informações do usuário
+        function carregarInformacoesUsuario(userId, userEmail) {
+            console.log("Buscando usuário com ID:", userId, "e email:", userEmail);
+            
+            firebase.firestore().collection("users").doc(userId).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        console.log("Dados do usuário encontrados pelo UID:", userData);
+                        processarDadosUsuario(userData);
+                    } else {
+                        console.log("Usuário não encontrado pelo UID. Tentando buscar por email...");
+                        buscarUsuarioPorEmail(userEmail);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Erro ao buscar usuário pelo UID:", error);
+                    buscarUsuarioPorEmail(userEmail);
+                });
+        }
+        
+        function buscarUsuarioPorEmail(userEmail) {
+            console.log("Buscando usuário por email:", userEmail);
+            
+            firebase.firestore().collection("users")
+                .where("email", "==", userEmail)
+                .limit(1)
+                .get()
+                .then((querySnapshot) => {
+                    if (!querySnapshot.empty) {
+                        const doc = querySnapshot.docs[0];
+                        const userData = doc.data();
+                        console.log("Dados do usuário encontrados por email:", userData);
+                        processarDadosUsuario(userData);
+                    } else {
+                        console.log("Usuário não encontrado por email também.");
+                        buscarEmTodasColecoes(userEmail);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Erro ao buscar usuário por email:", error);
+                    buscarEmTodasColecoes(userEmail);
+                });
+        }
+        
+        function buscarEmTodasColecoes(userEmail) {
+            const colecoes = ['users', 'usuarios', 'colaboradores', 'funcionarios'];
+            let encontrado = false;
+            
+            colecoes.forEach(colecao => {
+                if (!encontrado) {
+                    firebase.firestore().collection(colecao)
+                        .where("email", "==", userEmail)
+                        .limit(1)
+                        .get()
+                        .then((querySnapshot) => {
+                            if (!querySnapshot.empty) {
+                                const doc = querySnapshot.docs[0];
+                                const userData = doc.data();
+                                console.log(`Usuário encontrado na coleção ${colecao}:`, userData);
+                                processarDadosUsuario(userData);
+                                encontrado = true;
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(`Erro ao buscar na coleção ${colecao}:`, error);
+                        });
+                }
+            });
+            
+            setTimeout(() => {
+                if (!encontrado && !userUnit) {
+                    console.log("Usuário não encontrado em nenhuma coleção após busca completa.");
+                    document.getElementById("sidebar-user-unit").textContent = "Unidade não encontrada";
+                }
+            }, 3000);
+        }
+        
+        function processarDadosUsuario(userData) {
+            console.log("Processando dados do usuário:", userData);
+            
+            const userName = userData.name || userData.nome || userData.displayName || "Usuário";
+            document.getElementById("sidebar-user-name").textContent = userName;
+            
+            userUnit = userData.unit || userData.unidade || "Unidade não definida";
+            document.getElementById("sidebar-user-unit").textContent = userUnit;
+            
+            console.log("Unidade definida como:", userUnit);
+            
+            document.getElementById('unidadePadrinho').value = userUnit;
+            document.getElementById('unidadeApadrinhado').value = userUnit;
+            
+            if (userUnit === "Unidade não definida") {
+                console.warn("Unidade não foi definida corretamente. Dados disponíveis:", userData);
+            }
+        }
+        
+        function calcularDataTermino() {
+            const dataInicio = document.getElementById('dataInicio').value;
+            if (dataInicio) {
+                const data = new Date(dataInicio);
+                data.setDate(data.getDate() + 90);
+                
+                const ano = data.getFullYear();
+                const mes = String(data.getMonth() + 1).padStart(2, '0');
+                const dia = String(data.getDate()).padStart(2, '0');
+                
+                document.getElementById('dataTermino').value = `${ano}-${mes}-${dia}`;
+            }
+        }
+        
+        function generateUniqueId() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const randomNum = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+            
+            return `PAD${year}${month}${day}${hours}${minutes}${seconds}${randomNum}`;
+        }
+        
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+        
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+        
+        function imageToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+        
+        function generateQRCodeData(recordId) {
+            return `PADRINHO_ID:${recordId}`;
+        }
+        
+        function gerarQRCode() {
+            if (!savedRecordId) {
+                alert('Por favor, salve o cadastro primeiro antes de gerar o QR Code.');
+                return;
+            }
+            
+            const qrDataString = generateQRCodeData(savedRecordId);
+            currentQRCodeData = qrDataString;
+            
+            console.log("Gerando QR Code com dados:", qrDataString);
+            console.log("Tamanho dos dados:", qrDataString.length, "caracteres");
+            
+            // Mostrar dados do QR Code
+            document.getElementById('qrDataId').textContent = savedRecordId;
+            document.getElementById('qrDataPadrinho').textContent = document.getElementById('nomePadrinho').value;
+            document.getElementById('qrDataApadrinhado').textContent = document.getElementById('nomeApadrinhado').value;
+            document.getElementById('qrDataDisplay').style.display = 'block';
+            
+            document.getElementById('qrcode').innerHTML = '';
+            
+            try {
+                let typeNumber = 0;
+                let errorCorrectionLevel = 'M';
+                
+                if (qrDataString.length < 50) {
+                    errorCorrectionLevel = 'H';
+                }
+                
+                const qr = qrcode(typeNumber, errorCorrectionLevel);
+                qr.addData(qrDataString);
+                qr.make();
+                
+                console.log("QR Code criado com sucesso, módulos:", qr.getModuleCount());
+                
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const size = 250;
+                canvas.width = size;
+                canvas.height = size;
+                
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, size, size);
+                
+                const moduleCount = qr.getModuleCount();
+                const moduleSize = size / moduleCount;
+                
+                ctx.fillStyle = 'black';
+                for (let row = 0; row < moduleCount; row++) {
+                    for (let col = 0; col < moduleCount; col++) {
+                        if (qr.isDark(row, col)) {
+                            ctx.fillRect(
+                                col * moduleSize,
+                                row * moduleSize,
+                                moduleSize,
+                                moduleSize
+                            );
+                        }
+                    }
+                }
+                
+                document.getElementById('qrcode').appendChild(canvas);
+                console.log('QR Code gerado com sucesso!');
+                
+                document.getElementById('btnImprimirQRCode').style.display = 'inline-block';
+                document.getElementById('btnDownloadQRCode').style.display = 'inline-block';
+                document.getElementById('btnCopiarDados').style.display = 'inline-block';
+                
+            } catch (error) {
+                console.error('Erro ao gerar QR Code:', error);
+                
+                try {
+                    console.log("Tentando configuração alternativa...");
+                    document.getElementById('qrcode').innerHTML = '';
+                    
+                    const qr = qrcode(4, 'L');
+                    qr.addData(savedRecordId);
+                    qr.make();
+                    
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const size = 200;
+                    canvas.width = size;
+                    canvas.height = size;
+                    
+                    ctx.fillStyle = 'white';
+                    ctx.fillRect(0, 0, size, size);
+                    
+                    const moduleCount = qr.getModuleCount();
+                    const moduleSize = size / moduleCount;
+                    
+                    ctx.fillStyle = 'black';
+                    for (let row = 0; row < moduleCount; row++) {
+                        for (let col = 0; col < moduleCount; col++) {
+                            if (qr.isDark(row, col)) {
+                                ctx.fillRect(
+                                    col * moduleSize,
+                                    row * moduleSize,
+                                    moduleSize,
+                                    moduleSize
+                                );
+                            }
+                        }
+                    }
+                    
+                    document.getElementById('qrcode').appendChild(canvas);
+                    console.log('QR Code gerado com configuração alternativa!');
+                    
+                    document.getElementById('btnImprimirQRCode').style.display = 'inline-block';
+                    document.getElementById('btnDownloadQRCode').style.display = 'inline-block';
+                    document.getElementById('btnCopiarDados').style.display = 'inline-block';
+                    
+                } catch (secondError) {
+                    console.error('Erro também na configuração alternativa:', secondError);
+                    document.getElementById('qrcode').innerHTML = 
+                        '<div class="alert alert-danger">' +
+                        '<p><strong>Erro ao gerar QR Code:</strong></p>' +
+                        '<p>Dados muito grandes para QR Code. Tente com informações mais curtas.</p>' +
+                        '<p><strong>ID do Registro:</strong> ' + savedRecordId + '</p>' +
+                        '</div>';
+                }
+            }
+        }
+        
+        function copiarDadosQR() {
+            if (!currentQRCodeData) {
+                alert('Por favor, gere o QR Code primeiro.');
+                return;
+            }
+            
+            navigator.clipboard.writeText(currentQRCodeData).then(function() {
+                const copyBtn = document.getElementById('btnCopiarDados');
+                const originalHtml = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+                copyBtn.classList.remove('btn-warning');
+                copyBtn.classList.add('btn-success');
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHtml;
+                    copyBtn.classList.remove('btn-success');
+                    copyBtn.classList.add('btn-warning');
+                }, 2000);
+            }).catch(function(error) {
+                console.error('Erro ao copiar dados:', error);
+                alert('Erro ao copiar dados para a área de transferência');
+            });
+        }
+        
+        function prepararImpressao() {
+            if (!savedRecordId) {
+                alert('Por favor, gere o QR Code primeiro.');
+                return;
+            }
+            
+            document.getElementById('printQrcode').innerHTML = '';
+            
+            const qrDataString = generateQRCodeData(savedRecordId);
+            const qr = qrcode(4, 'M');
+            qr.addData(qrDataString);
+            qr.make();
+            
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const size = 300;
+            canvas.width = size;
+            canvas.height = size;
+            
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, size, size);
+            
+            const moduleCount = qr.getModuleCount();
+            const moduleSize = size / moduleCount;
+            
+            ctx.fillStyle = 'black';
+            for (let row = 0; row < moduleCount; row++) {
+                for (let col = 0; col < moduleCount; col++) {
+                    if (qr.isDark(row, col)) {
+                        ctx.fillRect(
+                            col * moduleSize,
+                            row * moduleSize,
+                            moduleSize,
+                            moduleSize
+                        );
+                    }
+                }
+            }
+            
+            document.getElementById('printQrcode').appendChild(canvas);
+            
+            document.getElementById('printRecordId').textContent = savedRecordId;
+            document.getElementById('printPadrinhoNome').textContent = document.getElementById('nomePadrinho').value;
+            document.getElementById('printPadrinhoFuncao').textContent = document.getElementById('funcaoPadrinho').value;
+            document.getElementById('printPadrinhoExperiencia').textContent = document.getElementById('tempoExperienciaPadrinho').value;
+            document.getElementById('printApadrinhadoNome').textContent = document.getElementById('nomeApadrinhado').value;
+            document.getElementById('printApadrinhadoFuncao').textContent = document.getElementById('funcaoApadrinhado').value;
+            document.getElementById('printApadrinhadoCodigo').textContent = document.getElementById('codigoFuncionarioApadrinhado').value;
+            document.getElementById('printPeriodo').textContent = `${document.getElementById('dataInicio').value} a ${document.getElementById('dataTermino').value}`;
+            document.getElementById('printUnidade').textContent = userUnit;
+            document.getElementById('printDataCadastro').textContent = new Date().toLocaleDateString('pt-BR');
+            
+            return true;
+        }
+        
+        function imprimirQRCode() {
+            if (prepararImpressao()) {
+                document.getElementById('printableArea').style.display = 'block';
+                
+                setTimeout(() => {
+                    window.print();
+                    
+                    setTimeout(() => {
+                        document.getElementById('printableArea').style.display = 'none';
+                    }, 100);
+                }, 500);
+            }
+        }
+        
+        function downloadQRCode() {
+            if (!savedRecordId) {
+                alert('Por favor, gere o QR Code primeiro.');
+                return;
+            }
+            
+            const canvas = document.querySelector('#qrcode canvas');
+            if (canvas) {
+                const link = document.createElement('a');
+                const padrinhoNome = document.getElementById('nomePadrinho').value.replace(/\s+/g, '_');
+                const apadrinhadoNome = document.getElementById('nomeApadrinhado').value.replace(/\s+/g, '_');
+                link.download = `qr_code_padrinhos_${padrinhoNome}_${apadrinhadoNome}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+        }
+        
+        // Inicialização quando o documento estiver carregado
+        document.addEventListener('DOMContentLoaded', function() {
+            const hoje = new Date();
+            const dataFormatada = hoje.toISOString().split('T')[0];
+            document.getElementById('dataInicio').value = dataFormatada;
+            calcularDataTermino();
+            
+            document.getElementById('btnGerarQRCode').disabled = true;
+            
+            // Preview das fotos
+            document.getElementById('fotoPadrinho').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('previewFotoPadrinho').src = e.target.result;
+                        document.getElementById('previewFotoPadrinho').style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            document.getElementById('fotoApadrinhado').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('previewFotoApadrinhado').src = e.target.result;
+                        document.getElementById('previewFotoApadrinhado').style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Gerar QR Code
+            document.getElementById('btnGerarQRCode').addEventListener('click', gerarQRCode);
+            
+            // Imprimir QR Code
+            document.getElementById('btnImprimirQRCode').addEventListener('click', imprimirQRCode);
+            
+            // Download QR Code
+            document.getElementById('btnDownloadQRCode').addEventListener('click', downloadQRCode);
+            
+            // Copiar Dados
+            document.getElementById('btnCopiarDados').addEventListener('click', copiarDadosQR);
+            
+            // Envio do formulário
+            document.getElementById('padrinhosForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                if (!currentUser) {
+                    alert("Usuário não autenticado. Por favor, faça login novamente.");
+                    window.location.href = "../index.html";
+                    return;
+                }
+                
+                if (!userUnit || userUnit === "Unidade não definida") {
+                    alert("Unidade do usuário não encontrada. Não é possível salvar os dados.");
+                    return;
+                }
+                
+                const submitBtn = document.getElementById('btnSubmitPadrinhos');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+                showLoading();
+                
+                try {
+                    // GERAR ID ÚNICO PARA O REGISTRO
+                    const id = generateUniqueId();
+                    savedRecordId = id;
+                    
+                    console.log("ID gerado para o registro:", id);
+                    
+                    const fotoPadrinho = document.getElementById('fotoPadrinho').files[0];
+                    const fotoApadrinhado = document.getElementById('fotoApadrinhado').files[0];
+                    
+                    let base64FotoPadrinho = '';
+                    let base64FotoApadrinhado = '';
+                    
+                    if (fotoPadrinho) {
+                        base64FotoPadrinho = await imageToBase64(fotoPadrinho);
+                    }
+                    
+                    if (fotoApadrinhado) {
+                        base64FotoApadrinhado = await imageToBase64(fotoApadrinhado);
+                    }
+                    
+                    // Dados completos incluindo o ID
+                    const padrinhoData = {
+                        id: id, // ID único salvo no documento
+                        padrinho: {
+                            nome: document.getElementById('nomePadrinho').value,
+                            unidade: userUnit,
+                            funcao: document.getElementById('funcaoPadrinho').value,
+                            tempoExperiencia: document.getElementById('tempoExperienciaPadrinho').value,
+                            foto: base64FotoPadrinho
+                        },
+                        apadrinhado: {
+                            nome: document.getElementById('nomeApadrinhado').value,
+                            unidade: userUnit,
+                            funcao: document.getElementById('funcaoApadrinhado').value,
+                            codigoFuncionario: document.getElementById('codigoFuncionarioApadrinhado').value,
+                            dataInicio: document.getElementById('dataInicio').value,
+                            dataTermino: document.getElementById('dataTermino').value,
+                            foto: base64FotoApadrinhado
+                        },
+                        userId: currentUser.uid,
+                        userEmail: currentUser.email,
+                        userUnit: userUnit,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    
+                    // Salvar no Firestore usando o ID como documento ID
+                    await firebase.firestore().collection('padrinhos').doc(id).set(padrinhoData);
+                    
+                    console.log('Documento salvo com ID:', id);
+                    
+                    // Mostrar ID gerado na interface
+                    document.getElementById('displayRecordId').textContent = id;
+                    document.getElementById('idDisplay').style.display = 'block';
+                    
+                    // Atualizar modal com o ID
+                    document.getElementById('modalRecordId').textContent = id;
+                    
+                    const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                    modal.show();
+                    
+                    // Habilitar botão de gerar QR Code após salvar
+                    document.getElementById('btnGerarQRCode').disabled = false;
+                    
+                } catch (error) {
+                    console.error('Erro ao salvar documento:', error);
+                    alert('Ocorreu um erro ao salvar os dados. Por favor, tente novamente.');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-save"></i> Salvar no Sistema';
+                    hideLoading();
+                }
+            });
+            
+            // Logout
+            document.getElementById('sidebar-logout-btn').addEventListener('click', function() {
+                firebase.auth().signOut().then(() => {
+                    window.location.href = "../index.html";
+                }).catch((error) => {
+                    console.error("Erro ao fazer logout:", error);
+                });
+            });
+            
+            // Toggle do menu lateral
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('active');
+            });
+        });
+    </script>
+</body>
+</html>
