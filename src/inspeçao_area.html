@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspeção de Setor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/comunicaçãao_ocorrencia.css">
+    <style>
+        .calculated-field {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+        }
+        .question-group {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hamburger Menu Button (visível apenas em mobile) -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <div class="app-container">
+        <!-- Menu Lateral -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <i class="fas fa-user-circle user-avatar"></i>
+                    <div class="user-info">
+                        <span class="user-name" id="sidebar-user-name"></span>
+                        <span class="user-unit" id="sidebar-user-unit"></span>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <ul>
+                    <li>
+                        <a href="home.html">
+                            <i class="fas fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="old_home.html">
+                            <i class="fas fa-gauge"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="documentos.html">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Documentos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="validades.html">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Validades</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="procedimentos_operacionais.html">
+                            <i class="fas fa-book"></i>
+                            <span>Procedimentos Operacionais</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="comunicacao_ocorrencia.html">
+                            <i class="fas fa-bullhorn"></i>
+                            <span>Comunicação de Ocorrência</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="invetigacao.html">
+                            <i class="fas fa-search"></i>
+                            <span>Investigação de Ocorrência</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="relato_desvio.html">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>Relatos de Desvio</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="historicoRD.html">
+                            <i class="fas fa-history"></i>
+                            <span>Histórico de Relatos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="padrinho.html">
+                            <i class="fas fa-handshake"></i>
+                            <span>Programa Padrinhos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-face-dizzy"></i>
+                            <span>Visualização de Padrinhos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="visualizar-padrinhos.html">
+                            <i class="fas fa-qrcode"></i>
+                            <span>Leitor QR Code</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="inspecao_setor.html">
+                            <i class="fas fa-clipboard-check"></i>
+                            <span>Inspeção de Setor</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="confirm-unit-change" class="btn btn-sm btn-success w-100" style="display: none;">
+                    <i class="fas fa-check"></i> Confirmar
+                </button>
+            </div>
+            
+            <button class="btn btn-danger btn-sm w-100" id="sidebar-logout-btn">
+                <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Sair</span>
+            </button>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>Inspeção de Setor</h1>
+                <div class="breadcrumb">Formulário • Inspeção</div>
+            </div>
+
+            <div class="form-container">
+                <form id="inspecaoForm">
+                    
+                    <!-- Seção 1: Informações Gerais -->
+                    <div class="form-section">
+                        <h3>Informações Gerais</h3>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="unidade" class="form-label">Unidade:</label>
+                                    <input type="text" class="form-control" id="unidade" name="unidade" required readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="setor" class="form-label">Setor Inspecionado:</label>
+                                    <input type="text" class="form-control" id="setor" name="setor" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-divider"></div>
+                    
+                    <!-- Seção 2: Pilar 1 – Instalações e Infraestrutura -->
+                    <div class="form-section">
+                        <h3>Pilar 1 – Instalações e Infraestrutura</h3>
+                        
+                        <div class="question-group">
+                            <label class="form-label">O piso do setor possui saliências ou depressões que dificultam a circulação?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p1_q1_sim" name="p1_q1" value="Sim" required>
+                                    <label for="p1_q1_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p1_q1_nao" name="p1_q1" value="Não">
+                                    <label for="p1_q1_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <label class="form-label">Existem aberturas no piso ou paredes sem proteção contra queda?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p1_q2_sim" name="p1_q2" value="Sim" required>
+                                    <label for="p1_q2_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p1_q2_nao" name="p1_q2" value="Não">
+                                    <label for="p1_q2_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <label class="form-label">Os pisos, escadas e rampas suportam adequadamente as cargas previstas?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p1_q3_sim" name="p1_q3" value="Sim" required>
+                                    <label for="p1_q3_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p1_q3_nao" name="p1_q3" value="Não">
+                                    <label for="p1_q3_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <label class="form-label">O piso apresenta risco de escorregamento e possui sistema antiderrapante?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p1_q4_sim" name="p1_q4" value="Sim" required>
+                                    <label for="p1_q4_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p1_q4_nao" name="p1_q4" value="Não">
+                                    <label for="p1_q4_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <label class="form-label">O painel elétrico está fechado e com travamento adequado?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p1_q5_sim" name="p1_q5" value="Sim" required>
+                                    <label for="p1_q5_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p1_q5_nao" name="p1_q5" value="Não">
+                                    <label for="p1_q5_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <label class="form-label">Há fiação exposta ou em mau estado ao redor do painel?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p1_q6_sim" name="p1_q6" value="Sim" required>
+                                    <label for="p1_q6_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p1_q6_nao" name="p1_q6" value="Não">
+                                    <label for="p1_q6_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <label class="form-label">Há proteção contra contato acidental com partes energizadas visíveis?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p1_q7_sim" name="p1_q7" value="Sim" required>
+                                    <label for="p1_q7_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p1_q7_nao" name="p1_q7" value="Não">
+                                    <label for="p1_q7_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <label class="form-label">A iluminação da área é adequada para inspeção visual segura?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p1_q8_sim" name="p1_q8" value="Sim" required>
+                                    <label for="p1_q8_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p1_q8_nao" name="p1_q8" value="Não">
+                                    <label for="p1_q8_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <label class="form-label">Há obstruções ou materiais armazenados em frente ao painel elétrico?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p1_q9_sim" name="p1_q9" value="Sim" required>
+                                    <label for="p1_q9_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p1_q9_nao" name="p1_q9" value="Não">
+                                    <label for="p1_q9_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <label class="form-label">Há sinalização visível e adequada nas rotas de circulação e emergência?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p1_q10_sim" name="p1_q10" value="Sim" required>
+                                    <label for="p1_q10_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p1_q10_nao" name="p1_q10" value="Não">
+                                    <label for="p1_q10_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-divider"></div>
+                    
+                    <!-- Seção 3: Pilar 2 – Espaço e Layout -->
+                    <div class="form-section">
+                        <h3>Pilar 2 – Espaço e Layout</h3>
+                        
+                        <div class="question-group">
+                            <label class="form-label">A largura dos corredores permite a circulação segura de empilhadeiras?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p2_q1_sim" name="p2_q1" value="Sim" required>
+                                    <label for="p2_q1_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p2_q1_nao" name="p2_q1" value="Não">
+                                    <label for="p2_q1_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <label class="form-label">Existem áreas de manobra suficientes para empilhadeiras realizarem curvas e inversões?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p2_q2_sim" name="p2_q2" value="Sim" required>
+                                    <label for="p2_q2_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p2_q2_nao" name="p2_q2" value="Não">
+                                    <label for="p2_q2_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <label class="form-label">Os pontos de carga e descarga estão posicionados de forma a evitar congestionamentos?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p2_q3_sim" name="p2_q3" value="Sim" required>
+                                    <label for="p2_q3_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p2_q3_nao" name="p2_q3" value="Não">
+                                    <label for="p2_q3_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <label class="form-label">O pé-direito do galpão é adequado para o tipo de empilhadeira e altura de estocagem?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p2_q4_sim" name="p2_q4" value="Sim" required>
+                                    <label for="p2_q4_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p2_q4_nao" name="p2_q4" value="Não">
+                                    <label for="p2_q4_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <label class="form-label">Existe sinalização clara indicando rotas de empilhadeiras e áreas restritas?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p2_q5_sim" name="p2_q5" value="Sim" required>
+                                    <label for="p2_q5_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p2_q5_nao" name="p2_q5" value="Não">
+                                    <label for="p2_q5_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <label class="form-label">O piso do galpão é nivelado e resistente ao tráfego de empilhadeiras?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p2_q6_sim" name="p2_q6" value="Sim" required>
+                                    <label for="p2_q6_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p2_q6_nao" name="p2_q6" value="Não">
+                                    <label for="p2_q6_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <label class="form-label">Existe proteção contra colisões em estruturas próximas às rotas de empilhadeira?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p2_q7_sim" name="p2_q7" value="Sim" required>
+                                    <label for="p2_q7_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p2_q7_nao" name="p2_q7" value="Não">
+                                    <label for="p2_q7_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <label class="form-label">Os acessos ao galpão (portas, docas) são compatíveis com o tamanho das empilhadeiras?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p2_q8_sim" name="p2_q8" value="Sim" required>
+                                    <label for="p2_q8_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p2_q8_nao" name="p2_q8" value="Não">
+                                    <label for="p2_q8_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <label class="form-label">Existe iluminação adequada nas áreas de circulação de empilhadeiras?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p2_q9_sim" name="p2_q9" value="Sim" required>
+                                    <label for="p2_q9_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p2_q9_nao" name="p2_q9" value="Não">
+                                    <label for="p2_q9_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <label class="form-label">Existem dispositivos de segurança como espelhos convexos e sensores em cruzamentos?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p2_q10_sim" name="p2_q10" value="Sim" required>
+                                    <label for="p2_q10_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p2_q10_nao" name="p2_q10" value="Não">
+                                    <label for="p2_q10_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-divider"></div>
+                    
+                    <!-- Seção 4: Pilar 3 – Organização e Armazenagem -->
+                    <div class="form-section">
+                        <h3>Pilar 3 – Organização e Armazenagem</h3>
+                        
+                        <div class="question-group">
+                            <label class="form-label">A disposição dos pallets e estantes permite acesso fácil com empilhadeira?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p3_q1_sim" name="p3_q1" value="Sim" required>
+                                    <label for="p3_q1_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p3_q1_nao" name="p3_q1" value="Não">
+                                    <label for="p3_q1_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <label class="form-label">Os espaços entre estantes respeitam as normas de segurança para movimentação com empilhadeira?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p3_q2_sim" name="p3_q2" value="Sim" required>
+                                    <label for="p3_q2_sim">Sim</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="radio" id="p3_q2_nao" name="p3_q2" value="Não">
+                                    <label for="p3_q2_nao">Não</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-divider"></div>
+                    
+                    <!-- Seção 5: Fotos da Inspeção -->
+                    <div class="form-section">
+                        <h3>Fotos da Inspeção</h3>
+                        <div class="form-group">
+                            <label for="fotosInspecao" class="form-label">Adicionar Fotos:</label>
+                            <input type="file" class="form-control" id="fotosInspecao" name="fotosInspecao" multiple accept="image/*">
+                            <small class="text-muted">Selecione uma ou mais fotos para anexar ao relatório</small>
+                        </div>
+                        <div class="photo-preview" id="photoPreview"></div>
+                    </div>
+                    
+                    <div class="section-divider"></div>
+                    
+                    <!-- Seção 6: Observações -->
+                    <div class="form-section">
+                        <h3>Observações</h3>
+                        <div class="form-group">
+                            <textarea class="form-control" id="observacoes" name="observacoes" rows="5" placeholder="Observações adicionais sobre a inspeção..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-4">
+                        <button type="submit" class="btn btn-submit" id="btnSubmit">
+                            <i class="fas fa-paper-plane"></i> Enviar Inspeção
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Inspeção Enviada</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Sua inspeção de setor foi enviada com sucesso e salva no sistema.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Inicialização do Firebase (mesma configuração)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDZwa4XNqlupNDLs7-CRQbhr5pRT4NyFBA",
+            authDomain: "application-gzl.firebaseapp.com",
+            databaseURL: "https://application-gzl-default-rtdb.firebaseio.com",
+            projectId: "application-gzl",
+            storageBucket: "application-gzl.appspot.com",
+            messagingSenderId: "319900903265",
+            appId: "1:319900903265:web:a8f400aeb7a697fc168720",
+            measurementId: "G-ZRRFQZXT54"
+        };
+        
+        // Inicializa o Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Função para gerar ID único (mesma do primeiro código)
+        function generateUniqueId() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const randomNum = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+            return `${year}${month}${day}${randomNum}`;
+        }
+        
+        // Inicialização quando o documento estiver carregado
+        document.addEventListener('DOMContentLoaded', function() {
+            // Preenche automaticamente a unidade se o usuário estiver logado
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    firebase.firestore().collection('users').doc(user.uid).get()
+                        .then(doc => {
+                            if (doc.exists) {
+                                const userData = doc.data();
+                                document.getElementById('unidade').value = userData.unit || '';
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Erro ao buscar unidade:", error);
+                        });
+                }
+            });
+
+            // Manipulação de fotos (mesma lógica do primeiro código)
+            const photoInput = document.getElementById('fotosInspecao');
+            const photoPreview = document.getElementById('photoPreview');
+            const fotosBase64 = [];
+            
+            photoInput.addEventListener('change', function(e) {
+                const files = e.target.files;
+                photoPreview.innerHTML = '';
+                fotosBase64.length = 0;
+                
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(event) {
+                        const photoDiv = document.createElement('div');
+                        photoDiv.className = 'photo-preview-item';
+                        photoDiv.innerHTML = `
+                            <img src="${event.target.result}" alt="Preview">
+                            <button type="button" class="remove-photo" data-index="${i}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `;
+                        photoPreview.appendChild(photoDiv);
+                        
+                        // Adiciona evento de remoção
+                        photoDiv.querySelector('.remove-photo').addEventListener('click', function() {
+                            photoDiv.remove();
+                            fotosBase64.splice(i, 1);
+                        });
+                        
+                        // Armazena a imagem como base64
+                        fotosBase64.push(event.target.result.split(',')[1]);
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Envio do formulário
+            document.getElementById('inspecaoForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const submitBtn = document.getElementById('btnSubmit');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+                // Gera ID único para a inspeção
+                const inspecaoId = generateUniqueId();
+
+                // Coleta todas as respostas do formulário
+                const formData = new FormData(this);
+                const respostas = {};
+                
+                // Coleta todas as respostas de rádio
+                const radioButtons = document.querySelectorAll('input[type="radio"]:checked');
+                radioButtons.forEach(radio => {
+                    respostas[radio.name] = radio.value;
+                });
+
+                const user = firebase.auth().currentUser;
+                const now = new Date();
+
+                const inspecaoData = {
+                    id: inspecaoId,
+                    unidade: document.getElementById('unidade').value,
+                    setor: document.getElementById('setor').value,
+                    observacoes: document.getElementById('observacoes').value,
+                    respostas: respostas,
+                    fotos: fotosBase64,
+                    userId: user.uid,
+                    userName: user.displayName || user.email,
+                    dataInspecao: firebase.firestore.FieldValue.serverTimestamp(),
+                    dataLocal: now.toISOString(),
+                    hora: now.toLocaleTimeString('pt-BR'),
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                // Salva no Firestore na coleção 'inspecoes'
+                firebase.firestore().collection('inspecoes').doc(inspecaoId).set(inspecaoData)
+                    .then(() => {
+                        console.log('Inspeção salva com ID:', inspecaoId);
+                        
+                        // Mostra modal de confirmação
+                        const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                        modal.show();
+                        
+                        // Limpa o formulário
+                        document.getElementById('inspecaoForm').reset();
+                        document.getElementById('photoPreview').innerHTML = '';
+                        fotosBase64.length = 0;
+                    })
+                    .catch((error) => {
+                        console.error('Erro ao salvar inspeção:', error);
+                        alert('Ocorreu um erro ao salvar a inspeção. Por favor, tente novamente.');
+                    })
+                    .finally(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Inspeção';
+                    });
+            });
+        });
+    </script>
+    <script src="../js/hamb.js"></script>
+    <script src="../js/auth.js"></script>
+</body>
+</html>
