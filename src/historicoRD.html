@@ -57,6 +57,10 @@
             font-weight: bold;
             color: #0d6efd;
         }
+        
+        .badge {
+            font-size: 0.75em;
+        }
     </style>
 </head>
 <body>
@@ -213,6 +217,20 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
+                            <label for="filtroUnidade" class="form-label">Unidade:</label>
+                            <input type="text" class="form-control" id="filtroUnidade" placeholder="Filtrar por unidade">
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="filtroEnviadoPor" class="form-label">Enviado Por:</label>
+                            <input type="text" class="form-control" id="filtroEnviadoPor" placeholder="Filtrar por nome">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
                             <label for="filtroBusca" class="form-label">Buscar:</label>
                             <div class="input-group">
                                 <input type="text" class="form-control" id="filtroBusca" placeholder="ID ou descrição">
@@ -222,14 +240,14 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="total-registros" id="totalRegistros">
                             Total de registros: 0
                         </div>
                     </div>
-                    <div class="col-md-6 text-end">
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-12 text-end">
                         <button class="btn btn-secondary" id="btnLimparFiltros">
                             <i class="fas fa-times"></i> Limpar Filtros
                         </button>
@@ -252,6 +270,8 @@
                                     <th>Tipo</th>
                                     <th>Aberto Para</th>
                                     <th>Detalhes</th>
+                                    <th>Unidade</th>
+                                    <th>Enviado Por</th>
                                     <th>Status</th>
                                     <th>Ações</th>
                                 </tr>
@@ -366,15 +386,44 @@
             colecoes.forEach(colecao => {
                 promises.push(
                     firebase.firestore().collection(colecao)
-                        .get()  // REMOVI o filtro por userId para carregar TODOS os documentos
-                        .then((querySnapshot) => {
+                        .get()
+                        .then(async (querySnapshot) => {
                             console.log(`${colecao}: ${querySnapshot.size} documentos encontrados`);
-                            querySnapshot.forEach((doc) => {
+                            
+                            // Processar cada documento individualmente
+                            for (const doc of querySnapshot.docs) {
                                 const relato = doc.data();
-                                relato.colecao = colecao; // Adiciona a coleção de origem
-                                relato.firebaseId = doc.id; // Adiciona o ID do documento no Firebase
+                                relato.colecao = colecao;
+                                relato.firebaseId = doc.id;
+                                
+                                // Buscar informações do usuário que criou o relato
+                                if (relato.userId) {
+                                    try {
+                                        const userDoc = await firebase.firestore().collection("users").doc(relato.userId).get();
+                                        if (userDoc.exists) {
+                                            const userData = userDoc.data();
+                                            relato.userEmail = userData.email || 'Não informado';
+                                            relato.userName = userData.nome || 'Não informado';
+                                            relato.userUnit = userData.unidade || 'Não informado';
+                                        } else {
+                                            relato.userEmail = 'Usuário não encontrado';
+                                            relato.userName = 'Usuário não encontrado';
+                                            relato.userUnit = 'Usuário não encontrado';
+                                        }
+                                    } catch (error) {
+                                        console.error(`Erro ao buscar dados do usuário ${relato.userId}:`, error);
+                                        relato.userEmail = 'Erro ao carregar';
+                                        relato.userName = 'Erro ao carregar';
+                                        relato.userUnit = 'Erro ao carregar';
+                                    }
+                                } else {
+                                    relato.userEmail = 'Não disponível';
+                                    relato.userName = 'Não disponível';
+                                    relato.userUnit = 'Não disponível';
+                                }
+                                
                                 todosRelatos.push(relato);
-                            });
+                            }
                         })
                         .catch((error) => {
                             console.error(`Erro ao carregar relatos da coleção ${colecao}:`, error);
@@ -411,6 +460,8 @@
             const tipoFiltro = document.getElementById('filtroTipo').value;
             const dataInicio = document.getElementById('filtroDataInicio').value;
             const dataFim = document.getElementById('filtroDataFim').value;
+            const unidadeFiltro = document.getElementById('filtroUnidade').value.toLowerCase();
+            const enviadoPorFiltro = document.getElementById('filtroEnviadoPor').value.toLowerCase();
             const textoBusca = document.getElementById('filtroBusca').value.toLowerCase();
             
             let relatosFiltrados = todosRelatos;
@@ -447,6 +498,18 @@
                 });
             }
             
+            if (unidadeFiltro) {
+                relatosFiltrados = relatosFiltrados.filter(relato => 
+                    relato.userUnit && relato.userUnit.toLowerCase().includes(unidadeFiltro)
+                );
+            }
+            
+            if (enviadoPorFiltro) {
+                relatosFiltrados = relatosFiltrados.filter(relato => 
+                    relato.userName && relato.userName.toLowerCase().includes(enviadoPorFiltro)
+                );
+            }
+            
             if (textoBusca) {
                 relatosFiltrados = relatosFiltrados.filter(relato => {
                     try {
@@ -455,7 +518,8 @@
                             (relato.descricaoMedida && relato.descricaoMedida.toLowerCase().includes(textoBusca)) ||
                             (relato.detalhes && Array.isArray(relato.detalhes) && relato.detalhes.some(d => d.toLowerCase().includes(textoBusca))) ||
                             (relato.categoria && relato.categoria.toLowerCase().includes(textoBusca)) ||
-                            (relato.abertoPara && relato.abertoPara.toLowerCase().includes(textoBusca))
+                            (relato.abertoPara && relato.abertoPara.toLowerCase().includes(textoBusca)) ||
+                            (relato.userEmail && relato.userEmail.toLowerCase().includes(textoBusca))
                         );
                     } catch (e) {
                         console.error("Erro ao filtrar por texto:", e, relato);
@@ -540,6 +604,8 @@
                     <td>${tipoExibicao}</td>
                     <td>${relato.abertoPara || 'Não informado'}</td>
                     <td>${resumoDetalhes || 'Não informado'}</td>
+                    <td>${relato.userUnit || 'Não informado'}</td>
+                    <td>${relato.userName || 'Não informado'}</td>
                     <td><span class="badge bg-success">Enviado</span></td>
                     <td class="action-buttons">
                         <button class="btn btn-sm btn-info btn-visualizar" data-id="${relato.firebaseId}" data-colecao="${relato.colecao}">
@@ -571,10 +637,27 @@
                         const relato = doc.data();
                         relato.firebaseId = doc.id;
                         relato.colecao = colecao;
-                        exibirDetalhesRelato(relato);
+                        
+                        // Buscar informações do usuário se não estiverem carregadas
+                        if (!relato.userName && relato.userId) {
+                            return firebase.firestore().collection("users").doc(relato.userId).get()
+                                .then((userDoc) => {
+                                    if (userDoc.exists) {
+                                        const userData = userDoc.data();
+                                        relato.userEmail = userData.email || 'Não informado';
+                                        relato.userName = userData.nome || 'Não informado';
+                                        relato.userUnit = userData.unidade || 'Não informado';
+                                    }
+                                    return relato;
+                                });
+                        }
+                        return relato;
                     } else {
-                        alert('Relato não encontrado!');
+                        throw new Error('Relato não encontrado');
                     }
+                })
+                .then((relatoCompleto) => {
+                    exibirDetalhesRelato(relatoCompleto);
                     hideLoading();
                 })
                 .catch((error) => {
@@ -627,6 +710,20 @@
                         <p><strong>Aberto Para:</strong> ${relato.abertoPara || 'Não informado'}</p>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Unidade:</strong> ${relato.userUnit || 'Não informado'}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Enviado Por:</strong> ${relato.userName || 'Não informado'}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <p><strong>Email:</strong> ${relato.userEmail || 'Não informado'}</p>
+                    </div>
+                </div>
+                <hr>
             `;
             
             // Detalhes específicos por tipo
@@ -664,12 +761,18 @@
             
             // Informações de abertura
             html += `
+                <hr>
                 <div class="row">
                     <div class="col-md-6">
                         <p><strong>Aberto Por:</strong> ${relato.abertoPor || 'Não informado'}</p>
                     </div>
                     <div class="col-md-6">
                         <p><strong>Data de Envio:</strong> ${dataHoraFormatada}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <p><strong>User ID:</strong> ${relato.userId || 'Não informado'}</p>
                     </div>
                 </div>
             `;
@@ -706,6 +809,8 @@
             document.getElementById('filtroTipo').addEventListener('change', aplicarFiltros);
             document.getElementById('filtroDataInicio').addEventListener('change', aplicarFiltros);
             document.getElementById('filtroDataFim').addEventListener('change', aplicarFiltros);
+            document.getElementById('filtroUnidade').addEventListener('keyup', aplicarFiltros);
+            document.getElementById('filtroEnviadoPor').addEventListener('keyup', aplicarFiltros);
             document.getElementById('filtroBusca').addEventListener('keyup', aplicarFiltros);
             document.getElementById('btnBuscar').addEventListener('click', aplicarFiltros);
             
@@ -714,6 +819,8 @@
                 document.getElementById('filtroTipo').value = '';
                 document.getElementById('filtroDataInicio').value = '';
                 document.getElementById('filtroDataFim').value = '';
+                document.getElementById('filtroUnidade').value = '';
+                document.getElementById('filtroEnviadoPor').value = '';
                 document.getElementById('filtroBusca').value = '';
                 aplicarFiltros();
             });
@@ -730,4 +837,4 @@
     </script>
     <script src="../js/hamb.js"></script>
 </body>
-</html>
+</html

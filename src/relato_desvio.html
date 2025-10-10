@@ -988,6 +988,7 @@
         
         // Variável global para armazenar o usuário atual
         let currentUser = null;
+        let userData = null;
         
         // Verificar autenticação do usuário
         firebase.auth().onAuthStateChanged(function(user) {
@@ -1008,7 +1009,7 @@
             firebase.firestore().collection("users").doc(userId).get()
                 .then((doc) => {
                     if (doc.exists) {
-                        const userData = doc.data();
+                        userData = doc.data();
                         document.getElementById("sidebar-user-name").textContent = userData.nome || "Usuário";
                         document.getElementById("sidebar-user-unit").textContent = userData.unidade || "Unidade";
                     } else {
@@ -1139,6 +1140,8 @@
                         abertoPor: document.getElementById('abertoPor').value,
                         userId: currentUser.uid,
                         userEmail: currentUser.email,
+                        userName: userData?.nome || currentUser.displayName || 'Não informado',
+                        userUnit: userData?.unidade || 'Não informado',
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
                     
@@ -1176,6 +1179,12 @@
                     await firebase.firestore().collection(colecao).doc(relatoData.id).set(relatoData);
                     
                     console.log('Documento salvo com ID:', relatoData.id);
+                    console.log('Dados do usuário salvos:', {
+                        userId: relatoData.userId,
+                        userEmail: relatoData.userEmail,
+                        userName: relatoData.userName,
+                        userUnit: relatoData.userUnit
+                    });
                     
                     // Mostra modal de confirmação
                     const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
