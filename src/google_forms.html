@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulários Google</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/validade.css">
+    <link rel="icon" href="../img/engenheiro.png" type="image/x-icon">
+    <style>
+        .forms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-left: 4px solid #007bff;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .form-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+        
+        .form-card i {
+            font-size: 2rem;
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+        
+        .form-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .form-card p {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .btn-form {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+        
+        .btn-form:hover {
+            background: #0056b3;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .form-category {
+            margin-bottom: 30px;
+        }
+        
+        .form-category h2 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hamburger Menu Button (visível apenas em mobile) -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <div class="app-container">
+        <!-- Menu Lateral -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <i class="fas fa-user-circle user-avatar"></i>
+                    <div class="user-info">
+                        <span class="user-name" id="sidebar-user-name">Carregando...</span>
+                        <span class="user-unit" id="sidebar-user-unit">Carregando...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <ul>
+                    <li>
+                        <a href="home.html">
+                            <i class="fas fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="old_home.html">
+                            <i class="fas fa-gauge"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="documentos.html">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Documentos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="validades.html">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Validades</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="procedimentos_operacionais.html">
+                            <i class="fas fa-book"></i>
+                            <span>Procedimentos Operacionais</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="comunicaçao_ocorrencia.html">
+                            <i class="fas fa-bullhorn"></i>
+                            <span>Comunicação de Ocorrencia</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="invetigacao.html">
+                            <i class="fas fa-search"></i>
+                            <span>Investigação de Ocorrencia</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="relato_desvio.html">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>Relatos de Desvio</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="historicoRD.html">
+                            <i class="fas fa-history"></i>
+                            <span>Histórico de Relatos</span>
+                        </a>
+                    </li>
+                    <li >
+                        <a href="padrinho.html">
+                            <i class="fas fa-handshake"></i>
+                            <span>Cadastro de Apadrinhamento</span>
+                        </a>
+                    </li>
+                    <li >
+                        <a href="Controle_padrinho.html">
+                            <i class="fas fa-face-smile"></i>
+                            <span>Visualização de Apadrinhamento</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="visualizar-padrinhos.html">
+                            <i class="fas fa-qrcode"></i>
+                            <span>Buscar Padrinhos</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="google_forms.html" >
+                            <i class="fab fa-google"></i>
+                            <span>Formulários Google</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+
+
+            <div class="sidebar-footer">
+                <button class="btn btn-danger btn-sm" id="sidebar-logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
+            </div>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Formulários Google</h1>
+                <div class="breadcrumb">
+                    <a href="home.html">Home</a> / <span>Formulários Google</span>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fab fa-google"></i> Formulários para Preenchimento</h2>
+                        <p>Selecione um dos formulários abaixo para preencher as informações solicitadas</p>
+                    </div>
+                    
+                    <div class="card-body">
+                        <!-- Categoria: Documentação -->
+                        <div class="form-category">
+                            <h2>Documentação e Registros</h2>
+                            <div class="forms-grid">
+                                <div class="form-card">
+                                    <i class="fas fa-file-contract"></i>
+                                    <h3>Registro de HHT</h3>
+                                    <p>Formulário para registro das Homens-Horas Trabalhadas</p>
+                                    <a href="https://forms.gle/qmemy2mcjLqApYxK8" target="_blank" class="btn-form">
+                                        <i class="fas fa-external-link-alt"></i> Acessar Formulário
+                                    </a>
+                                </div>
+                                
+                                <div class="form-card">
+                                    <i class="fas fa-calendar-check"></i>
+                                    <h3>Aplicação de Etilometria</h3>
+                                    <p>Registro da aplicação de etilometria</p>
+                                    <a href="https://forms.gle/bKHRbCCJHTnrosdU7" target="_blank" class="btn-form">
+                                        <i class="fas fa-external-link-alt"></i> Acessar Formulário
+                                    </a>
+                                </div>
+                                
+                                <div class="form-card">
+                                    <i class="fas fa-clipboard-list"></i>
+                                    <h3>Teste De EPI</h3>
+                                    <p>Registro dos testes de EPI</p>
+                                    <a href="https://forms.gle/SwbMQsavPkzdqKup6" target="_blank" class="btn-form">
+                                        <i class="fas fa-external-link-alt"></i> Acessar Formulário
+                                    </a>
+                                </div>
+
+                                <div class="form-card">
+                                    <i class="fas fa-magic-wand-sparkles"></i>
+                                    <h3>Prova de Treinamento</h3>
+                                    <p>Registro da Prova de Treinamento</p>
+                                    <a href="https://forms.gle/kLsX5auoinHeLxZW9" target="_blank" class="btn-form">
+                                        <i class="fas fa-external-link-alt"></i> Acessar Formulário
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Categoria: Ocorrências -->
+                        <div class="form-category">
+                            <h2>Ferramentas Preventivas</h2>
+                            <div class="forms-grid">
+                                <div class="form-card">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <h3>Auditoria Comportamental</h3>
+                                    <p>Registro de auditorias comportamentais realizadas</p>
+                                    <a href="https://forms.gle/pCZQAnTXRa4dGTU58" target="_blank" class="btn-form">
+                                        <i class="fas fa-external-link-alt"></i> Acessar Formulário
+                                    </a>
+                                </div>
+                                
+                                <div class="form-card">
+                                    <i class="fas fa-search"></i>
+                                    <h3>DTO</h3>
+                                    <p>Registro de Diagnóstico do Trabalho Operacional</p>
+                                    <a href="https://forms.gle/L5CULRcHw11pogqL6" target="_blank" class="btn-form">
+                                        <i class="fas fa-external-link-alt"></i> Acessar Formulário
+                                    </a>
+                                </div>
+                                
+                                <div class="form-card">
+                                    <i class="fas fa-clipboard-check"></i>
+                                    <h3>Cartão Verde</h3>
+                                    <p>Registro do Reconhecimento do Colaborador</p>
+                                    <a href="https://forms.gle/TomDqACycoBZr5UDA" target="_blank" class="btn-form">
+                                        <i class="fas fa-external-link-alt"></i> Acessar Formulário
+                                    </a>
+                                </div>
+
+                                <div class="form-card">
+                                    <i class="fas fa-check-double"></i>
+                                    <h3>Relatorio de visita SST</h3>
+                                    <p>Registro de Visita as Unidades</p>
+                                    <a href="https://forms.gle/6rq3mHaXNDnvBsWq7" target="_blank" class="btn-form">
+                                        <i class="fas fa-external-link-alt"></i> Acessar Formulário
+                                    </a>
+                                </div>
+
+                                <div class="form-card">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <h3>Ronda de Segurança</h3>
+                                    <p>Registro das Rondas de Segurança</p>
+                                    <a href="https://forms.gle/nQGJur4kaGkfafDK7" target="_blank" class="btn-form">
+                                        <i class="fas fa-external-link-alt"></i> Acessar Formulário
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Categoria: Treinamentos -->
+                        <div class="form-category">
+                            <h2>Checklists</h2>
+                            <div class="forms-grid">
+                                <div class="form-card">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                    <h3>Cinto de Segurança</h3>
+                                    <p>Avaliação de uso do cinto de segurança</p>
+                                    <a href="https://forms.gle/n5AC12QzVLSdP4u18" target="_blank" class="btn-form">
+                                        <i class="fas fa-external-link-alt"></i> Acessar Formulário
+                                    </a>
+                                </div>
+                                
+                                <div class="form-card">
+                                    <i class="fas fa-handshake"></i>
+                                    <h3>Ferramentas Operacionais</h3>
+                                    <p>Registro de uso de ferramentas operacionais</p>
+                                    <a href="https://forms.gle/HKHKmEj6jczraoLDA" target="_blank" class="btn-form">
+                                        <i class="fas fa-external-link-alt"></i> Acessar Formulário
+                                    </a>
+                                </div>
+                                
+                                <div class="form-card">
+                                    <i class="fas fa-pallet"></i>
+                                    <h3>Paleteira</h3>
+                                    <p>Formulário para registro de uso de paleteiras</p>
+                                    <a href="https://forms.gle/PxjA6MEor3XXMXoG8" target="_blank" class="btn-form">
+                                        <i class="fas fa-external-link-alt"></i> Acessar Formulário
+                                    </a>
+                                </div>
+
+                                <div class="form-card">
+                                    <i class="fas fa-truck-loading"></i>
+                                    <h3>Empilhadeira    </h3>
+                                    <p>Formulário para registro de uso de empilhadeiras</p>
+                                    <a href="https://forms.gle/ueyi4YstgPXFLd3k8" target="_blank" class="btn-form">
+                                        <i class="fas fa-external-link-alt"></i> Acessar Formulário
+                                    </a>
+                                </div>
+
+                                <div class="form-card">
+                                    <i class="fas fa-helmet-safety"></i>
+                                    <h3>Trava quedas</h3>
+                                    <p>Formulário para registro de uso de trava quedas</p>
+                                    <a href="https://forms.gle/udshQvtcqBMzczaG6" target="_blank" class="btn-form">
+                                        <i class="fas fa-external-link-alt"></i> Acessar Formulário
+                                    </a>
+                                </div>
+
+                                <div class="form-card">
+                                    <i class="fas fa-hammer"></i>
+                                    <h3>Ferramenta e Equipamentos</h3>
+                                    <p>Formulário para registro de uso de ferramentas e equipamentos</p>
+                                    <a href="https://forms.gle/Np2i38cdxptD1UBJA" target="_blank" class="btn-form">
+                                        <i class="fas fa-external-link-alt"></i> Acessar Formulário
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Categoria: Qualidade -->
+                        <div class="form-category">
+                            <h2>Qualidade e Processos</h2>
+                            <div class="forms-grid">
+                                <div class="form-card">
+                                    <i class="fas fa-cogs"></i>
+                                    <h3>Desenvolvimento</h3>
+                                    <p>Aguarde</p>
+                                    <a href="#" target="_blank" class="btn-form">
+                                        <i class="fas fa-external-link-alt"></i> Acessar Formulário
+                                    </a>
+                                </div>
+                    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/hamb.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            firebase.auth().onAuthStateChanged(async function(user) {
+                if (user) {
+                    const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+                    
+                    if (userDoc.exists) {
+                        const userData = userDoc.data();
+                        const currentUser = {
+                            uid: user.uid,
+                            email: user.email,
+                            displayName: userData.name || user.email,
+                            unidade: userData.unit || 'Não definida',
+                            unidadeId: userData.unitId || userData.unit
+                        };
+                        
+                        // Atualiza a sidebar
+                        document.getElementById('sidebar-user-name').textContent = currentUser.displayName;
+                        document.getElementById('sidebar-user-unit').textContent = currentUser.unidade;
+                    }
+                } else {
+                    window.location.href = 'index.html';
+                }
+            });
+
+            // Logout
+            document.getElementById('sidebar-logout-btn')?.addEventListener('click', function() {
+                firebase.auth().signOut().then(() => {
+                    window.location.href = 'index.html';
+                }).catch(error => {
+                    console.error('Erro ao fazer logout:', error);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
