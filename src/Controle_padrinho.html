@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualização de Padrinhos</title>
+    <title>Visualização de Padrinhos com Avaliações</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="../css/comunicaçãao_ocorrencia.css">
     <style>
         * {
             margin: 0;
@@ -148,6 +147,24 @@
             text-decoration: none;
         }
         
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #219a52;
+        }
+        
         .btn-danger {
             background: #e74c3c;
             color: white;
@@ -155,6 +172,15 @@
         
         .btn-danger:hover {
             background: #c0392b;
+        }
+        
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #e67e22;
         }
         
         .btn-sm {
@@ -303,6 +329,7 @@
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
         }
         
         .padrinho-card:hover {
@@ -395,6 +422,210 @@
             gap: 8px;
         }
         
+        .avaliacoes-section {
+            background-color: #f0f7ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .avaliacao-item {
+            background: white;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #3498db;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .avaliacao-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .avaliacao-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .avaliacao-title {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .avaliacao-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-pendente {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-liberada {
+            background: #d1ecf1;
+            color: #0c5460;
+            cursor: pointer;
+        }
+        
+        .status-concluida {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-reprovada {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-aprovada {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .avaliacao-details {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #28a745;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #7f8c8d;
+            padding: 5px;
+        }
+        
+        .close-modal:hover {
+            color: #e74c3c;
+        }
+        
+        .pergunta-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .pergunta-texto {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+        
+        .opcoes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .opcao-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .opcao-item:hover {
+            border-color: #3498db;
+            background: #f0f7ff;
+        }
+        
+        .opcao-item.selected {
+            border-color: #27ae60;
+            background: #f0fff4;
+        }
+        
+        .opcao-letra {
+            font-weight: bold;
+            color: #3498db;
+            min-width: 25px;
+        }
+        
+        .opcao-texto {
+            flex: 1;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -432,6 +663,49 @@
             to { transform: rotate(360deg); }
         }
         
+        .finalizacao-section {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .finalizacao-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar-toggle {
@@ -444,6 +718,8 @@
                 top: 0;
                 height: 100vh;
                 z-index: 999;
+                width: 85%;
+                max-width: 280px;
             }
             
             .sidebar.active {
@@ -464,6 +740,94 @@
             
             .stats {
                 flex-direction: column;
+            }
+            
+            .modal-content {
+                margin: 20px auto;
+                padding: 20px;
+                width: 95%;
+            }
+            
+            .finalizacao-buttons {
+                flex-direction: column;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .filter-options {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .filter-options select {
+                min-width: 100%;
+            }
+            
+            .content-header {
+                padding: 20px 15px;
+            }
+            
+            .content-body {
+                padding: 15px;
+            }
+            
+            .card-header-padrinho {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .info-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .info-label {
+                width: 100%;
+            }
+            
+            .avaliacao-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .modal-content {
+                padding: 15px;
+            }
+            
+            .pergunta-item {
+                padding: 15px;
+            }
+            
+            .opcao-item {
+                padding: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .content-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .stat-card {
+                padding: 15px 10px;
+            }
+            
+            .stat-number {
+                font-size: 1.5rem;
+            }
+            
+            .padrinho-card {
+                margin-bottom: 20px;
+            }
+            
+            .card-body {
+                padding: 15px;
             }
         }
     </style>
@@ -545,12 +909,11 @@
                             <span>Histórico de Relatos</span>
                         </a>
                     </li>
-                    <li >
+                    <li>
                         <a href="padrinho.html">
                             <i class="fas fa-handshake"></i>
                             <span>Cadastro de Apadrinhamento</span>
                         </a>
-                    </li>
                     <li class="active">
                         <a href="Controle_padrinho.html">
                             <i class="fas fa-face-smile"></i>
@@ -564,7 +927,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="google_forms.html" >
+                        <a href="google_forms.html">
                             <i class="fab fa-google"></i>
                             <span>Formulários Google</span>
                         </a>
@@ -582,16 +945,16 @@
         <!-- Conteúdo Principal -->
         <main class="main-content">
             <header class="content-header">
-                <h1><i class="fas fa-eye"></i> Visualização de Apadrinhamento</h1>
+                <h1><i class="fas fa-chart-line"></i> Visualização de Apadrinhamento com Avaliações</h1>
                 <div class="breadcrumb">
-                    <a href="home.html">Home</a> / <span>Visualização de Padrinhos</span>
+                    <a href="home.html">Home</a> / <span>Visualização de Padrinhos com Avaliações</span>
                 </div>
             </header>
 
             <div class="content-body">
                 <div class="card">
                     <div class="card-header">
-                        <h2><i class="fas fa-handshake"></i> Lista de Apadrinhamento</h2>
+                        <h2><i class="fas fa-handshake"></i> Lista de Apadrinhamento com Avaliações</h2>
                         <div class="search-box">
                             <input type="text" id="search-input" placeholder="Buscar por nome, função ou unidade...">
                             <i class="fas fa-search"></i>
@@ -609,8 +972,8 @@
                                 <span class="stat-label">Ativos</span>
                             </div>
                             <div class="stat-card">
-                                <span class="stat-number" id="unit-count">0</span>
-                                <span class="stat-label" id="unit-label">Minha Unidade</span>
+                                <span class="stat-number" id="completed-count">0</span>
+                                <span class="stat-label">Concluídos</span>
                             </div>
                         </div>
                         
@@ -618,6 +981,12 @@
                             <div class="filter-options">
                                 <select id="unit-filter">
                                     <option value="">Todas as unidades</option>
+                                </select>
+                                <select id="status-filter">
+                                    <option value="">Todos os status</option>
+                                    <option value="ativo">Ativos</option>
+                                    <option value="concluido">Concluídos</option>
+                                    <option value="finalizado">Finalizados</option>
                                 </select>
                                 <select id="sort-option">
                                     <option value="nome">Ordenar por Nome</option>
@@ -629,13 +998,56 @@
                         <div id="padrinhos-container">
                             <div class="loading">
                                 <div class="spinner"></div>
-                                <p>Carregando padrinhos...</p>
+                                <p>Carregando padrinhos e avaliações...</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Modal para Responder Avaliação -->
+    <div class="modal" id="avaliacaoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span id="modalAvaliacaoTitulo">Avaliação</span>
+                </h2>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            
+            <div id="modalAvaliacaoContent">
+                <!-- Conteúdo da avaliação será inserido aqui -->
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="cancelarAvaliacao">Cancelar</button>
+                <button class="btn btn-success" id="salvarAvaliacao">Salvar Respostas</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Ver Resultados da Avaliação -->
+    <div class="modal" id="resultadoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-chart-bar"></i>
+                    <span id="modalResultadoTitulo">Resultado da Avaliação</span>
+                </h2>
+                <button class="close-modal" id="closeResultadoModal">&times;</button>
+            </div>
+            
+            <div id="modalResultadoContent">
+                <!-- Conteúdo do resultado será inserido aqui -->
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="fecharResultadoModal">Fechar</button>
+            </div>
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -658,29 +1070,725 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Referência à coleção de padrinhos
+        // Referências às coleções
         const padrinhosRef = db.collection("padrinhos");
+        const avaliacoesRef = db.collection("avaliacoes");
+        const permitidosRef = db.collection("colaboradores_permitidos");
 
         // Elementos DOM
         const padrinhosContainer = document.getElementById("padrinhos-container");
         const searchInput = document.getElementById("search-input");
         const unitFilter = document.getElementById("unit-filter");
+        const statusFilter = document.getElementById("status-filter");
         const sortOption = document.getElementById("sort-option");
         const totalCount = document.getElementById("total-count");
         const activeCount = document.getElementById("active-count");
-        const unitCount = document.getElementById("unit-count");
-        const unitLabel = document.getElementById("unit-label");
+        const completedCount = document.getElementById("completed-count");
         const sidebarUserName = document.getElementById("sidebar-user-name");
         const sidebarUserUnit = document.getElementById("sidebar-user-unit");
         const sidebarToggle = document.getElementById("sidebarToggle");
         const sidebar = document.getElementById("sidebar");
         const logoutBtn = document.getElementById("sidebar-logout-btn");
 
+        // Elementos do Modal
+        const avaliacaoModal = document.getElementById("avaliacaoModal");
+        const modalAvaliacaoTitulo = document.getElementById("modalAvaliacaoTitulo");
+        const modalAvaliacaoContent = document.getElementById("modalAvaliacaoContent");
+        const closeModal = document.getElementById("closeModal");
+        const cancelarAvaliacao = document.getElementById("cancelarAvaliacao");
+        const salvarAvaliacao = document.getElementById("salvarAvaliacao");
+
+        // Elementos do Modal de Resultado
+        const resultadoModal = document.getElementById("resultadoModal");
+        const modalResultadoTitulo = document.getElementById("modalResultadoTitulo");
+        const modalResultadoContent = document.getElementById("modalResultadoContent");
+        const closeResultadoModal = document.getElementById("closeResultadoModal");
+        const fecharResultadoModal = document.getElementById("fecharResultadoModal");
+
         // Variáveis globais
         let allPadrinhos = [];
         let filteredPadrinhos = [];
         let unidades = new Set();
         let currentUser = null;
+        let avaliacaoAtual = null;
+        let padrinhoAtual = null;
+        let respostasAtuais = {};
+
+        // Definição completa das 12 avaliações
+        const avaliacoes = [
+            {
+                id: 1,
+                titulo: "Avaliação 1 - Conceitos Básicos de Segurança",
+                perguntas: [
+                    {
+                        pergunta: "Qual é o nome do seu padrinho / madrinha de segurança?",
+                        opcoes: [
+                            "Devo perguntar ao meu supervisor.",
+                            "É uma pessoa designada para me orientar sobre os riscos e procedimentos seguros.",
+                            "Devo consultar a lista de capacitados.",
+                            "O nome do meu padrinho/madrinha é de conhecimento do setor de RH."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "O que você deve fazer ao identificar um risco não controlado no seu ambiente de trabalho?",
+                        opcoes: [
+                            "Ignorar, pois alguém já deve ter visto.",
+                            "Comunicar imediatamente à liderança e isolar a área, se possível.",
+                            "Anotar e reportar apenas no final do turno.",
+                            "Tentar resolver sozinho, sem avisar ninguém."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "O que você deve fazer ao perceber que um colega está sem EPI?",
+                        opcoes: [
+                            "Ignorar, pois a responsabilidade é somente dele.",
+                            "Alertar o colega sobre a necessidade do uso e, se necessário, comunicar a supervisão.",
+                            "Tirar uma foto e enviar para o chefe.",
+                            "Fornecer o meu EPI para ele."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Se você não souber como executar uma tarefa, o que deve fazer?",
+                        opcoes: [
+                            "Tentar fazer do seu jeito.",
+                            "Parar a atividade e buscar orientação com a supervisão ou com um colega experiente.",
+                            "Pedir para um colega assumir a tarefa por você.",
+                            "Deixar para fazer outro dia."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "O que você deve fazer caso se envolva em uma ocorrência?",
+                        opcoes: [
+                            "Esconder a evidência para não se prejudicar.",
+                            "Comunicar imediatamente a supervisão e buscar os primeiros socorros, se necessário.",
+                            "Sair do local rapidamente.",
+                            "Culpar um colega para se proteger."
+                        ],
+                        respostaCorreta: 1
+                    }
+                ]
+            },
+            {
+                id: 2,
+                titulo: "Avaliação 2 - Responsabilidade e Comportamento Seguro",
+                perguntas: [
+                    {
+                        pergunta: "O que significa agir com responsabilidade na área operacional?",
+                        opcoes: [
+                            "Fazer apenas o que o chefe manda.",
+                            "Cumprir as normas e procedimentos, mesmo sem supervisão, pensando na própria segurança e na dos outros.",
+                            "Trabalhar o mais rápido possível.",
+                            "Assumir riscos para mostrar coragem."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Em caso de dúvida sobre uma orientação, qual é a atitude correta?",
+                        opcoes: [
+                            "Fingir que entendeu para não parecer incompetente.",
+                            "Procurar a pessoa que deu a orientação e pedir esclarecimentos.",
+                            "Perguntar para um colega que também pode não saber.",
+                            "Ignorar a dúvida e seguir adiante."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "O que fazer ao presenciar um comportamento inseguro?",
+                        opcoes: [
+                            "Aplaudir a ousadia do colega.",
+                            "Interromper a ação com educação, alertando sobre o risco, e comunicar a supervisão.",
+                            "Filmar para postar nas redes sociais.",
+                            "Não fazer nada, pois cada um é responsável por si."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Por que é importante seguir as orientações do padrinho/madrinha de segurança?",
+                        opcoes: [
+                            "Porque ele pode me dar falta se eu não obedecer.",
+                            "Para aprender as práticas seguras específicas da área e me integrar à cultura de segurança.",
+                            "Porque é uma tradição da empresa.",
+                            "Para impressionar a gerência."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Qual é o papel de cada colaborador na prevenção de acidentes?",
+                        opcoes: [
+                            "Apenas o setor de segurança do trabalho é responsável.",
+                            "Ser protagonista da segurança, adotando e cobrando atitudes seguras no dia a dia.",
+                            "Fazer apenas o que está no contrato.",
+                            "Rezar para que nada aconteça."
+                        ],
+                        respostaCorreta: 1
+                    }
+                ]
+            },
+            {
+                id: 3,
+                titulo: "Avaliação 3 - Atenção e Foco no Trabalho",
+                perguntas: [
+                    {
+                        pergunta: "Em quais aspectos você deve estar atento ao circular pela área operacional?",
+                        opcoes: [
+                            "Apenas no meu caminho.",
+                            "Sinalização, veículos em movimento, condições do piso e atividades ao redor.",
+                            "Nas conversas dos colegas.",
+                            "No horário do almoço."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "O que significa trabalhar com atenção?",
+                        opcoes: [
+                            "Fazer várias tarefas ao mesmo tempo.",
+                            "Estar focado na atividade que está executando, observando os detalhes e os riscos envolvidos.",
+                            "Trabalhar olhando para o relógio.",
+                            "Ficar sempre perto do supervisor."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Por que é importante manter o foco nas atividades?",
+                        opcoes: [
+                            "Para terminar mais rápido e sair mais cedo.",
+                            "Para evitar distrações que podem levar a erros e acidentes.",
+                            "Para o chefe não reclamar.",
+                            "Porque é uma regra chata da empresa."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "O que fazer ao perceber que está cansado ou distraído durante o trabalho?",
+                        opcoes: [
+                            "Tomar um café e tentar se concentrar.",
+                            "Parar a atividade, comunicar o supervisor e fazer uma pausa para se recompor.",
+                            "Ignorar e continuar trabalhando no mesmo ritmo.",
+                            "Pedir para um colega assumir seu lugar sem avisar ninguém."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Qual é a atitude correta ao ouvir uma orientação de segurança?",
+                        opcoes: [
+                            "Escutar com atenção, confirmar o entendimento e colocar em prática.",
+                            "Concordar com a cabeça e depois fazer do seu jeito.",
+                            "Discutir para mostrar que sabe mais.",
+                            "Anotar e nunca mais ler."
+                        ],
+                        respostaCorreta: 0
+                    }
+                ]
+            },
+            {
+                id: 4,
+                titulo: "Avaliação 4 - Trabalho em Equipe e Comunicação",
+                perguntas: [
+                    {
+                        pergunta: "Como você pode ajudar um colega que está com dificuldade?",
+                        opcoes: [
+                            "Fazendo a tarefa inteira por ele.",
+                            "Oferecendo apoio e, se não souber resolver, orientá-lo a buscar ajuda com a supervisão.",
+                            "Criticando sua falta de habilidade.",
+                            "Ignorando, pois problemas dele não são meus."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Por que é importante seguir as regras de segurança?",
+                        opcoes: [
+                            "Para evitar multas para a empresa.",
+                            "Para preservar a integridade física de todos e prevenir acidentes.",
+                            "Porque o sindicato exige.",
+                            "Para não ter que assinar documentos."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Qual é o impacto de uma atitude insegura no trabalho?",
+                        opcoes: [
+                            "Pode gerar um acidente, colocando em risco o autor, os colegas e o patrimônio.",
+                            "Nenhum, desde que ninguém veja.",
+                            "Apenas uma advertência verbal.",
+                            "Aumenta a produtividade."
+                        ],
+                        respostaCorreta: 0
+                    },
+                    {
+                        pergunta: "O que fazer ao perceber que um equipamento está fora do lugar?",
+                        opcoes: [
+                            "Ignorar, pois não fui eu quem deixou.",
+                            "Guardar no local correto, se for seguro, ou comunicar a situação.",
+                            "Jogar no lixo.",
+                            "Levar para casa."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Como a comunicação ajuda na prevenção de acidentes?",
+                        opcoes: [
+                            "Permite que fofoquemos sobre os colegas.",
+                            "Permite alertar sobre riscos, compartilhar informações e coordenar ações de forma segura.",
+                            "Ajuda a passar o tempo mais rápido.",
+                            "É útil apenas em reuniões."
+                        ],
+                        respostaCorreta: 1
+                    }
+                ]
+            },
+            {
+                id: 5,
+                titulo: "Avaliação 5 - Cultura de Segurança",
+                perguntas: [
+                    {
+                        pergunta: "O que significa 'cuidar de si, dos outros e deixar ser cuidado' no trabalho?",
+                        opcoes: [
+                            "Cada um deve cuidar de si mesmo.",
+                            "É uma filosofia de segurança que promove a proteção mútua e a aceitação de feedbacks.",
+                            "Significa que a empresa é responsável por tudo.",
+                            "É apenas um slogan motivacional."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Como você pode incentivar seus colegas a agirem com segurança?",
+                        opcoes: [
+                            "Sendo exemplo, cumprindo as regras e conversando sobre a importância das práticas seguras.",
+                            "Ameaçando contar para o chefe.",
+                            "Oferecendo dinheiro.",
+                            "Criticando-os publicamente."
+                        ],
+                        respostaCorreta: 0
+                    },
+                    {
+                        pergunta: "Por que é importante participar do DDS - Diálogo Diário de Segurança?",
+                        opcoes: [
+                            "Para cumprir uma obrigação.",
+                            "É um momento para discutir futebol.",
+                            "Para reforçar a conscientização, compartilhar experiências e aprender sobre temas de segurança.",
+                            "Para assinar a lista de presença."
+                        ],
+                        respostaCorreta: 2
+                    },
+                    {
+                        pergunta: "O que fazer ao receber uma crítica construtiva sobre segurança?",
+                        opcoes: [
+                            "Ficar com raiva da pessoa.",
+                            "Escutar, refletir e agradecer, usando o feedback para melhorar.",
+                            "Ignorar completamente.",
+                            "Devolver uma crítica sobre a pessoa."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Como você demonstra comprometimento com a segurança?",
+                        opcoes: [
+                            "Só falando sobre isso.",
+                            "Praticando atos seguros no dia a dia e participando ativamente das iniciativas de segurança.",
+                            "Assinando os documentos.",
+                            "Usando o EPI apenas quando o chefe está vendo."
+                        ],
+                        respostaCorreta: 1
+                    }
+                ]
+            },
+            {
+                id: 6,
+                titulo: "Avaliação 6 - Liderança e Exemplo",
+                perguntas: [
+                    {
+                        pergunta: "O que significa ser exemplo para os colegas?",
+                        opcoes: [
+                            "Fazer todas as tarefas sozinho.",
+                            "Ser o mais rápido na equipe.",
+                            "Adotar e demonstrar consistentemente comportamentos seguros e corretos.",
+                            "Ser o mais popular do setor."
+                        ],
+                        respostaCorreta: 2
+                    },
+                    {
+                        pergunta: "Qual é a importância de manter o ambiente limpo e organizado?",
+                        opcoes: [
+                            "Deixa o local mais bonito para fotos.",
+                            "Evita acidentes como tropeços, quedas e facilita a resposta a emergências.",
+                            "É uma exigência apenas da limpeza.",
+                            "Para o chefe não reclamar."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "O que fazer ao perceber que uma tarefa está sendo feita de forma improvisada?",
+                        opcoes: [
+                            "Aproveitar a ideia e improvisar também.",
+                            "Interromper com educação, alertar sobre os riscos e sugerir seguir o procedimento correto.",
+                            "Filmar para um tutorial.",
+                            "Ignorar, pois não é problema meu."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Como você pode contribuir para melhorar a segurança no setor?",
+                        opcoes: [
+                            "Sugerindo melhorias, participando das discussões de segurança e corrigindo desvios.",
+                            "Reclamando sozinho no cantinho.",
+                            "Sendo o primeiro a sair sempre.",
+                            "Deixando tudo como está para não causar problemas."
+                        ],
+                        respostaCorreta: 0
+                    },
+                    {
+                        pergunta: "Descreva as recomendações de segurança de cada passo da sua atividade principal",
+                        opcoes: [
+                            "O apadrinhado respondeu de forma satisfatória, descrevendo com detalhes as recomendações de segurança de cada passo da sua atividade.",
+                            "O apadrinhado respondeu de forma aceitável, descrevendo algumas das recomendações de segurança de cada passo da sua atividade.",
+                            "O apadrinhado respondeu de forma insatisfatória, não soube descrever a maioria das recomendações de segurança de cada passo da sua atividade.",
+                            "O apadrinhado respondeu de forma inaceitável, não descreveu nenhuma das recomendações de segurança de cada passo da sua atividade."
+                        ],
+                        respostaCorreta: 0
+                    }
+                ]
+            },
+            {
+                id: 7,
+                titulo: "Avaliação 7 - Comunicação Efetiva",
+                perguntas: [
+                    {
+                        pergunta: "O que fazer ao receber uma orientação que você não entendeu?",
+                        opcoes: [
+                            "Anotar e tentar decifrar depois.",
+                            "Pedir para a pessoa repetir ou explicar de outra forma até compreender totalmente.",
+                            "Concordar e fazer do jeito que achar.",
+                            "Perguntar para um colega que também não estava prestando atenção."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Por que é importante avisar a liderança sobre qualquer situação de risco?",
+                        opcoes: [
+                            "Para que a liderança possa tomar as providências necessárias para eliminar ou controlar o risco.",
+                            "Para mostrar que sou o único que vejo perigos.",
+                            "Para o chefe ter o que fazer.",
+                            "Para poder me isentar de qualquer responsabilidade."
+                        ],
+                        respostaCorreta: 0
+                    },
+                    {
+                        pergunta: "Como a comunicação entre colegas pode evitar acidentes?",
+                        opcoes: [
+                            "Permite avisar sobre riscos iminentes e coordenar ações de forma segura.",
+                            "Ajuda a combinar de sair mais cedo.",
+                            "Cria um ambiente de trabalho mais barulhento.",
+                            "É útil apenas em emergências."
+                        ],
+                        respostaCorreta: 0
+                    },
+                    {
+                        pergunta: "Qual é o impacto da falta de comunicação na segurança do trabalho?",
+                        opcoes: [
+                            "Pode gerar mal-entendidos, descoordenação e acidentes.",
+                            "Deixa o ambiente mais silencioso.",
+                            "Aumenta a autonomia dos funcionários.",
+                            "Não tem nenhum impacto."
+                        ],
+                        respostaCorreta: 0
+                    },
+                    {
+                        pergunta: "Qual é a atitude correta ao receber uma orientação sobre seu comportamento?",
+                        opcoes: [
+                            "Ficar na defensiva e justificar o erro.",
+                            "Escutar com respeito, refletir e mudar a atitude se necessário.",
+                            "Virar as costas e sair andando.",
+                            "Fingir que não ouviu."
+                        ],
+                        respostaCorreta: 1
+                    }
+                ]
+            },
+            {
+                id: 8,
+                titulo: "Avaliação 8 - Diálogo e Feedback",
+                perguntas: [
+                    {
+                        pergunta: "O que fazer se você perceber que um colega está distraído durante o trabalho?",
+                        opcoes: [
+                            "Dar um susto nele para acordar.",
+                            "Alertá-lo de forma educada para ajudá-lo a retomar o foco.",
+                            "Fazer uma piada para os outros colegas.",
+                            "Ignorar, pois ele que sabe o que está fazendo."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Por que é importante manter um diálogo aberto com o padrinho/madrinha de segurança?",
+                        opcoes: [
+                            "Para contar os problemas pessoais.",
+                            "Para tirar dúvidas, relatar preocupações e aprender continuamente.",
+                            "Para fazer amizade e ter vantagens.",
+                            "Porque é obrigatório."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Como você pode ajudar a melhorar a comunicação na equipe?",
+                        opcoes: [
+                            "Falando por todos.",
+                            "Sendo claro ao passar informações, ouvindo ativamente e confirmando o entendimento.",
+                            "Criando um grupo de WhatsApp secreto.",
+                            "Repassando informações apenas para quem você gosta."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "O que fazer ao perceber que uma informação importante não foi repassada?",
+                        opcoes: [
+                            "Esperar que alguém perceba.",
+                            "Procurar a fonte da informação (ex.: supervisão) para se atualizar e repassar aos demais, se for o caso.",
+                            "Inventar uma informação para não parar o trabalho.",
+                            "Culpar o turno anterior."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Descreva as recomendações de segurança das suas atividades.",
+                        opcoes: [
+                            "São muitas para listar.",
+                            "Usar EPI, seguir procedimentos, inspecionar ferramentas e manter a área organizada.",
+                            "Fazer o serviço rápido e ir para casa.",
+                            "Ter cuidado."
+                        ],
+                        respostaCorreta: 1
+                    }
+                ]
+            },
+            {
+                id: 9,
+                titulo: "Avaliação 9 - Atenção e Distrações",
+                perguntas: [
+                    {
+                        pergunta: "Como o uso de celular pode afetar sua atenção no trabalho?",
+                        opcoes: [
+                            "Ajuda a passar o tempo.",
+                            "Pode distraí-lo de riscos e tarefas críticas, aumentando a chance de acidentes.",
+                            "Não afeta, desde que use fone de ouvido.",
+                            "Melhora a concentração."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "O que fazer ao perceber que está perdendo o foco?",
+                        opcoes: [
+                            "Forçar a concentração até o final do turno.",
+                            "Parar por um momento, se alongar e, se necessário, comunicar o supervisor.",
+                            "Ligar o celular para se distrair.",
+                            "Tomar um energético."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Por que é importante evitar distrações na área operacional?",
+                        opcoes: [
+                            "Para não atrapalhar os colegas.",
+                            "Porque um segundo de distração pode ser suficiente para causar um acidente grave.",
+                            "Para o chefe achar que estou focado.",
+                            "Porque é proibido falar alto."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Como o cansaço pode influenciar sua atenção?",
+                        opcoes: [
+                            "Não influencia, trabalho melhor sob pressão.",
+                            "Reduz o estado de alerta, os reflexos e a capacidade de tomar decisões seguras.",
+                            "Ajuda a dormir melhor à noite.",
+                            "Deixa a visão mais aguçada."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Qual é a atitude correta ao perceber que um colega está desatento?",
+                        opcoes: [
+                            "Gracejar com a situação.",
+                            "Chamar sua atenção de forma discreta e amigável para um risco potencial.",
+                            "Falar para o supervisor para ele ser advertido.",
+                            "Não fazer nada, ele é adulto."
+                        ],
+                        respostaCorreta: 1
+                    }
+                ]
+            },
+            {
+                id: 10,
+                titulo: "Avaliação 10 - Comprometimento e Revisão",
+                perguntas: [
+                    {
+                        pergunta: "Por que é importante revisar a tarefa antes de finalizá-la?",
+                        opcoes: [
+                            "Para garantir que tudo foi feito corretamente e não deixar riscos residuais.",
+                            "Para perder tempo.",
+                            "Para o chefe ver que estou revisando.",
+                            "Só é importante em tarefas complexas."
+                        ],
+                        respostaCorreta: 0
+                    },
+                    {
+                        pergunta: "Como você demonstra comprometimento com a segurança?",
+                        opcoes: [
+                            "Sendo o primeiro a chegar e o último a sair.",
+                            "Sendo o mais rápido.",
+                            "Cumprindo as normas, usando os EPIs e participando ativamente das ações de segurança.",
+                            "Falando mal dos colegas que não seguem as regras."
+                        ],
+                        respostaCorreta: 2
+                    },
+                    {
+                        pergunta: "O que fazer ao perceber que uma tarefa foi mal executada?",
+                        opcoes: [
+                            "Esconder o erro.",
+                            "Comunicar imediatamente ao supervisor para que as correções necessárias sejam feitas.",
+                            "Deixar para o próximo turno resolver.",
+                            "Culpar o estagiário."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Por que é importante cumprir os horários e procedimentos?",
+                        opcoes: [
+                            "Para não receber advertência.",
+                            "Para garantir a coordenação segura das atividades e a presença nos momentos críticos.",
+                            "Porque o relógio ponto é caro.",
+                            "Para impressionar a chefia."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Como o comprometimento individual afeta a equipe?",
+                        opcoes: [
+                            "Cria um ambiente de confiança, segurança e eficiência para todos.",
+                            "Aumenta a cobrança sobre os outros.",
+                            "Não afeta, cada um na sua.",
+                            "Gente comprometida atrapalha quem não é."
+                        ],
+                        respostaCorreta: 0
+                    }
+                ]
+            },
+            {
+                id: 11,
+                titulo: "Avaliação 11 - Prevenção e Emergências",
+                perguntas: [
+                    {
+                        pergunta: "Qual é a importância de assumir seus erros com maturidade?",
+                        opcoes: [
+                            "Permite que o erro seja corrigido rapidamente e que todos aprendam com a situação.",
+                            "Para ser punido mais rapidamente.",
+                            "Para mostrar que é humilde.",
+                            "Não tem importância, o melhor é não assumir."
+                        ],
+                        respostaCorreta: 0
+                    },
+                    {
+                        pergunta: "O que significa agir de forma preventiva?",
+                        opcoes: [
+                            "Corrigir os problemas depois que acontecem.",
+                            "Identificar e eliminar riscos antes que eles causem um incidente ou acidente.",
+                            "Esperar o acidente acontecer para aprender.",
+                            "Só agir quando for obrigado."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Como identificar situações que podem gerar riscos?",
+                        opcoes: [
+                            "Só identifico quando me machuco.",
+                            "Realizando a análise de risco da tarefa e estando atento às condições anormais.",
+                            "Por meio de adivinhação.",
+                            "Perguntando para o colega se ele acha que tem risco."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "O que fazer antes de iniciar qualquer atividade?",
+                        opcoes: [
+                            "Começar logo para ganhar tempo.",
+                            "Verificar as condições de segurança, usar os EPIs necessários e entender o procedimento.",
+                            "Pedir para um colega iniciar por mim.",
+                            "Ligar para a família avisando que vai começar."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "O que fazer em caso de emergência?",
+                        opcoes: [
+                            "Correr em desespero.",
+                            "Seguir o procedimento de emergência, acionar o alarme e dirigir-se ao ponto de encontro.",
+                            "Esperar para ver o que os outros fazem.",
+                            "Gravar um vídeo para o jornal."
+                        ],
+                        respostaCorreta: 1
+                    }
+                ]
+            },
+            {
+                id: 12,
+                titulo: "Avaliação 12 - Responsabilidade e Procedimentos",
+                perguntas: [
+                    {
+                        pergunta: "O que significa 'agir com responsabilidade mesmo sem supervisão'?",
+                        opcoes: [
+                            "Fazer o que quiser quando ninguém está vendo.",
+                            "Seguir os procedimentos e normas por convicção e comprometimento com a segurança.",
+                            "Trabalhar mais devagar.",
+                            "Sair mais cedo."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Por que é importante estar sempre atento ao ambiente?",
+                        opcoes: [
+                            "Para encontrar objetos perdidos.",
+                            "Porque os riscos podem surgir a qualquer momento e de fontes inesperadas.",
+                            "Para ver se o chefe está chegando.",
+                            "Para não bater nos colegas."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Quais consequências você pode gerar para outras pessoas ao descumprir seus procedimentos operacionais?",
+                        opcoes: [
+                            "Nenhuma, os problemas são somente meus.",
+                            "Posso causar acidentes que machuquem colegas, terceiros e afetem suas famílias.",
+                            "Posso ser promovido por ser ousado.",
+                            "Posso ganhar um prêmio por produtividade."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "O que fazer se você não conhece 100% dos seus procedimentos operacionais?",
+                        opcoes: [
+                            "Pergunto pro meu colega.",
+                            "Consultar o procedimento operacional para garantir a execução correta.",
+                            "Nada, apenas fazer do jeito que eu acho seguro.",
+                            "Procedimentos são apenas sugestões."
+                        ],
+                        respostaCorreta: 1
+                    },
+                    {
+                        pergunta: "Você sabe onde encontrar seus procedimentos operacionais?",
+                        opcoes: [
+                            "Sim, sei onde acessá-los fisicamente ou no sistema.",
+                            "Procuro no Google.",
+                            "Pergunto sempre para o mesmo colega.",
+                            "Eles estão perdidos em alguma gaveta."
+                        ],
+                        respostaCorreta: 0
+                    }
+                ]
+            }
+        ];
 
         // Hamburger menu toggle
         sidebarToggle.addEventListener('click', function() {
@@ -694,17 +1802,344 @@
             });
         });
 
+        // Funções do Modal
+        closeModal.addEventListener('click', function() {
+            avaliacaoModal.style.display = 'none';
+        });
+
+        cancelarAvaliacao.addEventListener('click', function() {
+            avaliacaoModal.style.display = 'none';
+            respostasAtuais = {};
+        });
+
+        // Funções do Modal de Resultado
+        closeResultadoModal.addEventListener('click', function() {
+            resultadoModal.style.display = 'none';
+        });
+
+        fecharResultadoModal.addEventListener('click', function() {
+            resultadoModal.style.display = 'none';
+        });
+
+        // Fechar modais ao clicar fora
+        window.addEventListener('click', function(event) {
+            if (event.target === avaliacaoModal) {
+                avaliacaoModal.style.display = 'none';
+                respostasAtuais = {};
+            }
+            if (event.target === resultadoModal) {
+                resultadoModal.style.display = 'none';
+            }
+        });
+
+        // Função para abrir modal de avaliação
+        function abrirModalAvaliacao(padrinho, avaliacao) {
+            avaliacaoAtual = avaliacao;
+            padrinhoAtual = padrinho;
+            respostasAtuais = {};
+            
+            modalAvaliacaoTitulo.textContent = avaliacao.titulo;
+            modalAvaliacaoContent.innerHTML = '';
+            
+            // Adicionar perguntas ao modal
+            avaliacao.perguntas.forEach((pergunta, indexPergunta) => {
+                const perguntaElement = document.createElement('div');
+                perguntaElement.className = 'pergunta-item';
+                perguntaElement.innerHTML = `
+                    <div class="pergunta-texto">${indexPergunta + 1}. ${pergunta.pergunta}</div>
+                    <div class="opcoes-list">
+                        ${pergunta.opcoes.map((opcao, indexOpcao) => `
+                            <div class="opcao-item" data-pergunta="${indexPergunta}" data-opcao="${indexOpcao}">
+                                <div class="opcao-letra">${String.fromCharCode(97 + indexOpcao)})</div>
+                                <div class="opcao-texto">${opcao}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                modalAvaliacaoContent.appendChild(perguntaElement);
+            });
+            
+            // Adicionar event listeners para as opções
+            document.querySelectorAll('.opcao-item').forEach(opcao => {
+                opcao.addEventListener('click', function() {
+                    const perguntaIndex = parseInt(this.getAttribute('data-pergunta'));
+                    const opcaoIndex = parseInt(this.getAttribute('data-opcao'));
+                    
+                    // Remover seleção anterior da mesma pergunta
+                    this.parentNode.querySelectorAll('.opcao-item').forEach(item => {
+                        item.classList.remove('selected');
+                    });
+                    
+                    // Selecionar nova opção
+                    this.classList.add('selected');
+                    
+                    // Salvar resposta
+                    respostasAtuais[perguntaIndex] = opcaoIndex;
+                });
+            });
+            
+            avaliacaoModal.style.display = 'block';
+        }
+
+        // Função para salvar avaliação
+        salvarAvaliacao.addEventListener('click', async function() {
+            if (!avaliacaoAtual || !padrinhoAtual) return;
+            
+            // Verificar se todas as perguntas foram respondidas
+            const totalPerguntas = avaliacaoAtual.perguntas.length;
+            const perguntasRespondidas = Object.keys(respostasAtuais).length;
+            
+            if (perguntasRespondidas < totalPerguntas) {
+                alert('Por favor, responda todas as perguntas antes de salvar.');
+                return;
+            }
+            
+            try {
+                // Calcular nota
+                let acertos = 0;
+                avaliacaoAtual.perguntas.forEach((pergunta, index) => {
+                    if (respostasAtuais[index] === pergunta.respostaCorreta) {
+                        acertos++;
+                    }
+                });
+                
+                const nota = Math.round((acertos / totalPerguntas) * 100);
+                const aprovado = nota >= 80;
+                
+                // Salvar no Firebase
+                const avaliacaoData = {
+                    padrinhoId: padrinhoAtual.id,
+                    avaliacaoId: avaliacaoAtual.id,
+                    avaliacaoTitulo: avaliacaoAtual.titulo,
+                    respostas: respostasAtuais,
+                    nota: nota,
+                    aprovado: aprovado,
+                    dataRealizacao: new Date().toISOString(),
+                    realizadoPor: currentUser.uid,
+                    realizadoPorNome: currentUser.name
+                };
+                
+                await avaliacoesRef.add(avaliacaoData);
+                
+                // Atualizar interface
+                alert(`Avaliação salva com sucesso! Sua nota: ${nota}% - ${aprovado ? 'Aprovado' : 'Reprovado'}`);
+                avaliacaoModal.style.display = 'none';
+                respostasAtuais = {};
+                
+                // Recarregar dados para atualizar status
+                loadPadrinhos();
+                
+            } catch (error) {
+                console.error('Erro ao salvar avaliação:', error);
+                alert('Erro ao salvar avaliação. Tente novamente.');
+            }
+        });
+
+        // Função para ver resultado de avaliação
+        async function verResultadoAvaliacao(padrinho, avaliacao) {
+            try {
+                // Buscar resultado da avaliação no Firebase
+                const querySnapshot = await avaliacoesRef
+                    .where('padrinhoId', '==', padrinho.id)
+                    .where('avaliacaoId', '==', avaliacao.id)
+                    .get();
+                
+                if (querySnapshot.empty) {
+                    alert('Nenhum resultado encontrado para esta avaliação.');
+                    return;
+                }
+                
+                const resultado = querySnapshot.docs[0].data();
+                
+                // Configurar modal de resultado
+                modalResultadoTitulo.textContent = `Resultado: ${avaliacao.titulo}`;
+                modalResultadoContent.innerHTML = '';
+                
+                // Adicionar informações gerais
+                const infoGeral = document.createElement('div');
+                infoGeral.className = 'pergunta-item';
+                infoGeral.innerHTML = `
+                    <div class="pergunta-texto">Informações Gerais</div>
+                    <div class="info-row">
+                        <div class="info-label">Nota:</div>
+                        <div class="info-value">
+                            <span class="badge ${resultado.aprovado ? 'badge-success' : 'badge-danger'}">
+                                ${resultado.nota}% - ${resultado.aprovado ? 'Aprovado' : 'Reprovado'}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Data:</div>
+                        <div class="info-value">${formatDate(resultado.dataRealizacao)}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Realizado por:</div>
+                        <div class="info-value">${resultado.realizadoPorNome}</div>
+                    </div>
+                `;
+                modalResultadoContent.appendChild(infoGeral);
+                
+                // Adicionar detalhes das respostas
+                avaliacao.perguntas.forEach((pergunta, index) => {
+                    const respostaIndex = resultado.respostas[index];
+                    const respostaCorreta = pergunta.respostaCorreta;
+                    const acertou = respostaIndex === respostaCorreta;
+                    
+                    const perguntaElement = document.createElement('div');
+                    perguntaElement.className = 'pergunta-item';
+                    perguntaElement.innerHTML = `
+                        <div class="pergunta-texto">
+                            ${index + 1}. ${pergunta.pergunta}
+                            <span class="badge ${acertou ? 'badge-success' : 'badge-danger'}">
+                                ${acertou ? '✓ Correta' : '✗ Incorreta'}
+                            </span>
+                        </div>
+                        <div class="opcoes-list">
+                            ${pergunta.opcoes.map((opcao, indexOpcao) => `
+                                <div class="opcao-item ${indexOpcao === respostaIndex ? 'selected' : ''} ${indexOpcao === respostaCorreta ? 'selected' : ''}">
+                                    <div class="opcao-letra">${String.fromCharCode(97 + indexOpcao)})</div>
+                                    <div class="opcao-texto">${opcao}</div>
+                                    ${indexOpcao === respostaCorreta ? '<i class="fas fa-check" style="color: #27ae60;"></i>' : ''}
+                                    ${indexOpcao === respostaIndex && !acertou ? '<i class="fas fa-times" style="color: #e74c3c;"></i>' : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    modalResultadoContent.appendChild(perguntaElement);
+                });
+                
+                resultadoModal.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Erro ao carregar resultado:', error);
+                alert('Erro ao carregar resultado da avaliação.');
+            }
+        }
+
+        // Função para calcular as avaliações liberadas
+        function calcularAvaliacoesLiberadas(dataInicio, avaliacoesRealizadas = []) {
+            const hoje = new Date();
+            const inicio = new Date(dataInicio);
+            const diffTime = Math.abs(hoje - inicio);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            // Verificar se hoje é segunda-feira
+            const isSegundaFeira = hoje.getDay() === 1;
+            
+            // Calcular semanas (máximo 12 semanas)
+            const semanas = Math.min(Math.floor(diffDays / 7), 12);
+            
+            const avaliacoesCalculadas = avaliacoes.map((avaliacao, index) => {
+                const semanaLiberacao = index + 1;
+                const dataLiberacao = new Date(inicio);
+                dataLiberacao.setDate(inicio.getDate() + (semanaLiberacao * 7));
+                
+                // Ajustar para a próxima segunda-feira se não for segunda
+                if (dataLiberacao.getDay() !== 1) {
+                    const diasParaSegunda = (1 - dataLiberacao.getDay() + 7) % 7;
+                    dataLiberacao.setDate(dataLiberacao.getDate() + diasParaSegunda);
+                }
+                
+                // Verificar se já existe uma avaliação realizada para esta
+                const avaliacaoRealizada = avaliacoesRealizadas.find(ar => ar.avaliacaoId === avaliacao.id);
+                
+                let status = 'pendente';
+                if (avaliacaoRealizada) {
+                    status = avaliacaoRealizada.aprovado ? 'aprovada' : 'reprovada';
+                } else if (semanaLiberacao <= semanas && isSegundaFeira) {
+                    status = 'liberada';
+                } else if (semanaLiberacao < semanas) {
+                    status = 'concluida';
+                }
+                
+                return {
+                    ...avaliacao,
+                    semana: semanaLiberacao,
+                    dataLiberacao: dataLiberacao.toISOString().split('T')[0],
+                    status: status,
+                    avaliacaoRealizada: avaliacaoRealizada
+                };
+            });
+            
+            return avaliacoesCalculadas;
+        }
+
+        // Função para verificar se todas as avaliações foram concluídas
+        function todasAvaliacoesConcluidas(avaliacoesPadrinho) {
+            return avaliacoesPadrinho.every(a => 
+                a.status === 'aprovada' || a.status === 'reprovada'
+            );
+        }
+
+        // Função para verificar se todas as avaliações foram aprovadas
+        function todasAvaliacoesAprovadas(avaliacoesPadrinho) {
+            return avaliacoesPadrinho.every(a => a.status === 'aprovada');
+        }
+
+        // Função para finalizar processo de apadrinhamento
+        async function finalizarProcesso(padrinho) {
+            if (!confirm('Tem certeza que deseja finalizar o processo de apadrinhamento? Esta ação moverá o colaborador para a base de permitidos.')) {
+                return;
+            }
+            
+            try {
+                // Mover para a coleção de permitidos
+                const dadosPermitido = {
+                    nome: padrinho.apadrinhado.nome,
+                    funcao: padrinho.apadrinhado.funcao,
+                    unidade: padrinho.padrinho.unidade,
+                    dataInicio: padrinho.apadrinhado.dataInicio,
+                    dataTermino: padrinho.apadrinhado.dataTermino,
+                    padrinho: padrinho.padrinho.nome,
+                    dataFinalizacao: new Date().toISOString(),
+                    finalizadoPor: currentUser.uid,
+                    finalizadoPorNome: currentUser.name
+                };
+                
+                await permitidosRef.add(dadosPermitido);
+                
+                // Atualizar status no documento do padrinho
+                await padrinhosRef.doc(padrinho.id).update({
+                    status: 'finalizado',
+                    dataFinalizacao: new Date().toISOString()
+                });
+                
+                alert('Processo finalizado com sucesso! O colaborador foi movido para a base de permitidos.');
+                loadPadrinhos();
+                
+            } catch (error) {
+                console.error('Erro ao finalizar processo:', error);
+                alert('Erro ao finalizar processo. Tente novamente.');
+            }
+        }
+
         // Carregar padrinhos do Firestore
-        function loadPadrinhos() {
-            padrinhosRef.get().then((querySnapshot) => {
+        async function loadPadrinhos() {
+            try {
+                const querySnapshot = await padrinhosRef.get();
                 allPadrinhos = [];
                 unidades.clear();
                 
+                // Buscar avaliações realizadas para cada padrinho
+                const avaliacoesSnapshot = await avaliacoesRef.get();
+                const avaliacoesPorPadrinho = {};
+                
+                avaliacoesSnapshot.forEach(doc => {
+                    const avaliacaoData = doc.data();
+                    if (!avaliacoesPorPadrinho[avaliacaoData.padrinhoId]) {
+                        avaliacoesPorPadrinho[avaliacaoData.padrinhoId] = [];
+                    }
+                    avaliacoesPorPadrinho[avaliacaoData.padrinhoId].push(avaliacaoData);
+                });
+                
                 querySnapshot.forEach((doc) => {
                     const padrinhoData = doc.data();
+                    const avaliacoesRealizadas = avaliacoesPorPadrinho[doc.id] || [];
+                    
                     allPadrinhos.push({
                         id: doc.id,
-                        ...padrinhoData
+                        ...padrinhoData,
+                        avaliacoesRealizadas: avaliacoesRealizadas
                     });
                     
                     // Adicionar unidade às opções de filtro
@@ -722,7 +2157,7 @@
                 // Aplicar filtros iniciais
                 applyFilters();
                 
-            }).catch((error) => {
+            } catch (error) {
                 console.error("Erro ao carregar padrinhos: ", error);
                 padrinhosContainer.innerHTML = `
                     <div class="empty-state">
@@ -731,7 +2166,7 @@
                         <p>Não foi possível carregar os padrinhos. Verifique sua conexão e tente novamente.</p>
                     </div>
                 `;
-            });
+            }
         }
 
         // Atualizar estatísticas
@@ -741,22 +2176,26 @@
             // Contar padrinhos ativos (com data de término no futuro)
             const hoje = new Date().toISOString().split('T')[0];
             const ativos = allPadrinhos.filter(p => 
+                p.status !== 'finalizado' && 
                 p.apadrinhado && p.apadrinhado.dataTermino && p.apadrinhado.dataTermino >= hoje
             ).length;
             
             activeCount.textContent = ativos;
             
-            // Contar padrinhos da unidade atual
-            if (currentUser && currentUser.unidade.toLowerCase() !== 'gestão corp') {
-                const unitPadrinhos = allPadrinhos.filter(p => 
-                    p.padrinho && p.padrinho.unidade === currentUser.unidade
-                ).length;
-                unitCount.textContent = unitPadrinhos;
-                unitLabel.textContent = currentUser.unidade;
-            } else {
-                unitCount.textContent = allPadrinhos.length;
-                unitLabel.textContent = 'Todas as Unidades';
-            }
+            // Contar padrinhos concluídos (com todas as avaliações feitas)
+            const concluidos = allPadrinhos.filter(p => {
+                if (p.status === 'finalizado') return false;
+                if (!p.apadrinhado || !p.apadrinhado.dataInicio) return false;
+                
+                const avaliacoesPadrinho = calcularAvaliacoesLiberadas(
+                    p.apadrinhado.dataInicio, 
+                    p.avaliacoesRealizadas || []
+                );
+                
+                return todasAvaliacoesConcluidas(avaliacoesPadrinho);
+            }).length;
+            
+            completedCount.textContent = concluidos;
         }
 
         // Atualizar filtro de unidades
@@ -779,6 +2218,7 @@
         function applyFilters() {
             const searchTerm = searchInput.value.toLowerCase();
             const selectedUnit = unitFilter.value;
+            const selectedStatus = statusFilter.value;
             const sortBy = sortOption.value;
             
             // Aplicar filtros
@@ -798,13 +2238,36 @@
                 // Filtro de unidade
                 const matchesUnit = selectedUnit === '' || unidadePadrinho === selectedUnit;
                 
+                // Filtro de status
+                let matchesStatus = true;
+                if (selectedStatus === 'ativo') {
+                    const hoje = new Date().toISOString().split('T')[0];
+                    matchesStatus = padrinho.status !== 'finalizado' && 
+                        padrinho.apadrinhado && padrinho.apadrinhado.dataTermino && 
+                        padrinho.apadrinhado.dataTermino >= hoje;
+                } else if (selectedStatus === 'concluido') {
+                    if (padrinho.status === 'finalizado') {
+                        matchesStatus = false;
+                    } else if (padrinho.apadrinhado && padrinho.apadrinhado.dataInicio) {
+                        const avaliacoesPadrinho = calcularAvaliacoesLiberadas(
+                            padrinho.apadrinhado.dataInicio, 
+                            padrinho.avaliacoesRealizadas || []
+                        );
+                        matchesStatus = todasAvaliacoesConcluidas(avaliacoesPadrinho);
+                    } else {
+                        matchesStatus = false;
+                    }
+                } else if (selectedStatus === 'finalizado') {
+                    matchesStatus = padrinho.status === 'finalizado';
+                }
+                
                 // Filtro de visualização baseado na unidade do usuário
                 let matchesView = true;
                 if (currentUser && currentUser.unidade.toLowerCase() !== 'gestão corp') {
                     matchesView = unidadePadrinho === currentUser.unidade;
                 }
                 
-                return matchesSearch && matchesUnit && matchesView;
+                return matchesSearch && matchesUnit && matchesStatus && matchesView;
             });
             
             // Aplicar ordenação
@@ -840,8 +2303,36 @@
             
             padrinhosContainer.innerHTML = `
                 <div class="padrinhos-grid">
-                    ${filteredPadrinhos.map(padrinho => `
+                    ${filteredPadrinhos.map(padrinho => {
+                        const avaliacoesPadrinho = padrinho.apadrinhado?.dataInicio ? 
+                            calcularAvaliacoesLiberadas(padrinho.apadrinhado.dataInicio, padrinho.avaliacoesRealizadas || []) : [];
+                        
+                        const avaliacoesConcluidas = avaliacoesPadrinho.filter(a => 
+                            a.status === 'aprovada' || a.status === 'reprovada'
+                        ).length;
+                        
+                        const avaliacoesAprovadas = avaliacoesPadrinho.filter(a => 
+                            a.status === 'aprovada'
+                        ).length;
+                        
+                        const progresso = avaliacoesPadrinho.length > 0 ? 
+                            (avaliacoesConcluidas / avaliacoesPadrinho.length) * 100 : 0;
+                        
+                        const todasConcluidas = todasAvaliacoesConcluidas(avaliacoesPadrinho);
+                        const todasAprovadas = todasAvaliacoesAprovadas(avaliacoesPadrinho);
+                        
+                        return `
                         <div class="padrinho-card">
+                            ${padrinho.status === 'finalizado' ? 
+                                `<div style="position: absolute; top: 10px; right: 10px; z-index: 10;">
+                                    <span class="badge badge-success">Finalizado</span>
+                                </div>` : 
+                                todasConcluidas ? 
+                                `<div style="position: absolute; top: 10px; right: 10px; z-index: 10;">
+                                    <span class="badge badge-info">Concluído</span>
+                                </div>` : ''
+                            }
+                            
                             <div class="card-header-padrinho">
                                 ${padrinho.padrinho?.foto ? 
                                     `<img src="${padrinho.padrinho.foto}" alt="${padrinho.padrinho.nome}" class="avatar">` :
@@ -892,13 +2383,95 @@
                                 </div>
                                 ` : ''}
                                 
+                                <div class="avaliacoes-section">
+                                    <div class="apadrinhado-title">
+                                        <i class="fas fa-clipboard-check"></i>
+                                        <span>Progresso das Avaliações</span>
+                                    </div>
+                                    
+                                    <div class="info-row">
+                                        <div class="info-label">Progresso:</div>
+                                        <div class="info-value">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: ${progresso}%"></div>
+                                            </div>
+                                            <small>${avaliacoesConcluidas} de ${avaliacoesPadrinho.length} avaliações concluídas</small>
+                                            <br>
+                                            <small>${avaliacoesAprovadas} aprovadas, ${avaliacoesConcluidas - avaliacoesAprovadas} reprovadas</small>
+                                        </div>
+                                    </div>
+                                    
+                                    ${avaliacoesPadrinho.map(avaliacao => {
+                                        let onClickAction = 'return false';
+                                        let statusText = '';
+                                        
+                                        if (avaliacao.status === 'liberada') {
+                                            onClickAction = `abrirModalAvaliacao(${JSON.stringify(padrinho).replace(/"/g, '&quot;')}, ${JSON.stringify(avaliacao).replace(/"/g, '&quot;')})`;
+                                            statusText = 'Liberada - Clique para responder';
+                                        } else if (avaliacao.status === 'aprovada' || avaliacao.status === 'reprovada') {
+                                            onClickAction = `verResultadoAvaliacao(${JSON.stringify(padrinho).replace(/"/g, '&quot;')}, ${JSON.stringify(avaliacao).replace(/"/g, '&quot;')})`;
+                                            statusText = avaliacao.status === 'aprovada' ? 'Aprovada - Clique para ver resultado' : 'Reprovada - Clique para ver resultado';
+                                        } else if (avaliacao.status === 'pendente') {
+                                            statusText = 'Pendente';
+                                        } else if (avaliacao.status === 'concluida') {
+                                            statusText = 'Concluída';
+                                        }
+                                        
+                                        return `
+                                            <div class="avaliacao-item" onclick="${onClickAction}">
+                                                <div class="avaliacao-header">
+                                                    <div class="avaliacao-title">${avaliacao.titulo}</div>
+                                                    <div class="avaliacao-status status-${avaliacao.status}">
+                                                        ${statusText}
+                                                    </div>
+                                                </div>
+                                                <div class="avaliacao-details">
+                                                    <strong>Semana ${avaliacao.semana}</strong> - 
+                                                    Liberação: ${formatDate(avaliacao.dataLiberacao)}
+                                                    ${avaliacao.avaliacaoRealizada ? 
+                                                        ` | Nota: ${avaliacao.avaliacaoRealizada.nota}%` : ''
+                                                    }
+                                                </div>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                                
+                                ${todasConcluidas && padrinho.status !== 'finalizado' ? `
+                                <div class="finalizacao-section">
+                                    <div class="apadrinhado-title">
+                                        <i class="fas fa-flag-checkered"></i>
+                                        <span>Finalização do Processo</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-label">Status:</div>
+                                        <div class="info-value">
+                                            ${todasAprovadas ? 
+                                                `<span class="badge badge-success">Todas as avaliações foram aprovadas</span>` :
+                                                `<span class="badge badge-warning">Algumas avaliações foram reprovadas</span>`
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="finalizacao-buttons">
+                                        <button class="btn btn-success" onclick="finalizarProcesso(${JSON.stringify(padrinho).replace(/"/g, '&quot;')})">
+                                            <i class="fas fa-check-circle"></i> Finalizar Processo
+                                        </button>
+                                        ${!todasAprovadas ? `
+                                        <button class="btn btn-warning" onclick="alert('Para finalizar o processo, todas as avaliações devem ser aprovadas. Reprove as avaliações reprovadas.')">
+                                            <i class="fas fa-exclamation-triangle"></i> Reprovado - Ver Detalhes
+                                        </button>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                                ` : ''}
+                                
                                 <div class="info-row">
                                     <div class="info-label">ID:</div>
                                     <div class="info-value" style="font-size: 0.8rem; color: #888;">${padrinho.id}</div>
                                 </div>
                             </div>
                         </div>
-                    `).join('')}
+                    `}).join('')}
                 </div>
             `;
         }
@@ -908,8 +2481,19 @@
             if (!dateString) return '';
             
             try {
+                // Verificar se é uma data ISO
+                if (dateString.includes('T')) {
+                    const date = new Date(dateString);
+                    return date.toLocaleDateString('pt-BR');
+                }
+                
+                // Verificar se está no formato YYYY-MM-DD
                 const [year, month, day] = dateString.split('-');
-                return `${day}/${month}/${year}`;
+                if (year && month && day) {
+                    return `${day}/${month}/${year}`;
+                }
+                
+                return dateString;
             } catch (e) {
                 return dateString;
             }
@@ -918,6 +2502,7 @@
         // Event listeners
         searchInput.addEventListener('input', applyFilters);
         unitFilter.addEventListener('change', applyFilters);
+        statusFilter.addEventListener('change', applyFilters);
         sortOption.addEventListener('change', applyFilters);
 
         // Inicializar

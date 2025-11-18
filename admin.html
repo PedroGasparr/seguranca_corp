@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Corp - Painel Admin</title>
+    <style>
+        /* ===== RESET E CONFIGURAÇÕES GLOBAIS ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Cores principais */
+            --primary-color: #2c3e50;
+            --primary-dark: #1a252f;
+            --primary-light: #34495e;
+            --secondary-color: #3498db;
+            --accent-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --info-color: #3498db;
+            --neutral-color: #95a5a6;
+            
+            /* Cores de texto */
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --text-muted: #718096;
+            --text-light: #ffffff;
+            
+            /* Cores de fundo */
+            --bg-white: #ffffff;
+            --bg-light: #f8f9fa;
+            --bg-lighter: #f7fafc;
+            --bg-overlay: rgba(0, 0, 0, 0.5);
+            
+            /* Cores de estado */
+            --success-bg: #d4edda;
+            --success-text: #155724;
+            --success-border: #c3e6cb;
+            --error-bg: #f8d7da;
+            --error-text: #721c24;
+            --error-border: #f5c6cb;
+            
+            /* Sombras */
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 15px 35px rgba(0, 0, 0, 0.2);
+            
+            /* Bordas */
+            --border-radius-sm: 5px;
+            --border-radius: 8px;
+            --border-radius-lg: 15px;
+            --border-radius-xl: 20px;
+            
+            /* Transições */
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.5s ease;
+            
+            /* Espaçamentos */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            
+            /* Tipografia */
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-3xl: 1.875rem;
+        }
+
+        /* ===== BASE E TIPOGRAFIA ===== */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            min-height: 100vh;
+            padding: var(--space-md);
+            line-height: 1.6;
+            color: var(--text-primary);
+            font-size: var(--font-size-base);
+        }
+
+        /* ===== LAYOUT PRINCIPAL ===== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: var(--bg-white);
+            border-radius: var(--border-radius-lg);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: var(--space-xl);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .logo h1 {
+            color: var(--text-primary);
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .logo span {
+            color: var(--secondary-color);
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: var(--font-size-lg);
+            box-shadow: var(--shadow-sm);
+            transition: transform var(--transition-normal);
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .logout-btn {
+            background: var(--danger-color);
+            color: var(--text-light);
+            border: none;
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: var(--font-size-sm);
+            transition: all var(--transition-normal);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .logout-btn:active {
+            transform: translateY(0);
+        }
+
+        /* ===== PAINEL ADMIN ===== */
+        .admin-panel {
+            background: var(--bg-white);
+            border-radius: var(--border-radius-lg);
+            padding: var(--space-2xl);
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            padding-bottom: var(--space-lg);
+            border-bottom: 2px solid var(--bg-light);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .panel-title {
+            font-size: var(--font-size-2xl);
+            color: var(--text-primary);
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .search-box {
+            display: flex;
+            gap: var(--space-sm);
+            flex: 1;
+            max-width: 500px;
+            min-width: 250px;
+        }
+
+        .search-input {
+            padding: var(--space-md);
+            border: 2px solid #e1e5e9;
+            border-radius: var(--border-radius);
+            width: 100%;
+            font-size: var(--font-size-base);
+            transition: all var(--transition-normal);
+            background: var(--bg-lighter);
+            flex: 1;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            background: var(--bg-white);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-btn {
+            background: var(--secondary-color);
+            color: var(--text-light);
+            border: none;
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all var(--transition-normal);
+            white-space: nowrap;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-btn:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .search-btn:active {
+            transform: translateY(0);
+        }
+
+        /* ===== TABELA DE USUÁRIOS ===== */
+        .users-container {
+            overflow-x: auto;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            margin-top: var(--space-lg);
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+            background: var(--bg-white);
+        }
+
+        .users-table th {
+            background: var(--bg-light);
+            padding: var(--space-lg);
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 2px solid #e1e5e9;
+            font-size: var(--font-size-sm);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .users-table td {
+            padding: var(--space-lg);
+            border-bottom: 1px solid #e1e5e9;
+            vertical-align: middle;
+            font-size: var(--font-size-sm);
+        }
+
+        .users-table tr {
+            transition: background-color var(--transition-fast);
+        }
+
+        .users-table tr:hover {
+            background-color: var(--bg-lighter);
+        }
+
+        /* ===== BADGES ===== */
+        .user-type-badge,
+        .status-badge {
+            padding: var(--space-xs) var(--space-md);
+            border-radius: 20px;
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            display: inline-block;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .badge-admin {
+            background: #e8f4fd;
+            color: #2980b9;
+            border: 1px solid #bbdefb;
+        }
+
+        .badge-user {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+
+        .badge-ativo {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+
+        .badge-inativo {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+
+        /* ===== BOTÕES DE AÇÃO ===== */
+        .action-buttons {
+            display: flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            border: none;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            transition: all var(--transition-normal);
+            white-space: nowrap;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .edit-btn {
+            background: var(--info-color);
+            color: var(--text-light);
+        }
+
+        .edit-btn:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .delete-btn {
+            background: var(--danger-color);
+            color: var(--text-light);
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .toggle-status-btn {
+            background: var(--warning-color);
+            color: var(--text-light);
+        }
+
+        .toggle-status-btn:hover {
+            background: #e67e22;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        /* ===== MENSAGENS ===== */
+        .message {
+            padding: var(--space-md);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--space-lg);
+            display: none;
+            font-weight: 500;
+            border: 1px solid transparent;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.success {
+            background: var(--success-bg);
+            color: var(--success-text);
+            border-color: var(--success-border);
+        }
+
+        .message.error {
+            background: var(--error-bg);
+            color: var(--error-text);
+            border-color: var(--error-border);
+        }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-overlay);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-md);
+            animation: fadeIn var(--transition-normal);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--bg-white);
+            border-radius: var(--border-radius-lg);
+            padding: var(--space-2xl);
+            width: 100%;
+            max-width: 500px;
+            box-shadow: var(--shadow-xl);
+            animation: slideUp 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            padding-bottom: var(--space-lg);
+            border-bottom: 2px solid var(--bg-light);
+        }
+
+        .modal-title {
+            font-size: var(--font-size-xl);
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: var(--font-size-2xl);
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: color var(--transition-fast);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-btn:hover {
+            color: var(--text-primary);
+            background: var(--bg-light);
+        }
+
+        /* ===== FORMULÁRIOS ===== */
+        .form-group {
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: var(--space-sm);
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: var(--font-size-sm);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: var(--space-md);
+            border: 2px solid #e1e5e9;
+            border-radius: var(--border-radius);
+            font-size: var(--font-size-base);
+            transition: all var(--transition-normal);
+            background: var(--bg-lighter);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            background: var(--bg-white);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-md);
+            margin-top: var(--space-xl);
+            flex-wrap: wrap;
+        }
+
+        .cancel-btn,
+        .save-btn {
+            border: none;
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all var(--transition-normal);
+            min-width: 120px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .cancel-btn {
+            background: var(--neutral-color);
+            color: var(--text-light);
+        }
+
+        .cancel-btn:hover {
+            background: #7f8c8d;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .save-btn {
+            background: var(--accent-color);
+            color: var(--text-light);
+        }
+
+        .save-btn:hover {
+            background: #27ae60;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .cancel-btn:active,
+        .save-btn:active {
+            transform: translateY(0);
+        }
+
+        /* ===== LOADING ===== */
+        .loading {
+            text-align: center;
+            padding: var(--space-xl);
+            color: var(--text-muted);
+            font-size: var(--font-size-lg);
+        }
+
+        /* ===== AUTO-LOGIN OVERLAY ===== */
+        .auto-login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-overlay);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+        }
+
+        .auto-login-content {
+            background: var(--bg-white);
+            padding: var(--space-2xl);
+            border-radius: var(--border-radius-lg);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: var(--shadow-xl);
+            animation: scaleIn 0.3s ease;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .auto-login-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--secondary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto var(--space-lg);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ===== RESPONSIVIDADE ===== */
+        @media (max-width: 768px) {
+            body {
+                padding: var(--space-sm);
+            }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+                padding: var(--space-lg);
+            }
+            
+            .user-info {
+                justify-content: center;
+            }
+            
+            .admin-panel {
+                padding: var(--space-lg);
+                border-radius: var(--border-radius);
+            }
+            
+            .panel-title {
+                font-size: var(--font-size-xl);
+            }
+            
+            .search-box {
+                flex-direction: column;
+            }
+            
+            .users-container {
+                margin: 0 -var(--space-sm);
+                border-radius: 0;
+            }
+            
+            .modal-content {
+                padding: var(--space-xl);
+                margin: var(--space-sm);
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+            }
+            
+            .cancel-btn,
+            .save-btn {
+                min-width: 100%;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .users-table {
+                min-width: 600px;
+            }
+            
+            .users-table th,
+            .users-table td {
+                padding: var(--space-sm);
+                font-size: var(--font-size-xs);
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: var(--space-xs);
+            }
+            
+            .action-btn {
+                padding: var(--space-xs) var(--space-sm);
+                font-size: var(--font-size-xs);
+                justify-content: center;
+            }
+            
+            .user-type-badge,
+            .status-badge {
+                min-width: 60px;
+                font-size: 0.7rem;
+                padding: var(--space-xs) var(--space-sm);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Overlay de auto-login -->
+    <div id="auto-login-overlay" class="auto-login-overlay">
+        <div class="auto-login-content">
+            <div class="auto-login-spinner"></div>
+            <h3>Verificando autenticação...</h3>
+            <p>Conectando automaticamente ao sistema</p>
+        </div>
+    </div>
+
+    <!-- Container principal (só será mostrado se for admin) -->
+    <div id="main-container" class="container" style="display: none;">
+        <div class="header">
+            <div class="logo">
+                <h1>Security <span>Corp</span> Admin</h1>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar" id="user-avatar">A</div>
+                <span id="user-name">Administrador</span>
+                <button class="logout-btn" id="logout-btn">Sair</button>
+            </div>
+        </div>
+        
+        <div class="admin-panel">
+            <div class="panel-header">
+                <h2 class="panel-title">Gerenciar Usuários</h2>
+                <div class="search-box">
+                    <input type="text" id="search-input" class="search-input" placeholder="Buscar por nome ou email...">
+                    <button class="search-btn" id="search-btn">Buscar</button>
+                </div>
+            </div>
+            
+            <!-- Mensagens de status -->
+            <div id="message" class="message"></div>
+            
+            <!-- Tabela de usuários -->
+            <div id="users-container">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Unidade</th>
+                            <th>Função</th>
+                            <th>Status</th>
+                            <th>Admin</th>
+                            <th>Data de Criação</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body">
+                        <!-- Os dados dos usuários serão inseridos aqui via JavaScript -->
+                    </tbody>
+                </table>
+                <div id="loading-message" class="loading">Carregando usuários...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de acesso negado -->
+    <div id="access-denied-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Acesso Negado</h3>
+            </div>
+            <div style="padding: var(--space-xl); text-align: center;">
+                <p style="font-size: var(--font-size-lg); margin-bottom: var(--space-lg);">
+                    Você não tem permissão para acessar esta página.
+                </p>
+                <p style="color: var(--text-muted); margin-bottom: var(--space-xl);">
+                    Apenas usuários administradores podem acessar o painel de administração.
+                </p>
+                <button id="go-back-btn" class="logout-btn" style="margin: 0 auto;">
+                    Voltar para o Sistema
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para editar usuário -->
+    <div id="edit-user-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Editar Usuário</h3>
+                <button class="close-btn" id="close-edit-modal">&times;</button>
+            </div>
+            <form id="edit-user-form">
+                <input type="hidden" id="edit-user-id">
+                <div class="form-group">
+                    <label for="edit-user-name">Nome</label>
+                    <input type="text" id="edit-user-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-user-email">Email</label>
+                    <input type="email" id="edit-user-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-user-unit">Unidade</label>
+                    <select id="edit-user-unit">
+                        <option value="">Selecione uma unidade</option>
+                        <option value="gestão corp">Gestão Corp</option>
+                        <option value="FABRICA SUZANO ARACRUZ">Fábrica Suzano Aracruz</option>
+                        <option value="Unidade Maracanau">Unidade Maracanau</option>
+                        <option value="Unidade Belem">Unidade Belem</option>
+                        <option value="Unidade Mogi Das Cruzes">Unidade Mogi Das Cruzes</option>
+                        <option value="Unidade Imperatriz">Unidade Imperatriz</option>
+                        <option value="Unidade Cariacica">Unidade Cariacica</option>
+                        <option value="Unidade Teste">Unidade Teste</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-user-role">Função</label>
+                    <select id="edit-user-role" required>
+                        <option value="user">Usuário</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-user-status">Status da Conta</label>
+                    <select id="edit-user-status" required>
+                        <option value="ativo">Ativo</option>
+                        <option value="inativo">Inativo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-user-admin">Privilégio de Admin</label>
+                    <select id="edit-user-admin" required>
+                        <option value="false">Não</option>
+                        <option value="true">Sim</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="cancel-btn" id="cancel-edit">Cancelar</button>
+                    <button type="submit" class="save-btn">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase App (o core do Firebase) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <!-- Firebase Authentication -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <!-- Firebase Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Configuração do Firebase - USANDO SEU BANCO
+        const firebaseConfig = {
+            apiKey: "AIzaSyDZwa4XNqlupNDLs7-CRQbhr5pRT4NyFBA",
+            authDomain: "application-gzl.firebaseapp.com",
+            databaseURL: "https://application-gzl-default-rtdb.firebaseio.com",
+            projectId: "application-gzl",
+            storageBucket: "application-gzl.appspot.com",
+            messagingSenderId: "319900903265",
+            appId: "1:319900903265:web:a8f400aeb7a697fc168720",
+            measurementId: "G-ZRRFQZXT54"
+        };
+        
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Inicializar Firestore
+        const db = firebase.firestore();
+        
+        // Referências para os elementos do DOM
+        const logoutBtn = document.getElementById('logout-btn');
+        const searchInput = document.getElementById('search-input');
+        const searchBtn = document.getElementById('search-btn');
+        const usersTableBody = document.getElementById('users-table-body');
+        const loadingMessage = document.getElementById('loading-message');
+        const messageDiv = document.getElementById('message');
+        const editUserModal = document.getElementById('edit-user-modal');
+        const closeEditModal = document.getElementById('close-edit-modal');
+        const cancelEdit = document.getElementById('cancel-edit');
+        const editUserForm = document.getElementById('edit-user-form');
+        const autoLoginOverlay = document.getElementById('auto-login-overlay');
+        const mainContainer = document.getElementById('main-container');
+        const accessDeniedModal = document.getElementById('access-denied-modal');
+        const goBackBtn = document.getElementById('go-back-btn');
+        
+        // Variáveis globais
+        let allUsers = [];
+        let currentUser = null;
+        
+        // Função para verificar se o usuário é admin - CORRIGIDA
+        async function checkUserAdminStatus(userId) {
+            try {
+                console.log("Verificando usuário:", userId);
+                const userDoc = await db.collection('users').doc(userId).get();
+                
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    console.log("Dados do usuário:", userData);
+                    
+                    // Verificar apenas se o campo admin é true
+                    // Não verificar mais o campo status ou role
+                    const isAdmin = userData.admin === true;
+                    console.log("É admin?", isAdmin);
+                    
+                    return isAdmin;
+                }
+                console.log("Usuário não encontrado no Firestore");
+                return false;
+            } catch (error) {
+                console.error('Erro ao verificar status do usuário:', error);
+                return false;
+            }
+        }
+        
+        // Verificar autenticação com auto-login e verificação de admin
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                console.log("Usuário autenticado:", user.uid, user.email);
+                // Usuário está logado - verificar se é admin
+                const isAdmin = await checkUserAdminStatus(user.uid);
+                
+                if (isAdmin) {
+                    // Usuário é admin - permitir acesso
+                    currentUser = user;
+                    document.getElementById('user-name').textContent = user.displayName || user.email;
+                    document.getElementById('user-avatar').textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+                    
+                    // Esconder overlay de auto-login e mostrar conteúdo principal
+                    autoLoginOverlay.style.display = 'none';
+                    mainContainer.style.display = 'block';
+                    
+                    // Carregar usuários
+                    loadUsers();
+                } else {
+                    // Usuário não é admin - mostrar mensagem de acesso negado
+                    console.log("Usuário não é admin, mostrando acesso negado");
+                    autoLoginOverlay.style.display = 'none';
+                    accessDeniedModal.style.display = 'flex';
+                    
+                    // Fazer logout automático após alguns segundos
+                    setTimeout(() => {
+                        firebase.auth().signOut();
+                    }, 5000);
+                }
+            } else {
+                // Nenhum usuário logado - redirecionar para login
+                console.log("Nenhum usuário logado, redirecionando...");
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            }
+        });
+        
+        // Função para carregar todos os usuários
+        function loadUsers(searchTerm = '') {
+            loadingMessage.style.display = 'block';
+            usersTableBody.innerHTML = '';
+            
+            let usersQuery = db.collection('users');
+            
+            usersQuery.get()
+                .then((querySnapshot) => {
+                    allUsers = [];
+                    usersTableBody.innerHTML = '';
+                    
+                    if (querySnapshot.empty) {
+                        usersTableBody.innerHTML = `
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 30px;">
+                                    Nenhum usuário encontrado.
+                                </td>
+                            </tr>
+                        `;
+                        loadingMessage.style.display = 'none';
+                        return;
+                    }
+                    
+                    querySnapshot.forEach((doc) => {
+                        const userData = doc.data();
+                        
+                        // Filtrar por termo de busca se necessário
+                        if (searchTerm) {
+                            const searchLower = searchTerm.toLowerCase();
+                            const nameMatch = userData.name && userData.name.toLowerCase().includes(searchLower);
+                            const emailMatch = userData.email && userData.email.toLowerCase().includes(searchLower);
+                            
+                            // Se houver busca e não encontrar correspondência, pular este usuário
+                            if (searchTerm && !nameMatch && !emailMatch) {
+                                return;
+                            }
+                        }
+                        
+                        allUsers.push({
+                            id: doc.id,
+                            ...userData
+                        });
+                        
+                        // Formatar a data
+                        const createdAt = userData.createdAt ? 
+                            userData.createdAt.toDate().toLocaleDateString('pt-BR') : 
+                            'Data não disponível';
+                        
+                        // Determinar status (padrão para ativo se não definido)
+                        const status = userData.status || 'ativo';
+                        
+                        // Adicionar linha na tabela
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${userData.name || 'N/A'}</td>
+                            <td>${userData.email || 'N/A'}</td>
+                            <td>${userData.unit || 'N/A'}</td>
+                            <td>
+                                <span class="user-type-badge ${userData.role === 'admin' ? 'badge-admin' : 'badge-user'}">
+                                    ${userData.role === 'admin' ? 'Admin' : (userData.role || 'Usuário')}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge ${status === 'ativo' ? 'badge-ativo' : 'badge-inativo'}">
+                                    ${status === 'ativo' ? 'Ativo' : 'Inativo'}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge ${userData.admin ? 'badge-ativo' : 'badge-inativo'}">
+                                    ${userData.admin ? 'Sim' : 'Não'}
+                                </span>
+                            </td>
+                            <td>${createdAt}</td>
+                            <td class="action-buttons">
+                                <button class="edit-btn" data-id="${doc.id}">Editar</button>
+                                <button class="toggle-status-btn" data-id="${doc.id}" data-status="${status}">
+                                    ${status === 'ativo' ? 'Desativar' : 'Ativar'}
+                                </button>
+                                <button class="delete-btn" data-id="${doc.id}">Excluir</button>
+                            </td>
+                        `;
+                        
+                        usersTableBody.appendChild(row);
+                    });
+                    
+                    loadingMessage.style.display = 'none';
+                    
+                    // Adicionar event listeners para os botões de ação
+                    document.querySelectorAll('.edit-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const userId = e.target.getAttribute('data-id');
+                            openEditModal(userId);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.toggle-status-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const userId = e.target.getAttribute('data-id');
+                            const currentStatus = e.target.getAttribute('data-status');
+                            toggleUserStatus(userId, currentStatus);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.delete-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const userId = e.target.getAttribute('data-id');
+                            deleteUser(userId);
+                        });
+                    });
+                })
+                .catch((error) => {
+                    console.error('Erro ao carregar usuários:', error);
+                    showMessage('Erro ao carregar usuários.', 'error');
+                    loadingMessage.style.display = 'none';
+                });
+        }
+        
+        // Função para abrir o modal de edição
+        function openEditModal(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            
+            if (!user) {
+                showMessage('Usuário não encontrado.', 'error');
+                return;
+            }
+            
+            // Preencher o formulário com os dados do usuário
+            document.getElementById('edit-user-id').value = user.id;
+            document.getElementById('edit-user-name').value = user.name || '';
+            document.getElementById('edit-user-email').value = user.email || '';
+            document.getElementById('edit-user-unit').value = user.unit || '';
+            document.getElementById('edit-user-role').value = user.role || 'user';
+            document.getElementById('edit-user-status').value = user.status || 'ativo';
+            document.getElementById('edit-user-admin').value = user.admin ? 'true' : 'false';
+            
+            // Mostrar o modal
+            editUserModal.style.display = 'flex';
+        }
+        
+        // Função para fechar o modal de edição
+        function closeEditModalFunc() {
+            editUserModal.style.display = 'none';
+            editUserForm.reset();
+        }
+        
+        // Função para salvar as alterações do usuário
+        function saveUserChanges(e) {
+            e.preventDefault();
+            
+            const userId = document.getElementById('edit-user-id').value;
+            const name = document.getElementById('edit-user-name').value;
+            const email = document.getElementById('edit-user-email').value;
+            const unit = document.getElementById('edit-user-unit').value;
+            const role = document.getElementById('edit-user-role').value;
+            const status = document.getElementById('edit-user-status').value;
+            const admin = document.getElementById('edit-user-admin').value === 'true';
+            
+            // Validar dados
+            if (!name || !email || !unit || !role || !status) {
+                showMessage('Por favor, preencha todos os campos.', 'error');
+                return;
+            }
+            
+            // Atualizar no Firestore
+            db.collection('users').doc(userId).update({
+                name: name,
+                email: email,
+                unit: unit,
+                role: role,
+                status: status,
+                admin: admin,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                showMessage('Usuário atualizado com sucesso!', 'success');
+                closeEditModalFunc();
+                loadUsers(); // Recarregar a lista de usuários
+            })
+            .catch((error) => {
+                console.error('Erro ao atualizar usuário:', error);
+                showMessage('Erro ao atualizar usuário.', 'error');
+            });
+        }
+        
+        // Função para alternar o status do usuário (ativo/inativo)
+        function toggleUserStatus(userId, currentStatus) {
+            const newStatus = currentStatus === 'ativo' ? 'inativo' : 'ativo';
+            const actionText = newStatus === 'ativo' ? 'ativado' : 'desativado';
+            
+            if (!confirm(`Tem certeza que deseja ${actionText} este usuário?`)) {
+                return;
+            }
+            
+            db.collection('users').doc(userId).update({
+                status: newStatus,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                showMessage(`Usuário ${actionText} com sucesso!`, 'success');
+                loadUsers(); // Recarregar a lista de usuários
+            })
+            .catch((error) => {
+                console.error(`Erro ao ${actionText} usuário:`, error);
+                showMessage(`Erro ao ${actionText} usuário.`, 'error');
+            });
+        }
+        
+        // Função para excluir usuário
+        function deleteUser(userId) {
+            if (!confirm('Tem certeza que deseja excluir este usuário?')) {
+                return;
+            }
+            
+            db.collection('users').doc(userId).delete()
+                .then(() => {
+                    showMessage('Usuário excluído com sucesso!', 'success');
+                    loadUsers(); // Recarregar a lista de usuários
+                })
+                .catch((error) => {
+                    console.error('Erro ao excluir usuário:', error);
+                    showMessage('Erro ao excluir usuário.', 'error');
+                });
+        }
+        
+        // Funções para mostrar mensagens
+        function showMessage(message, type) {
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            // Esconder a mensagem após 5 segundos
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Event Listeners
+        logoutBtn.addEventListener('click', () => {
+            firebase.auth().signOut()
+                .then(() => {
+                    window.location.href = 'index.html';
+                })
+                .catch((error) => {
+                    console.error('Erro ao fazer logout:', error);
+                    showMessage('Erro ao fazer logout.', 'error');
+                    // Forçar redirecionamento mesmo com erro
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                });
+        });
+
+        goBackBtn.addEventListener('click', () => {
+            firebase.auth().signOut()
+                .then(() => {
+                    window.location.href = 'index.html';
+                })
+                .catch((error) => {
+                    console.error('Erro ao fazer logout:', error);
+                    window.location.href = 'index.html';
+                });
+        });
+        
+        searchBtn.addEventListener('click', () => {
+            const searchTerm = searchInput.value.trim();
+            loadUsers(searchTerm);
+        });
+        
+        searchInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                const searchTerm = searchInput.value.trim();
+                loadUsers(searchTerm);
+            }
+        });
+        
+        closeEditModal.addEventListener('click', closeEditModalFunc);
+        cancelEdit.addEventListener('click', closeEditModalFunc);
+        editUserForm.addEventListener('submit', saveUserChanges);
+        
+        // Fechar modal ao clicar fora dele
+        window.addEventListener('click', (e) => {
+            if (e.target === editUserModal) {
+                closeEditModalFunc();
+            }
+            if (e.target === accessDeniedModal) {
+                accessDeniedModal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
