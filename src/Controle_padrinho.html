@@ -183,6 +183,15 @@
             background: #e67e22;
         }
         
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #138496;
+        }
+        
         .btn-sm {
             padding: 8px 12px;
             font-size: 0.8rem;
@@ -474,19 +483,19 @@
             cursor: pointer;
         }
         
-        .status-concluida {
-            background: #d4edda;
-            color: #155724;
-        }
-        
         .status-reprovada {
             background: #f8d7da;
             color: #721c24;
         }
         
         .status-aprovada {
-            background: #d1ecf1;
-            color: #0c5460;
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-expirada {
+            background: #6c757d;
+            color: white;
         }
         
         .avaliacao-details {
@@ -671,6 +680,14 @@
             border-left: 4px solid #27ae60;
         }
         
+        .expiracao-section {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #ffc107;
+        }
+        
         .finalizacao-buttons {
             display: flex;
             gap: 10px;
@@ -704,6 +721,11 @@
         .badge-info {
             background: #d1ecf1;
             color: #0c5460;
+        }
+        
+        .badge-secondary {
+            background: #6c757d;
+            color: white;
         }
         
         /* Responsive */
@@ -975,6 +997,10 @@
                                 <span class="stat-number" id="completed-count">0</span>
                                 <span class="stat-label">Concluídos</span>
                             </div>
+                            <div class="stat-card">
+                                <span class="stat-number" id="expirado-count">0</span>
+                                <span class="stat-label">Expirados</span>
+                            </div>
                         </div>
                         
                         <div class="controls">
@@ -987,10 +1013,12 @@
                                     <option value="ativo">Ativos</option>
                                     <option value="concluido">Concluídos</option>
                                     <option value="finalizado">Finalizados</option>
+                                    <option value="expirado">Expirados</option>
                                 </select>
                                 <select id="sort-option">
                                     <option value="nome">Ordenar por Nome</option>
                                     <option value="dataInicio">Ordenar por Data de Início</option>
+                                    <option value="expiracao">Ordenar por Expiração</option>
                                 </select>
                             </div>
                         </div>
@@ -1074,6 +1102,7 @@
         const padrinhosRef = db.collection("padrinhos");
         const avaliacoesRef = db.collection("avaliacoes");
         const permitidosRef = db.collection("colaboradores_permitidos");
+        const validadosRef = db.collection("colaboradores_validados");
 
         // Elementos DOM
         const padrinhosContainer = document.getElementById("padrinhos-container");
@@ -1084,6 +1113,7 @@
         const totalCount = document.getElementById("total-count");
         const activeCount = document.getElementById("active-count");
         const completedCount = document.getElementById("completed-count");
+        const expiradoCount = document.getElementById("expirado-count");
         const sidebarUserName = document.getElementById("sidebar-user-name");
         const sidebarUserUnit = document.getElementById("sidebar-user-unit");
         const sidebarToggle = document.getElementById("sidebarToggle");
@@ -2016,40 +2046,53 @@
             }
         }
 
-        // Função para calcular as avaliações liberadas
+        // FUNÇÃO CORRIGIDA - Calcular avaliações liberadas
         function calcularAvaliacoesLiberadas(dataInicio, avaliacoesRealizadas = []) {
             const hoje = new Date();
             const inicio = new Date(dataInicio);
+            
+            // Zerar horas para comparação correta
+            hoje.setHours(0, 0, 0, 0);
+            inicio.setHours(0, 0, 0, 0);
+            
+            // Calcular diferença em dias
             const diffTime = Math.abs(hoje - inicio);
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             
-            // Verificar se hoje é segunda-feira
-            const isSegundaFeira = hoje.getDay() === 1;
-            
-            // Calcular semanas (máximo 12 semanas)
-            const semanas = Math.min(Math.floor(diffDays / 7), 12);
+            // Calcular semanas completas desde o início
+            const semanasDesdeInicio = Math.floor(diffDays / 7);
             
             const avaliacoesCalculadas = avaliacoes.map((avaliacao, index) => {
                 const semanaLiberacao = index + 1;
+                
+                // Calcular data de liberação (sempre às segundas a partir da data de início)
                 const dataLiberacao = new Date(inicio);
-                dataLiberacao.setDate(inicio.getDate() + (semanaLiberacao * 7));
                 
-                // Ajustar para a próxima segunda-feira se não for segunda
-                if (dataLiberacao.getDay() !== 1) {
-                    const diasParaSegunda = (1 - dataLiberacao.getDay() + 7) % 7;
-                    dataLiberacao.setDate(dataLiberacao.getDate() + diasParaSegunda);
-                }
+                // Se a data de início não for segunda, encontrar a próxima segunda
+                let diasParaPrimeiraSegunda = (1 - inicio.getDay() + 7) % 7;
+                if (diasParaPrimeiraSegunda === 7) diasParaPrimeiraSegunda = 0;
                 
-                // Verificar se já existe uma avaliação realizada para esta
+                // Data da primeira avaliação (primeira segunda após início)
+                dataLiberacao.setDate(inicio.getDate() + diasParaPrimeiraSegunda + ((semanaLiberacao - 1) * 7));
+                dataLiberacao.setHours(0, 0, 0, 0);
+                
+                // Verificar se já existe uma avaliação realizada
                 const avaliacaoRealizada = avaliacoesRealizadas.find(ar => ar.avaliacaoId === avaliacao.id);
                 
                 let status = 'pendente';
+                
                 if (avaliacaoRealizada) {
+                    // Já foi respondida
                     status = avaliacaoRealizada.aprovado ? 'aprovada' : 'reprovada';
-                } else if (semanaLiberacao <= semanas && isSegundaFeira) {
-                    status = 'liberada';
-                } else if (semanaLiberacao < semanas) {
-                    status = 'concluida';
+                } else {
+                    // Não foi respondida - verificar disponibilidade
+                    if (semanaLiberacao <= semanasDesdeInicio) {
+                        // Já passou o tempo mínimo para esta avaliação
+                        status = 'liberada';
+                    } else {
+                        // Ainda não chegou a semana mínima para esta avaliação
+                        status = 'pendente';
+                    }
                 }
                 
                 return {
@@ -2062,6 +2105,18 @@
             });
             
             return avaliacoesCalculadas;
+        }
+
+        // Função para verificar se o processo expirou (90 dias)
+        function verificarExpiracao(dataInicio) {
+            const hoje = new Date();
+            const inicio = new Date(dataInicio);
+            
+            // Calcular diferença em dias
+            const diffTime = Math.abs(hoje - inicio);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            return diffDays > 90; // Expirou se passaram mais de 90 dias
         }
 
         // Função para verificar se todas as avaliações foram concluídas
@@ -2113,6 +2168,69 @@
             }
         }
 
+        // NOVA FUNÇÃO: Mover para colaboradores validados
+        async function moverParaValidados(padrinho) {
+            if (!confirm(`Tem certeza que deseja mover "${padrinho.apadrinhado.nome}" para colaboradores validados?\n\nEsta ação irá:\n• Remover da base de apadrinhados\n• Mover para a base de colaboradores validados\n• Manter o histórico de avaliações`)) {
+                return;
+            }
+            
+            try {
+                // Buscar todas as avaliações do colaborador
+                const avaliacoesSnapshot = await avaliacoesRef
+                    .where('padrinhoId', '==', padrinho.id)
+                    .get();
+                
+                const avaliacoesData = [];
+                avaliacoesSnapshot.forEach(doc => {
+                    avaliacoesData.push(doc.data());
+                });
+                
+                // Calcular estatísticas das avaliações
+                const totalAvaliacoes = avaliacoesData.length;
+                const aprovadas = avaliacoesData.filter(a => a.aprovado).length;
+                const reprovadas = avaliacoesData.filter(a => !a.aprovado).length;
+                const notaMedia = totalAvaliacoes > 0 ? 
+                    Math.round(avaliacoesData.reduce((sum, a) => sum + a.nota, 0) / totalAvaliacoes) : 0;
+                
+                // Mover para a coleção de colaboradores validados
+                const dadosValidado = {
+                    nome: padrinho.apadrinhado.nome,
+                    funcao: padrinho.apadrinhado.funcao,
+                    unidade: padrinho.padrinho.unidade,
+                    dataInicioApadrinhamento: padrinho.apadrinhado.dataInicio,
+                    dataFimApadrinhamento: new Date().toISOString().split('T')[0],
+                    padrinho: padrinho.padrinho.nome,
+                    totalAvaliacoes: totalAvaliacoes,
+                    avaliacoesAprovadas: aprovadas,
+                    avaliacoesReprovadas: reprovadas,
+                    notaMedia: notaMedia,
+                    dataValidacao: new Date().toISOString(),
+                    validadoPor: currentUser.uid,
+                    validadoPorNome: currentUser.name,
+                    status: 'validado_expirado'
+                };
+                
+                await validadosRef.add(dadosValidado);
+                
+                // Remover da coleção de padrinhos
+                await padrinhosRef.doc(padrinho.id).delete();
+                
+                // Opcional: Também remover as avaliações associadas
+                const batch = db.batch();
+                avaliacoesSnapshot.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+                await batch.commit();
+                
+                alert('Colaborador movido para validados com sucesso!');
+                loadPadrinhos();
+                
+            } catch (error) {
+                console.error('Erro ao mover para validados:', error);
+                alert('Erro ao mover colaborador para validados. Tente novamente.');
+            }
+        }
+
         // Carregar padrinhos do Firestore
         async function loadPadrinhos() {
             try {
@@ -2136,10 +2254,15 @@
                     const padrinhoData = doc.data();
                     const avaliacoesRealizadas = avaliacoesPorPadrinho[doc.id] || [];
                     
+                    // Verificar se expirou (90 dias)
+                    const expirado = padrinhoData.apadrinhado && padrinhoData.apadrinhado.dataInicio ? 
+                        verificarExpiracao(padrinhoData.apadrinhado.dataInicio) : false;
+                    
                     allPadrinhos.push({
                         id: doc.id,
                         ...padrinhoData,
-                        avaliacoesRealizadas: avaliacoesRealizadas
+                        avaliacoesRealizadas: avaliacoesRealizadas,
+                        expirado: expirado
                     });
                     
                     // Adicionar unidade às opções de filtro
@@ -2173,10 +2296,11 @@
         function updateStats() {
             totalCount.textContent = allPadrinhos.length;
             
-            // Contar padrinhos ativos (com data de término no futuro)
+            // Contar padrinhos ativos (com data de término no futuro e não expirados)
             const hoje = new Date().toISOString().split('T')[0];
             const ativos = allPadrinhos.filter(p => 
                 p.status !== 'finalizado' && 
+                !p.expirado &&
                 p.apadrinhado && p.apadrinhado.dataTermino && p.apadrinhado.dataTermino >= hoje
             ).length;
             
@@ -2184,7 +2308,7 @@
             
             // Contar padrinhos concluídos (com todas as avaliações feitas)
             const concluidos = allPadrinhos.filter(p => {
-                if (p.status === 'finalizado') return false;
+                if (p.status === 'finalizado' || p.expirado) return false;
                 if (!p.apadrinhado || !p.apadrinhado.dataInicio) return false;
                 
                 const avaliacoesPadrinho = calcularAvaliacoesLiberadas(
@@ -2196,6 +2320,10 @@
             }).length;
             
             completedCount.textContent = concluidos;
+            
+            // Contar padrinhos expirados
+            const expirados = allPadrinhos.filter(p => p.expirado).length;
+            expiradoCount.textContent = expirados;
         }
 
         // Atualizar filtro de unidades
@@ -2241,12 +2369,9 @@
                 // Filtro de status
                 let matchesStatus = true;
                 if (selectedStatus === 'ativo') {
-                    const hoje = new Date().toISOString().split('T')[0];
-                    matchesStatus = padrinho.status !== 'finalizado' && 
-                        padrinho.apadrinhado && padrinho.apadrinhado.dataTermino && 
-                        padrinho.apadrinhado.dataTermino >= hoje;
+                    matchesStatus = padrinho.status !== 'finalizado' && !padrinho.expirado;
                 } else if (selectedStatus === 'concluido') {
-                    if (padrinho.status === 'finalizado') {
+                    if (padrinho.status === 'finalizado' || padrinho.expirado) {
                         matchesStatus = false;
                     } else if (padrinho.apadrinhado && padrinho.apadrinhado.dataInicio) {
                         const avaliacoesPadrinho = calcularAvaliacoesLiberadas(
@@ -2259,6 +2384,8 @@
                     }
                 } else if (selectedStatus === 'finalizado') {
                     matchesStatus = padrinho.status === 'finalizado';
+                } else if (selectedStatus === 'expirado') {
+                    matchesStatus = padrinho.expirado;
                 }
                 
                 // Filtro de visualização baseado na unidade do usuário
@@ -2280,6 +2407,11 @@
                     const dataA = a.apadrinhado?.dataInicio || '';
                     const dataB = b.apadrinhado?.dataInicio || '';
                     return dataB.localeCompare(dataA); // Mais recente primeiro
+                } else if (sortBy === 'expiracao') {
+                    // Ordenar por status de expiração (expirados primeiro)
+                    if (a.expirado && !b.expirado) return -1;
+                    if (!a.expirado && b.expirado) return 1;
+                    return 0;
                 }
                 return 0;
             });
@@ -2321,12 +2453,20 @@
                         const todasConcluidas = todasAvaliacoesConcluidas(avaliacoesPadrinho);
                         const todasAprovadas = todasAvaliacoesAprovadas(avaliacoesPadrinho);
                         
+                        // Calcular dias desde o início
+                        const diasDesdeInicio = padrinho.apadrinhado?.dataInicio ? 
+                            Math.ceil(Math.abs(new Date() - new Date(padrinho.apadrinhado.dataInicio)) / (1000 * 60 * 60 * 24)) : 0;
+                        
                         return `
                         <div class="padrinho-card">
                             ${padrinho.status === 'finalizado' ? 
                                 `<div style="position: absolute; top: 10px; right: 10px; z-index: 10;">
                                     <span class="badge badge-success">Finalizado</span>
                                 </div>` : 
+                                padrinho.expirado ?
+                                `<div style="position: absolute; top: 10px; right: 10px; z-index: 10;">
+                                    <span class="badge badge-secondary">Expirado</span>
+                                </div>` :
                                 todasConcluidas ? 
                                 `<div style="position: absolute; top: 10px; right: 10px; z-index: 10;">
                                     <span class="badge badge-info">Concluído</span>
@@ -2377,8 +2517,13 @@
                                         <div class="info-value">${formatDate(padrinho.apadrinhado.dataInicio) || 'Não informada'}</div>
                                     </div>
                                     <div class="info-row">
-                                        <div class="info-label">Término:</div>
-                                        <div class="info-value">${formatDate(padrinho.apadrinhado.dataTermino) || 'Não informada'}</div>
+                                        <div class="info-label">Dias:</div>
+                                        <div class="info-value">
+                                            <span class="${diasDesdeInicio > 90 ? 'badge badge-secondary' : ''}">
+                                                ${diasDesdeInicio} dias
+                                                ${diasDesdeInicio > 90 ? ' (Expirado)' : ''}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                                 ` : ''}
@@ -2404,6 +2549,7 @@
                                     ${avaliacoesPadrinho.map(avaliacao => {
                                         let onClickAction = 'return false';
                                         let statusText = '';
+                                        let statusClass = avaliacao.status;
                                         
                                         if (avaliacao.status === 'liberada') {
                                             onClickAction = `abrirModalAvaliacao(${JSON.stringify(padrinho).replace(/"/g, '&quot;')}, ${JSON.stringify(avaliacao).replace(/"/g, '&quot;')})`;
@@ -2413,15 +2559,13 @@
                                             statusText = avaliacao.status === 'aprovada' ? 'Aprovada - Clique para ver resultado' : 'Reprovada - Clique para ver resultado';
                                         } else if (avaliacao.status === 'pendente') {
                                             statusText = 'Pendente';
-                                        } else if (avaliacao.status === 'concluida') {
-                                            statusText = 'Concluída';
                                         }
                                         
                                         return `
                                             <div class="avaliacao-item" onclick="${onClickAction}">
                                                 <div class="avaliacao-header">
                                                     <div class="avaliacao-title">${avaliacao.titulo}</div>
-                                                    <div class="avaliacao-status status-${avaliacao.status}">
+                                                    <div class="avaliacao-status status-${statusClass}">
                                                         ${statusText}
                                                     </div>
                                                 </div>
@@ -2437,7 +2581,7 @@
                                     }).join('')}
                                 </div>
                                 
-                                ${todasConcluidas && padrinho.status !== 'finalizado' ? `
+                                ${todasConcluidas && padrinho.status !== 'finalizado' && !padrinho.expirado ? `
                                 <div class="finalizacao-section">
                                     <div class="apadrinhado-title">
                                         <i class="fas fa-flag-checkered"></i>
@@ -2461,6 +2605,35 @@
                                             <i class="fas fa-exclamation-triangle"></i> Reprovado - Ver Detalhes
                                         </button>
                                         ` : ''}
+                                    </div>
+                                </div>
+                                ` : ''}
+                                
+                                ${padrinho.expirado ? `
+                                <div class="expiracao-section">
+                                    <div class="apadrinhado-title">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Processo Expirado</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-label">Status:</div>
+                                        <div class="info-value">
+                                            <span class="badge badge-secondary">Expirado há ${diasDesdeInicio - 90} dias</span>
+                                        </div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-label">Ação:</div>
+                                        <div class="info-value">
+                                            <small>O processo de apadrinhamento expirou (90 dias). Mova para colaboradores validados.</small>
+                                        </div>
+                                    </div>
+                                    <div class="finalizacao-buttons">
+                                        <button class="btn btn-info" onclick="moverParaValidados(${JSON.stringify(padrinho).replace(/"/g, '&quot;')})">
+                                            <i class="fas fa-user-check"></i> Mover para Validados
+                                        </button>
+                                        <button class="btn btn-warning" onclick="alert('Este colaborador completou 90 dias no programa de apadrinhamento. Recomenda-se mover para a base de colaboradores validados.')">
+                                            <i class="fas fa-info-circle"></i> Ver Detalhes
+                                        </button>
                                     </div>
                                 </div>
                                 ` : ''}
