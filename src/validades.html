@@ -1,4 +1,4 @@
-<!--VERSION 3.7a-->
+<!--VERSION 3.8-->
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -40,8 +40,21 @@
             background-color: #fff3cd;
         }
         
+        .documento-item.nao-aplicavel:hover {
+            background-color: #e2e8f0;
+        }
+        
         .documento-info {
             flex-grow: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .documento-acoes {
+            display: flex;
+            gap: 10px;
+            margin-left: 15px;
         }
         
         .documento-status {
@@ -49,6 +62,8 @@
             border-radius: 4px;
             font-size: 12px;
             font-weight: bold;
+            min-width: 100px;
+            text-align: center;
         }
         
         .status-enviado {
@@ -68,6 +83,7 @@
         
         .documento-nome {
             font-weight: 500;
+            flex-grow: 1;
         }
         
         .card-unidade {
@@ -132,6 +148,152 @@
         .tooltip:hover .tooltiptext {
             visibility: visible;
             opacity: 1;
+        }
+        
+        /* Estilos para os botões de ação */
+        .document-actions {
+            display: none;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .btn-delete {
+            background-color: #dc3545 !important;
+            border-color: #dc3545 !important;
+        }
+        
+        .btn-delete:hover {
+            background-color: #c82333 !important;
+            border-color: #bd2130 !important;
+        }
+        
+        #selected-count {
+            margin-left: auto;
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        .text-warning {
+            color: #ffc107 !important;
+            margin-left: 5px;
+        }
+        
+        /* Estilo para linhas selecionadas */
+        tr.selected {
+            background-color: #e8f4ff !important;
+        }
+        
+        tr.selected:hover {
+            background-color: #d9edff !important;
+        }
+        
+        /* Alertas */
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        .confirmation-modal {
+            display: none;
+            position: fixed;
+            z-index: 3000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .confirmation-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .confirmation-content h3 {
+            color: #dc3545;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .confirmation-content .warning-text {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        
+        .confirmation-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        
+        .btn-reverter {
+            background-color: #6c757d !important;
+            border-color: #6c757d !important;
+            color: white !important;
+            padding: 2px 8px !important;
+            font-size: 11px !important;
+        }
+        
+        .btn-reverter:hover {
+            background-color: #5a6268 !important;
+            border-color: #545b62 !important;
+        }
+        
+        .btn-sm {
+            padding: 3px 10px !important;
+            font-size: 12px !important;
         }
     </style>
 </head>
@@ -315,6 +477,9 @@
                         <button class="btn btn-danger" id="move-to-disable-btn">
                             <i class="fas fa-archive"></i> Mover para Documentos Desativados
                         </button>
+                        <button class="btn btn-danger btn-delete" id="delete-documents-btn">
+                            <i class="fas fa-trash"></i> Excluir Permanentemente
+                        </button>
                         <span id="selected-count">0 selecionados</span>
                     </div>
                 </div>
@@ -438,6 +603,35 @@ Gestão Corporativa
         </div>
     </div>
 
+    <!-- Modal de confirmação para exclusão -->
+    <div class="confirmation-modal" id="delete-confirmation-modal">
+        <div class="confirmation-content">
+            <h3><i class="fas fa-exclamation-triangle"></i> Confirmação de Exclusão</h3>
+            <p>Você está prestes a excluir <strong id="delete-count">0</strong> documento(s) permanentemente.</p>
+            
+            <div class="warning-text">
+                <strong><i class="fas fa-exclamation-circle"></i> ATENÇÃO: Esta ação é irreversível!</strong>
+                <p style="margin: 5px 0 0 0; font-size: 14px;">
+                    • Os documentos serão removidos do banco de dados<br>
+                    • Não será possível recuperá-los<br>
+                    • Esta ação será registrada no log do sistema
+                </p>
+            </div>
+            
+            <p>Digite <strong>"EXCLUIR"</strong> no campo abaixo para confirmar:</p>
+            <input type="text" id="confirmation-input" class="form-control" placeholder="Digite EXCLUIR aqui..." style="margin-top: 10px;">
+            
+            <div class="confirmation-actions">
+                <button class="btn btn-secondary" id="cancel-delete-btn">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn btn-danger" id="confirm-delete-btn" disabled>
+                    <i class="fas fa-trash"></i> Confirmar Exclusão
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
@@ -455,6 +649,7 @@ Gestão Corporativa
         let isViewingAsUnit = false;
         let selectedDocuments = [];
         let naoObrigatoriosData = {};
+        let documentosNaoObrigatoriosIds = {}; // Para armazenar IDs dos registros
         
         // Lista de documentos obrigatórios
         const DOCUMENTOS_OBRIGATORIOS = [
@@ -517,6 +712,24 @@ Gestão Corporativa
             document.getElementById('confirm-send-email-btn')?.addEventListener('click', sendEmailAlert);
             document.getElementById('back-to-corp')?.addEventListener('click', backToCorpView);
             
+            // Event listeners para modal de exclusão
+            document.getElementById('cancel-delete-btn')?.addEventListener('click', () => {
+                document.getElementById('delete-confirmation-modal').style.display = 'none';
+                document.getElementById('confirmation-input').value = '';
+                document.getElementById('confirm-delete-btn').disabled = true;
+            });
+            
+            document.getElementById('confirmation-input')?.addEventListener('input', function(e) {
+                const confirmBtn = document.getElementById('confirm-delete-btn');
+                if (e.target.value.toUpperCase() === 'EXCLUIR') {
+                    confirmBtn.disabled = false;
+                } else {
+                    confirmBtn.disabled = true;
+                }
+            });
+            
+            document.getElementById('confirm-delete-btn')?.addEventListener('click', deleteDocumentsPermanently);
+            
             // Fechar modais
             document.querySelectorAll('.modal-close').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -532,6 +745,11 @@ Gestão Corporativa
                 if (e.target === document.getElementById('email-modal')) {
                     document.getElementById('email-modal').classList.remove('modal-open');
                 }
+                if (e.target === document.getElementById('delete-confirmation-modal')) {
+                    document.getElementById('delete-confirmation-modal').style.display = 'none';
+                    document.getElementById('confirmation-input').value = '';
+                    document.getElementById('confirm-delete-btn').disabled = true;
+                }
             });
 
             // Inicializar seleção de documentos
@@ -543,17 +761,21 @@ Gestão Corporativa
             try {
                 const snapshot = await firebase.firestore().collection('nao_obrigatorios').get();
                 naoObrigatoriosData = {};
+                documentosNaoObrigatoriosIds = {};
                 
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     if (!naoObrigatoriosData[data.unidadeId]) {
                         naoObrigatoriosData[data.unidadeId] = {};
+                        documentosNaoObrigatoriosIds[data.unidadeId] = {};
                     }
                     naoObrigatoriosData[data.unidadeId][data.tipo] = true;
+                    documentosNaoObrigatoriosIds[data.unidadeId][data.tipo] = doc.id;
                 });
             } catch (error) {
                 console.error("Erro ao carregar documentos não obrigatórios:", error);
                 naoObrigatoriosData = {};
+                documentosNaoObrigatoriosIds = {};
             }
         }
 
@@ -808,23 +1030,41 @@ Gestão Corporativa
                 documentosStatus.forEach(doc => {
                     let statusClass = 'status-pendente';
                     let statusText = 'Pendente';
+                    let acoesHTML = '';
                     
                     if (doc.naoAplicavel) {
                         statusClass = 'status-nao-aplicavel';
                         statusText = 'Não Aplicável';
+                        // Botão para reverter quando é não aplicável
+                        acoesHTML = `
+                            <div class="documento-acoes">
+                                <button class="btn btn-reverter btn-sm" data-tipo="${doc.tipo}" title="Reverter para pendente">
+                                    <i class="fas fa-undo"></i> Reverter
+                                </button>
+                            </div>
+                        `;
                     } else if (doc.enviado) {
                         statusClass = 'status-enviado';
                         statusText = 'Enviado';
+                    } else {
+                        // Botão para marcar como não aplicável quando está pendente
+                        acoesHTML = `
+                            <div class="documento-acoes">
+                                <button class="btn btn-warning btn-sm" data-tipo="${doc.tipo}" title="Marcar como não aplicável">
+                                    <i class="fas fa-ban"></i> Não Aplicável
+                                </button>
+                            </div>
+                        `;
                     }
                     
                     html += `
-                        <div class="documento-item ${doc.naoAplicavel ? '' : 'pendente'}" data-tipo="${doc.tipo}">
+                        <div class="documento-item ${doc.naoAplicavel ? 'nao-aplicavel' : (doc.enviado ? '' : 'pendente')}" data-tipo="${doc.tipo}">
                             <div class="documento-info">
                                 <div class="documento-nome">${doc.label}</div>
+                                ${acoesHTML}
                             </div>
-                            <span class="documento-status ${statusClass} tooltip">
+                            <span class="documento-status ${statusClass}">
                                 ${statusText}
-                                ${!doc.naoAplicavel && !doc.enviado ? '<span class="tooltiptext">Clique para marcar como Não Aplicável</span>' : ''}
                             </span>
                         </div>
                     `;
@@ -832,13 +1072,22 @@ Gestão Corporativa
                 
                 container.innerHTML = html;
                 
-                // Adicionar event listeners para documentos pendentes
-                document.querySelectorAll('.documento-item.pendente').forEach(item => {
-                    item.addEventListener('click', function() {
-                        const tipo = this.getAttribute('data-tipo');
+                // Adicionar event listeners para botões
+                container.addEventListener('click', function(e) {
+                    const naoAplicavelBtn = e.target.closest('.btn-warning');
+                    const reverterBtn = e.target.closest('.btn-reverter');
+                    
+                    if (naoAplicavelBtn) {
+                        const tipo = naoAplicavelBtn.getAttribute('data-tipo');
                         marcarComoNaoAplicavel(unitId, tipo);
-                    });
+                    }
+                    
+                    if (reverterBtn) {
+                        const tipo = reverterBtn.getAttribute('data-tipo');
+                        reverterParaPendente(unitId, tipo);
+                    }
                 });
+                
             } catch (error) {
                 console.error('Erro ao carregar documentos obrigatórios:', error);
                 container.innerHTML = '<div class="error">Erro ao carregar documentos obrigatórios</div>';
@@ -847,9 +1096,13 @@ Gestão Corporativa
 
         // Marcar documento como não aplicável
         async function marcarComoNaoAplicavel(unitId, tipo) {
+            if (!confirm(`Tem certeza que deseja marcar este documento como "Não Aplicável" para esta unidade?\n\nDocumento: ${getTipoText(tipo)}`)) {
+                return;
+            }
+            
             try {
                 // Salvar no Firestore
-                await firebase.firestore().collection('nao_obrigatorios').add({
+                const docRef = await firebase.firestore().collection('nao_obrigatorios').add({
                     unidadeId: unitId,
                     tipo: tipo,
                     marcadoPor: currentUser.displayName,
@@ -860,8 +1113,10 @@ Gestão Corporativa
                 // Atualizar dados locais
                 if (!naoObrigatoriosData[unitId]) {
                     naoObrigatoriosData[unitId] = {};
+                    documentosNaoObrigatoriosIds[unitId] = {};
                 }
                 naoObrigatoriosData[unitId][tipo] = true;
+                documentosNaoObrigatoriosIds[unitId][tipo] = docRef.id;
                 
                 // Atualizar a interface
                 await updateDocumentosObrigatorios(unitId);
@@ -871,9 +1126,53 @@ Gestão Corporativa
                     showCorpView();
                 }
                 
+                showAlert(`✅ Documento marcado como "Não Aplicável" com sucesso!`, 'success');
+                
             } catch (error) {
                 console.error('Erro ao marcar documento como não aplicável:', error);
-                alert('Erro ao marcar documento como não aplicável: ' + error.message);
+                showAlert(`❌ Erro ao marcar documento: ${error.message}`, 'danger');
+            }
+        }
+
+        // Reverter documento de "Não Aplicável" para pendente
+        async function reverterParaPendente(unitId, tipo) {
+            if (!confirm(`Tem certeza que deseja reverter este documento para "Pendente"?\n\nDocumento: ${getTipoText(tipo)}`)) {
+                return;
+            }
+            
+            try {
+                // Verificar se temos o ID do registro
+                if (!documentosNaoObrigatoriosIds[unitId] || !documentosNaoObrigatoriosIds[unitId][tipo]) {
+                    showAlert('❌ Erro: ID do registro não encontrado.', 'danger');
+                    return;
+                }
+                
+                const docId = documentosNaoObrigatoriosIds[unitId][tipo];
+                
+                // Remover do Firestore
+                await firebase.firestore().collection('nao_obrigatorios').doc(docId).delete();
+                
+                // Atualizar dados locais
+                if (naoObrigatoriosData[unitId]) {
+                    delete naoObrigatoriosData[unitId][tipo];
+                }
+                if (documentosNaoObrigatoriosIds[unitId]) {
+                    delete documentosNaoObrigatoriosIds[unitId][tipo];
+                }
+                
+                // Atualizar a interface
+                await updateDocumentosObrigatorios(unitId);
+                
+                // Se estiver na visão corporativa, atualizar também
+                if (currentUser.unidade.toLowerCase() === 'gestão corp') {
+                    showCorpView();
+                }
+                
+                showAlert(`✅ Documento revertido para "Pendente" com sucesso!`, 'success');
+                
+            } catch (error) {
+                console.error('Erro ao reverter documento:', error);
+                showAlert(`❌ Erro ao reverter documento: ${error.message}`, 'danger');
             }
         }
 
@@ -958,7 +1257,7 @@ Gestão Corporativa
                 modal.classList.add('modal-open');
             } catch (error) {
                 console.error('Erro ao carregar documentos:', error);
-                alert('Erro ao carregar documentos da unidade');
+                showAlert('❌ Erro ao carregar documentos da unidade', 'danger');
             }
         }
 
@@ -983,23 +1282,39 @@ Gestão Corporativa
                 documentosStatus.forEach(doc => {
                     let statusClass = 'status-pendente';
                     let statusText = 'Pendente';
+                    let acoesHTML = '';
                     
                     if (doc.naoAplicavel) {
                         statusClass = 'status-nao-aplicavel';
                         statusText = 'Não Aplicável';
+                        acoesHTML = `
+                            <div class="documento-acoes">
+                                <button class="btn btn-reverter btn-sm" data-tipo="${doc.tipo}" title="Reverter para pendente">
+                                    <i class="fas fa-undo"></i> Reverter
+                                </button>
+                            </div>
+                        `;
                     } else if (doc.enviado) {
                         statusClass = 'status-enviado';
                         statusText = 'Enviado';
+                    } else {
+                        acoesHTML = `
+                            <div class="documento-acoes">
+                                <button class="btn btn-warning btn-sm" data-tipo="${doc.tipo}" title="Marcar como não aplicável">
+                                    <i class="fas fa-ban"></i> Não Aplicável
+                                </button>
+                            </div>
+                        `;
                     }
                     
                     html += `
-                        <div class="documento-item ${doc.naoAplicavel ? '' : 'pendente'}" data-tipo="${doc.tipo}">
+                        <div class="documento-item ${doc.naoAplicavel ? 'nao-aplicavel' : (doc.enviado ? '' : 'pendente')}" data-tipo="${doc.tipo}">
                             <div class="documento-info">
                                 <div class="documento-nome">${doc.label}</div>
+                                ${acoesHTML}
                             </div>
-                            <span class="documento-status ${statusClass} tooltip">
+                            <span class="documento-status ${statusClass}">
                                 ${statusText}
-                                ${!doc.naoAplicavel && !doc.enviado ? '<span class="tooltiptext">Clique para marcar como Não Aplicável</span>' : ''}
                             </span>
                         </div>
                     `;
@@ -1007,17 +1322,20 @@ Gestão Corporativa
                 
                 container.innerHTML = html;
                 
-                // Adicionar event listeners para documentos pendentes no modal
-                document.querySelectorAll('#modal-documentos-obrigatorios-list .documento-item.pendente').forEach(item => {
-                    item.addEventListener('click', function() {
-                        const tipo = this.getAttribute('data-tipo');
+                // Adicionar event listeners para botões no modal
+                container.addEventListener('click', function(e) {
+                    const naoAplicavelBtn = e.target.closest('.btn-warning');
+                    const reverterBtn = e.target.closest('.btn-reverter');
+                    
+                    if (naoAplicavelBtn) {
+                        const tipo = naoAplicavelBtn.getAttribute('data-tipo');
                         marcarComoNaoAplicavel(unitId, tipo);
-                        
-                        // Fechar o modal após a operação
-                        setTimeout(() => {
-                            document.getElementById('unit-documents-modal').classList.remove('modal-open');
-                        }, 1000);
-                    });
+                    }
+                    
+                    if (reverterBtn) {
+                        const tipo = reverterBtn.getAttribute('data-tipo');
+                        reverterParaPendente(unitId, tipo);
+                    }
                 });
             } catch (error) {
                 console.error('Erro ao carregar documentos obrigatórios:', error);
@@ -1199,6 +1517,7 @@ Gestão Corporativa
             
             try {
                 const btn = document.getElementById('confirm-send-email-btn');
+                const originalBtnText = btn.innerHTML;
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
                 
@@ -1210,11 +1529,11 @@ Gestão Corporativa
                     unitName: unit.name
                 });
                 
-                alert('Email enviado com sucesso para os responsáveis da unidade!');
+                showAlert('✅ Email enviado com sucesso para os responsáveis da unidade!', 'success');
                 document.getElementById('email-modal').classList.remove('modal-open');
             } catch (error) {
                 console.error('Erro ao enviar email:', error);
-                alert('Erro ao enviar email: ' + error.message);
+                showAlert(`❌ Erro ao enviar email: ${error.message}`, 'danger');
             } finally {
                 const btn = document.getElementById('confirm-send-email-btn');
                 btn.disabled = false;
@@ -1279,6 +1598,7 @@ Gestão Corporativa
                 window.location.href = 'index.html';
             }).catch(error => {
                 console.error('Erro ao fazer logout:', error);
+                showAlert('❌ Erro ao fazer logout', 'danger');
             });
         }
 
@@ -1314,6 +1634,26 @@ Gestão Corporativa
 
             // Botão para mover documentos desativados
             document.getElementById('move-to-disable-btn')?.addEventListener('click', moveToDisableCollection);
+            
+            // Botão para excluir permanentemente
+            document.getElementById('delete-documents-btn')?.addEventListener('click', showDeleteConfirmationModal);
+        }
+
+        /**
+         * Mostra o modal de confirmação para exclusão
+         */
+        function showDeleteConfirmationModal() {
+            if (selectedDocuments.length === 0) {
+                showAlert('❌ Selecione pelo menos um documento para excluir.', 'warning');
+                return;
+            }
+            
+            // Mostra o modal de confirmação
+            document.getElementById('delete-count').textContent = selectedDocuments.length;
+            document.getElementById('delete-confirmation-modal').style.display = 'block';
+            document.getElementById('confirmation-input').value = '';
+            document.getElementById('confirm-delete-btn').disabled = true;
+            document.getElementById('confirmation-input').focus();
         }
 
         /**
@@ -1332,10 +1672,15 @@ Gestão Corporativa
                 
                 // Verifica se há documentos vencidos selecionados
                 const hasExpiredDocs = checkExpiredDocumentsStatus();
+                
+                // Só habilita mover para desativados se houver vencidos
                 document.getElementById('move-to-disable-btn').disabled = !hasExpiredDocs;
                 
-                if (!hasExpiredDocs) {
-                    selectedCount.innerHTML += '<span class="text-warning"> (Nenhum vencido selecionado)</span>';
+                // Para exclusão, sempre habilita (pode excluir qualquer documento)
+                document.getElementById('delete-documents-btn').disabled = false;
+                
+                if (!hasExpiredDocs && selectedDocuments.length > 0) {
+                    selectedCount.innerHTML += '<span class="text-warning"> (Mover: apenas vencidos)</span>';
                 }
             } else {
                 actionsPanel.style.display = 'none';
@@ -1378,7 +1723,7 @@ Gestão Corporativa
             if (selectedDocuments.length === 0) return;
             
             // Confirmação do usuário
-            const confirmMove = confirm(`Tem certeza que deseja mover ${selectedDocuments.length} documento(s) para la coleção de desativados?\n\nEsta ação não pode ser desfeita.`);
+            const confirmMove = confirm(`Tem certeza que deseja mover ${selectedDocuments.length} documento(s) para a coleção de desativados?\n\nEsta ação não pode ser desfeita.`);
             if (!confirmMove) return;
             
             try {
@@ -1416,7 +1761,8 @@ Gestão Corporativa
                 });
                 
                 if (docsToMove.length === 0) {
-                    alert('Nenhum dos documentos selecionados está vencido. Apenas documentos vencidos podem ser movidos.');
+                    showAlert('❌ Nenhum dos documentos selecionados está vencido. Apenas documentos vencidos podem ser movidos para desativados.', 'warning');
+                    resetButtonState(btn, originalBtnText);
                     return;
                 }
                 
@@ -1447,21 +1793,7 @@ Gestão Corporativa
                 await batch.commit();
                 
                 // Feedback visual
-                const successAlert = document.createElement('div');
-                successAlert.className = 'alert alert-success';
-                successAlert.innerHTML = `
-                    <i class="fas fa-check-circle"></i>
-                    ${docsToMove.length} documento(s) vencido(s) foram movidos para a coleção de desativados com sucesso!
-                `;
-                successAlert.style.position = 'fixed';
-                successAlert.style.top = '20px';
-                successAlert.style.right = '20px';
-                successAlert.style.zIndex = '2000';
-                successAlert.style.maxWidth = '400px';
-                successAlert.style.animation = 'fadeIn 0.5s, fadeOut 0.5s 4.5s forwards';
-                
-                document.body.appendChild(successAlert);
-                setTimeout(() => successAlert.remove(), 5000);
+                showAlert(`✅ ${docsToMove.length} documento(s) vencido(s) foram movidos para a coleção de desativados com sucesso!`, 'success');
                 
                 // Recarregar os documentos
                 if (isViewingAsUnit) {
@@ -1477,31 +1809,183 @@ Gestão Corporativa
                 
             } catch (error) {
                 console.error('Erro ao mover documentos:', error);
-                
-                // Feedback de erro
-                const errorAlert = document.createElement('div');
-                errorAlert.className = 'alert alert-danger';
-                errorAlert.innerHTML = `
-                    <i class="fas fa-exclamation-circle"></i>
-                    Ocorreu um erro ao mover os documentos: ${error.message}
-                `;
-                errorAlert.style.position = 'fixed';
-                errorAlert.style.top = '20px';
-                errorAlert.style.right = '20px';
-                errorAlert.style.zIndex = '2000';
-                errorAlert.style.maxWidth = '400px';
-                
-                document.body.appendChild(errorAlert);
-                setTimeout(() => errorAlert.remove(), 5000);
+                showAlert(`❌ Ocorreu um erro ao mover os documentos: ${error.message}`, 'danger');
             } finally {
-                const btn = document.getElementById('move-to-disable-btn');
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerHTML = originalBtnText;
+                // Resetar seleção
+                resetDocumentSelection();
+            }
+        }
+
+        /**
+         * Exclui permanentemente os documentos selecionados
+         */
+        async function deleteDocumentsPermanently() {
+            if (selectedDocuments.length === 0) return;
+            
+            try {
+                // Fechar modal
+                document.getElementById('delete-confirmation-modal').style.display = 'none';
+                
+                // Mostrar loading
+                showAlert(`<i class="fas fa-spinner fa-spin"></i> Excluindo ${selectedDocuments.length} documento(s)...`, 'info');
+                
+                // Excluir cada documento selecionado
+                const db = firebase.firestore();
+                const batch = db.batch();
+                
+                // Coletar informações dos documentos antes de excluir
+                const docsSnapshot = await db.collection('documentos')
+                    .where(firebase.firestore.FieldPath.documentId(), 'in', selectedDocuments)
+                    .get();
+                
+                // Verificar quais documentos podem ser excluídos
+                const docsToDelete = [];
+                const excludedDocs = [];
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                docsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const validadeDate = data.validade.toDate();
+                    const daysLeft = Math.ceil((validadeDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+                    
+                    // Pode excluir qualquer documento (não precisa estar vencido)
+                    docsToDelete.push({
+                        id: doc.id,
+                        data: data,
+                        daysLeft: daysLeft
+                    });
+                });
+                
+                if (docsToDelete.length === 0) {
+                    showAlert('❌ Nenhum documento encontrado para excluir.', 'warning');
+                    resetDocumentSelection();
+                    return;
                 }
+                
+                // Criar log de exclusões
+                const deletionLogs = [];
+                
+                for (const doc of docsToDelete) {
+                    // Adicionar operação de exclusão ao batch
+                    batch.delete(db.collection('documentos').doc(doc.id));
+                    
+                    // Registrar em log
+                    deletionLogs.push({
+                        id: doc.id,
+                        nome: doc.data.nome,
+                        tipo: doc.data.tipo,
+                        unidade: doc.data.unidade,
+                        unidadeId: doc.data.unidadeId,
+                        excluidoPor: currentUser.displayName,
+                        excluidoPorEmail: currentUser.email,
+                        excluidoPorId: currentUser.uid,
+                        excluidoEm: firebase.firestore.FieldValue.serverTimestamp(),
+                        validade: doc.data.validade,
+                        diasRestantes: doc.daysLeft,
+                        arquivoNome: doc.data.arquivoNome || 'Não informado',
+                        status: doc.daysLeft < 0 ? 'Vencido' : (doc.daysLeft <= 45 ? 'A vencer' : 'Conforme')
+                    });
+                }
+                
+                // Salvar logs de exclusões (opcional - remova o comentário se quiser ativar)
+                /*
+                const logPromises = deletionLogs.map(log => 
+                    db.collection('documentosDeletionLog').add(log)
+                );
+                await Promise.all(logPromises);
+                */
+                
+                // Executar a operação em lote
+                await batch.commit();
+                
+                // Feedback visual
+                let successMessage = `<strong>✅ ${docsToDelete.length} documento(s) foram excluídos permanentemente!</strong><br>`;
+                successMessage += `<small>Ação concluída com sucesso.</small>`;
+                
+                showAlert(successMessage, 'success');
+                
+                // Recarregar os documentos
+                if (isViewingAsUnit) {
+                    await loadUnitDocuments(selectedUnitId);
+                    await updateDocumentosObrigatorios(selectedUnitId);
+                } else if (currentUser.unidade.toLowerCase() === 'gestão corp') {
+                    await loadAllUnits();
+                    showCorpView();
+                } else {
+                    await loadUnitDocuments(currentUnitId);
+                    await updateDocumentosObrigatorios(currentUnitId);
+                }
+                
+            } catch (error) {
+                console.error('Erro ao excluir documentos:', error);
+                showAlert(`❌ Erro ao excluir documentos: ${error.message}`, 'danger');
+            } finally {
+                // Resetar input de confirmação
+                document.getElementById('confirmation-input').value = '';
+                document.getElementById('confirm-delete-btn').disabled = true;
                 
                 // Resetar seleção
                 resetDocumentSelection();
+            }
+        }
+
+        /**
+         * Mostra um alerta na tela
+         * @param {string} message - Mensagem a ser exibida
+         * @param {string} type - Tipo do alerta (success, danger, warning, info)
+         */
+        function showAlert(message, type = 'info') {
+            // Remove alertas anteriores
+            const existingAlerts = document.querySelectorAll('.custom-alert');
+            existingAlerts.forEach(alert => alert.remove());
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `custom-alert alert alert-${type}`;
+            alertDiv.innerHTML = message;
+            alertDiv.style.position = 'fixed';
+            alertDiv.style.top = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.zIndex = '2000';
+            alertDiv.style.maxWidth = '500px';
+            alertDiv.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            alertDiv.style.animation = 'fadeIn 0.5s, fadeOut 0.5s 4.5s forwards';
+            
+            document.body.appendChild(alertDiv);
+            
+            // Auto-remover após 5 segundos
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+            
+            // Adicionar botão de fechar
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '&times;';
+            closeBtn.style.position = 'absolute';
+            closeBtn.style.right = '10px';
+            closeBtn.style.top = '10px';
+            closeBtn.style.background = 'none';
+            closeBtn.style.border = 'none';
+            closeBtn.style.fontSize = '20px';
+            closeBtn.style.cursor = 'pointer';
+            closeBtn.style.color = 'inherit';
+            closeBtn.addEventListener('click', () => alertDiv.remove());
+            
+            alertDiv.style.paddingRight = '30px';
+            alertDiv.appendChild(closeBtn);
+        }
+
+        /**
+         * Reseta o estado do botão
+         * @param {HTMLElement} button - Elemento do botão
+         * @param {string} originalText - Texto original do botão
+         */
+        function resetButtonState(button, originalText) {
+            if (button) {
+                button.disabled = false;
+                button.innerHTML = originalText;
             }
         }
 
@@ -1515,8 +1999,13 @@ Gestão Corporativa
                 const row = checkbox.closest('tr');
                 row?.classList.remove('selected');
             });
-            document.getElementById('select-all-docs').checked = false;
-            document.getElementById('select-all-docs').indeterminate = false;
+            
+            const selectAll = document.getElementById('select-all-docs');
+            if (selectAll) {
+                selectAll.checked = false;
+                selectAll.indeterminate = false;
+            }
+            
             document.getElementById('docs-actions').style.display = 'none';
         }
     </script>
