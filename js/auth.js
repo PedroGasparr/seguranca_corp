@@ -85,6 +85,8 @@ function toggleAuthForms() {
 
 // Lógica da página de login
 if (isLoginPage) {
+    console.log("Estamos na página de login");
+    
     // Alternar entre login e registro
     document.getElementById('show-register-link')?.addEventListener('click', (e) => {
         e.preventDefault();
@@ -108,19 +110,66 @@ if (isLoginPage) {
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
         
+        console.log("Tentando login com:", email);
         toggleLoading('login-btn', true);
         
         auth.signInWithEmailAndPassword(email, password)
             .then((userCredential) => {
+                console.log("Autenticação bem-sucedida, UID:", userCredential.user.uid);
+                
                 // Atualiza o último login no Firestore
                 return db.collection('users').doc(userCredential.user.uid).update({
                     lastLogin: firebase.firestore.FieldValue.serverTimestamp()
                 });
             })
             .then(() => {
-                window.location.href = './src/home.html';
+                console.log("Buscando dados do usuário no Firestore...");
+                // Verifica o papel do usuário para redirecionamento
+                return db.collection('users').doc(auth.currentUser.uid).get();
+            })
+            .then((doc) => {
+                console.log("Documento recebido do Firestore:", doc.exists);
+                
+                if (doc.exists) {
+                    const userData = doc.data();
+                    console.log("Dados completos do usuário:", userData);
+                    console.log("Role específico:", userData.role);
+                    console.log("Tipo do role:", typeof userData.role);
+                    
+                    const userRole = userData.role;
+                    
+                    // Função para normalizar o role (remover acentos, minúsculas, remover espaços)
+                    function normalizeRole(role) {
+                        if (!role) return '';
+                        return role.toString()
+                            .toLowerCase()
+                            .normalize('NFD')
+                            .replace(/[\u0300-\u036f]/g, '')
+                            .trim();
+                    }
+                    
+                    const normalizedRole = normalizeRole(userRole);
+                    
+                    console.log("Role normalizado:", normalizedRole);
+                    console.log("Contém 'lider'?", normalizedRole.includes('lider'));
+                    
+                    // Se o usuário for Líder, redireciona para google_forms.html
+                    if (normalizedRole.includes('lider')) {
+                        console.log("✓ USUÁRIO É LÍDER - Redirecionando para pages/google_forms.html");
+                        window.location.href = 'pages/google_forms.html';
+                    } else {
+                        // Caso contrário, redireciona para home.html
+                        console.log("✗ USUÁRIO NÃO É LÍDER - Redirecionando para ./src/home.html");
+                        window.location.href = './src/home.html';
+                    }
+                } else {
+                    // Se não houver dados, redireciona para home.html
+                    console.log("✗ Documento não existe - Redirecionando para ./src/home.html");
+                    window.location.href = './src/home.html';
+                }
             })
             .catch((error) => {
+                console.error("Erro completo no login:", error);
                 let errorMessage = error.message;
                 if (error.code === 'auth/user-not-found') {
                     errorMessage = 'Usuário não encontrado. Verifique o email ou crie uma conta.';
@@ -172,6 +221,9 @@ if (isLoginPage) {
         const password = document.getElementById('register-password').value;
         const confirmPassword = document.getElementById('register-confirm-password').value;
         const unit = document.getElementById('register-unit').value;
+        const role = document.getElementById('register-role').value; // Captura a função
+        
+        console.log("Registro com role:", role);
         
         // Validações
         if (password !== confirmPassword) {
@@ -189,23 +241,56 @@ if (isLoginPage) {
             return;
         }
         
+        if (!role) {
+            showMessage('register-message', 'Selecione uma função', 'danger');
+            return;
+        }
+        
         toggleLoading('register-btn', true);
         
         auth.createUserWithEmailAndPassword(email, password)
             .then((userCredential) => {
-                // Salva informações adicionais no Firestore
+                console.log("Usuário criado, salvando dados no Firestore...");
+                
+                // Salva informações adicionais no Firestore incluindo a função
                 return db.collection('users').doc(userCredential.user.uid).set({
                     name: name,
                     email: email,
                     unit: unit,
+                    role: role, // Salva a função selecionada
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-                    role: 'user'
+                    status: "ativo",
+                    admin: false
                 });
             })
             .then(() => {
-                showMessage('register-message', 'Conta criada com sucesso! Redirecionando...', 'success');
-                setTimeout(() => window.location.href = './src/home.html', 2000);
+                // Função para normalizar o role
+                function normalizeRole(role) {
+                    if (!role) return '';
+                    return role.toString()
+                        .toLowerCase()
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '')
+                        .trim();
+                }
+                
+                const normalizedRole = normalizeRole(role);
+                
+                console.log("Role no registro:", role);
+                console.log("Role normalizado:", normalizedRole);
+                console.log("Contém 'lider'?", normalizedRole.includes('lider'));
+                
+                // Após registrar, verifica a função para redirecionamento
+                if (normalizedRole.includes('lider')) {
+                    showMessage('register-message', 'Conta criada com sucesso! Redirecionando para formulários...', 'success');
+                    console.log("✓ NOVO USUÁRIO É LÍDER - Redirecionando para pages/google_forms.html");
+                    setTimeout(() => window.location.href = 'pages/google_forms.html', 2000);
+                } else {
+                    showMessage('register-message', 'Conta criada com sucesso! Redirecionando...', 'success');
+                    console.log("✗ NOVO USUÁRIO NÃO É LÍDER - Redirecionando para ./src/home.html");
+                    setTimeout(() => window.location.href = './src/home.html', 2000);
+                }
             })
             .catch((error) => {
                 let errorMessage = error.message;
@@ -217,6 +302,7 @@ if (isLoginPage) {
                     errorMessage = 'Senha muito fraca. Use uma senha mais complexa.';
                 }
                 showMessage('register-message', errorMessage, 'danger');
+                console.error("Erro no registro:", error);
             })
             .finally(() => {
                 toggleLoading('register-btn', false);
@@ -226,17 +312,48 @@ if (isLoginPage) {
 
 // Lógica da página home
 if (isHomePage) {
+    console.log("Estamos na página home");
+    
     const loadUserData = (user) => {
+        console.log("Carregando dados do usuário:", user.uid);
+        
         db.collection('users').doc(user.uid).get()
             .then((doc) => {
                 if (!doc.exists) {
-                    console.log("Documento do usuário não encontrado");
+                    console.log("✗ Documento do usuário não encontrado");
                     return;
                 }
                 
                 const userData = doc.data();
                 
-                // Atualiza a interface
+                console.log("Dados do usuário na home:", userData);
+                console.log("Role na home:", userData.role);
+                
+                // Verifica se é líder e redireciona
+                function normalizeRole(role) {
+                    if (!role) return '';
+                    return role.toString()
+                        .toLowerCase()
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '')
+                        .trim();
+                }
+                
+                const userRole = userData.role;
+                const normalizedRole = normalizeRole(userRole);
+                
+                console.log("Role normalizado na home:", normalizedRole);
+                console.log("Contém 'lider'?", normalizedRole.includes('lider'));
+                
+                if (normalizedRole.includes('lider')) {
+                    console.log("✓ USUÁRIO NA HOME É LÍDER - Redirecionando para ../pages/google_forms.html");
+                    window.location.href = '../pages/google_forms.html';
+                    return;
+                }
+                
+                console.log("✗ USUÁRIO NA HOME NÃO É LÍDER - Continuando na home");
+                
+                // Atualiza a interface apenas se não for líder
                 document.getElementById('sidebar-user-name').textContent =
                     userData?.name || user.displayName || "Usuário";
                 document.getElementById('home-user-unit').textContent = 
@@ -244,6 +361,14 @@ if (isHomePage) {
                 document.getElementById('home-user-unit-detail').textContent = 
                     userData?.unit || "Não definida";
                 document.getElementById('home-user-email').textContent = user.email;
+                
+                // Adiciona exibição da função do usuário
+                if (userData?.role) {
+                    const roleElement = document.getElementById('home-user-role');
+                    if (roleElement) {
+                        roleElement.textContent = userData.role;
+                    }
+                }
                 
                 if (userData?.createdAt) {
                     const date = userData.createdAt.toDate();
@@ -272,16 +397,20 @@ if (isHomePage) {
     // Verifica autenticação ao carregar a home
     auth.onAuthStateChanged((user) => {
         if (user) {
+            console.log("Usuário autenticado na home, UID:", user.uid);
             loadUserData(user);
         } else {
+            console.log("Usuário não autenticado, redirecionando para index.html");
             window.location.href = 'index.html';
         }
     });
 }
+
 function logoutUser() {
-            firebase.auth().signOut().then(() => {
-                window.location.href = 'index.html';
-            }).catch(error => {
-                console.error('Erro ao fazer logout:', error);
-            });
-        }
+    console.log("Fazendo logout...");
+    firebase.auth().signOut().then(() => {
+        window.location.href = 'index.html';
+    }).catch(error => {
+        console.error('Erro ao fazer logout:', error);
+    });
+}
