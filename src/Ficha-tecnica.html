@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha de performance Individual TST</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Menu Lateral */
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary-color);
+            color: white;
+            transition: all 0.3s ease;
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            font-size: 2.5rem;
+            color: var(--secondary-color);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-unit {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .sidebar-menu ul {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-menu a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: var(--secondary-color);
+        }
+
+        .sidebar-menu a.active {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: white;
+            border-left-color: var(--secondary-color);
+        }
+
+        .sidebar-menu i {
+            width: 25px;
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Conteúdo Principal */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .content-header {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .content-header h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .breadcrumb {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        /* Formulário */
+        .form-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section {
+            margin-bottom: 40px;
+        }
+
+        .form-section h3 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            font-size: 1.3rem;
+        }
+
+        .section-divider {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 30px 0;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .form-control:disabled {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+        }
+
+        .btn-submit {
+            background-color: var(--success-color);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: #219653;
+            transform: translateY(-2px);
+        }
+
+        .btn-submit:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        /* Estilos específicos para campos numéricos */
+        .number-input-group {
+            position: relative;
+        }
+
+        .number-input-group input {
+            padding-right: 40px;
+        }
+
+        .input-helper {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        /* Área da foto do técnico */
+        .tecnico-foto-container {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+        }
+
+        .tecnico-foto {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .tecnico-info {
+            margin-top: 10px;
+        }
+
+        .tecnico-nome {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .tecnico-unidade {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .sem-foto {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            color: white;
+            font-size: 4rem;
+        }
+
+        /* Cards de informação */
+        .info-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: rgb(255, 255, 255);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px; 
+        }
+
+        .info-card h4 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
+
+        .info-card p {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .info-card-resultado{
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: rgb(255, 255, 255);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px; 
+        }
+
+        .info-card-resultado h4 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            opacity: 0.9;
+            text-align: center;
+        }
+
+        .info-card-resultado p {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0;
+            text-align: center;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+                overflow: hidden;
+            }
+
+            .sidebar.active {
+                width: 250px;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .sidebar-toggle {
+                display: block !important;
+            }
+            
+            .tecnico-foto {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .sem-foto {
+                width: 120px;
+                height: 120px;
+                font-size: 3rem;
+            }
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .sidebar-toggle span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background-color: white;
+            margin: 4px 0;
+            transition: 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hamburger Menu Button -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <div class="app-container">
+        <!-- Menu Lateral -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <i class="fas fa-user-circle user-avatar"></i>
+                    <div class="user-info">
+                        <span class="user-name" id="sidebar-user-name"></span>
+                        <span class="user-unit" id="sidebar-user-unit"></span>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <ul>
+                    <li>
+                        <a href="home.html">
+                            <i class="fas fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="confirm-unit-change" class="btn btn-sm btn-success w-100" style="display: none;">
+                    <i class="fas fa-check"></i> Confirmar
+                </button>
+            </div>
+            
+            <button class="btn btn-danger btn-sm w-100 mt-2" id="sidebar-logout-btn">
+                <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Sair</span>
+            </button>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>Ficha de performance Individual TST - Sistema de Pontuação</h1>
+                <div class="breadcrumb">Resultado Mensal - Metas</div>
+            </div>
+
+            <div class="form-container">
+                <form id="rankingForm">
+                    <!-- Seção 1: Informações do Técnico -->
+                    <div class="form-section">
+                        <h3>Informações do Técnico</h3>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="tecnico" class="form-label">Técnico:</label>
+                                    <select class="form-control" id="tecnico" name="tecnico" required>
+                                        <option value="">Selecione o técnico...</option>
+                                        <!-- Os técnicos serão carregados via JavaScript -->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="unidade" class="form-label">Unidade do Técnico:</label>
+                                    <input type="text" class="form-control" id="unidade" name="unidade" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Área para exibir a foto do técnico -->
+                        <div class="tecnico-foto-container" id="tecnicoFotoContainer">
+                            <div id="tecnicoFoto">
+                                <div class="sem-foto">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            </div>
+                            <div class="tecnico-info">
+                                <div class="tecnico-nome" id="tecnicoNomeExibicao">-</div>
+                                <div class="tecnico-unidade" id="tecnicoUnidadeExibicao">Selecione um técnico</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="porteUnidade" class="form-label">Porte da Unidade:</label>
+                                    <select class="form-control" id="porteUnidade" name="porteUnidade" required>
+                                        <option value="">Selecione o porte...</option>
+                                        <option value="P">P - Pequeno</option>
+                                        <option value="M">M - Médio</option>
+                                        <option value="G">G - Grande</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="dataHora" class="form-label">Data e Hora:</label>
+                                    <input type="datetime-local" class="form-control" id="dataHora" name="dataHora" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-divider"></div>
+                    
+                    <!-- Seção 2: Pontuação Operacional -->
+                    <div class="form-section">
+                        <h3>Pontuação Operacional</h3>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="auditoriaComportamental" class="form-label">Auditoria Comportamental:</label>
+                                    <div class="number-input-group">
+                                        <input type="number" class="form-control" id="auditoriaComportamental" 
+                                               name="auditoriaComportamental" min="0" max="8" step="1" required>
+                                        <span class="input-helper">pts</span>
+                                    </div>
+                                    <small class="text-muted">Pontuação de 0 a 8</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="dto" class="form-label">DTO:</label>
+                                    <div class="number-input-group">
+                                        <input type="number" class="form-control" id="dto" name="dto" min="0" max="5" step="1" required>
+                                        <span class="input-helper">pts</span>
+                                    </div>
+                                    <small class="text-muted">Pontuação de 0 a 5</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="cartaoVerde" class="form-label">Cartão Verde:</label>
+                                    <div class="number-input-group">
+                                        <input type="number" class="form-control" id="cartaoVerde" name="cartaoVerde" min="0" max="5" step="1" required>
+                                        <span class="input-helper">pts</span>
+                                    </div>
+                                    <small class="text-muted">Pontuação de 0 a 5</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="relatoDesvio" class="form-label">Relato de Desvio:</label>
+                                    <div class="number-input-group">
+                                        <input type="number" class="form-control" id="relatoDesvio" name="relatoDesvio" min="0" max="15" step="1" required>
+                                        <span class="input-helper">pts</span>
+                                    </div>
+                                    <small class="text-muted">Pontuação de 0 a 15</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="ronda" class="form-label">Ronda:</label>
+                                    <div class="number-input-group">
+                                        <input type="number" class="form-control" id="ronda" name="ronda" min="0" max="12" step="1" required>
+                                        <span class="input-helper">pts</span>
+                                    </div>
+                                    <small class="text-muted">Pontuação de 0 a 12</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-divider"></div>
+                    
+                    <!-- Seção 3: Pontuação Documental -->
+                    <div class="form-section">
+                        <h3>Pontuação Documental</h3>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="sistema" class="form-label">Sistema (VPN, Portal e SGG):</label>
+                                    <div class="number-input-group">
+                                        <input type="number" class="form-control" id="sistema" name="sistema" min="0" max="10" step="10" required>
+                                        <span class="input-helper">pts</span>
+                                    </div>
+                                    <small class="text-muted">Pontuação de 0 ou 10</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="gestaoPlanoAcao" class="form-label">Gestão do Plano de Ação:</label>
+                                    <div class="number-input-group">
+                                        <input type="number" class="form-control" id="gestaoPlanoAcao" name="gestaoPlanoAcao" min="0" max="10" step="10" required>
+                                        <span class="input-helper">pts</span>
+                                    </div>
+                                    <small class="text-muted">Pontuação de 0 ou 10</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-divider"></div>
+                    
+                    <!-- Seção 4: Pontuação de Ocorrência -->
+                    <div class="form-section">
+                        <h3>Pontuação de Ocorrência</h3>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="incidente" class="form-label">Incidente:</label>
+                                    <div class="number-input-group">
+                                        <input type="number" class="form-control" id="incidente" name="incidente" min="0" max="35" step="1" required>
+                                        <span class="input-helper">pts</span>
+                                    </div>
+                                    <small class="text-muted">Pontuação de 0 a 35</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="osa" class="form-label">OSA:</label>
+                                    <div class="number-input-group">
+                                        <input type="number" class="form-control" id="osa" name="osa" min="0" max="35" step="1" required>
+                                        <span class="input-helper">pts</span>
+                                    </div>
+                                    <small class="text-muted">Pontuação de 0 a 35</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="saf" class="form-label">SAF:</label>
+                                    <div class="number-input-group">
+                                        <input type="number" class="form-control" id="saf" name="saf" min="0" max="35" step="1" required>
+                                        <span class="input-helper">pts</span>
+                                    </div>
+                                    <small class="text-muted">Pontuação de 0 a 35</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="caf" class="form-label">CAF:</label>
+                                    <div class="number-input-group">
+                                        <input type="number" class="form-control" id="caf" name="caf" min="0" max="35" step="35" required>
+                                        <span class="input-helper">pts</span>
+                                    </div>
+                                    <small class="text-muted">Pontuação de 0 ou 35</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seção 5: Deflator Geral -->
+                    <div class="form-section">
+                        <h3>Deflator Geral</h3>         
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="deflator" class="form-label">Qualidade da Aplicação:</label>
+                                    <div class="number-input-group">
+                                        <input type="number" class="form-control" id="deflator" name="deflator" min="0" max="10" step="1" required>
+                                        <span class="input-helper">pts</span>
+                                    </div>
+                                    <small class="text-muted">Dedução de 0 a 10</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="Participação" class="form-label">Indice de Participação em Reunioes:</label>
+                                    <div class="number-input-group">
+                                        <input type="number" class="form-control" id="Participação" name="Participação" min="0" max="10" step="1" required>
+                                        <span class="input-helper">pts</span>
+                                    </div>
+                                    <small class="text-muted">Dedução de 0 a 10</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="Campanhas" class="form-label">Aplicação de Campanhas:</label>
+                                    <div class="number-input-group">
+                                        <input type="number" class="form-control" id="Campanhas" name="Campanhas" min="0" max="10" step="1" required>
+                                        <span class="input-helper">pts</span>
+                                    </div>
+                                    <small class="text-muted">Dedução de 0 a 10</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Cards de Resumo -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="info-card" style="background: linear-gradient(135deg, #667eea 0%, #4b86a2 100%);">
+                                <h4>Pontuação Operacional</h4>
+                                <p id="resumoOperacional">0.0 pts</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-card" style="background: linear-gradient(135deg, #93ccfb 0%, #5781f5 100%);">
+                                <h4>Pontuação Documental</h4>
+                                <p id="resumoDocumental">0.0 pts</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-card" style="background: linear-gradient(135deg, #93c0fb 0%, #0684be 100%);">
+                                <h4>Pontuação Ocorrência</h4>
+                                <p id="resumoOcorrencia">0.0 pts</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-card" style="background: linear-gradient(135deg, #93d1fb 0%, #066bbe 100%);">
+                                <h4>Deflator Geral</h4>
+                                <p id="resumoDeflator">0.0 pts</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                <h4>Pontuação Total</h4>
+                                <p id="resumoTotal">0.0 pts</p>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="info-card-resultado" id="cardResultado" style="background: linear-gradient(135deg, #666666 0%, #929292 100%);">
+                                <h4>Resultado</h4>
+                                <p id="notafinal">-</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-submit" id="btnSubmit">
+                            <i class="fas fa-save"></i> Salvar Pontuação
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Pontuação Salva</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>A pontuação do técnico foi salva com sucesso na coleção <strong>ranking-tst</strong>.</p>
+                    <p><strong>Pontuação Total:</strong> <span id="modalTotalPontos">0</span> pontos</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase e Bootstrap JS -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Seu auth.js existente -->
+    <script src="../js/auth.js"></script>
+    
+    <script>
+        // Aguarda o carregamento do DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            // Referências do DOM
+            const tecnicoSelect = document.getElementById('tecnico');
+            const unidadeInput = document.getElementById('unidade');
+            const dataHoraInput = document.getElementById('dataHora');
+            const form = document.getElementById('rankingForm');
+            const btnSubmit = document.getElementById('btnSubmit');
+            
+            // Elementos para exibição da foto
+            const tecnicoFotoContainer = document.getElementById('tecnicoFotoContainer');
+            const tecnicoFotoDiv = document.getElementById('tecnicoFoto');
+            const tecnicoNomeExibicao = document.getElementById('tecnicoNomeExibicao');
+            const tecnicoUnidadeExibicao = document.getElementById('tecnicoUnidadeExibicao');
+            
+            // Elementos de resumo
+            const resumoOperacional = document.getElementById('resumoOperacional');
+            const resumoDocumental = document.getElementById('resumoDocumental');
+            const resumoOcorrencia = document.getElementById('resumoOcorrencia');
+            const resumoDeflator = document.getElementById('resumoDeflator');
+            const resumoTotal = document.getElementById('resumoTotal');
+            const notaFinal = document.getElementById('notafinal');
+            const cardResultado = document.getElementById('cardResultado');
+
+            
+            // Configura data e hora atual
+            const now = new Date();
+            const timezoneOffset = now.getTimezoneOffset() * 60000;
+            const localISOTime = new Date(now - timezoneOffset).toISOString().slice(0, 16);
+            dataHoraInput.value = localISOTime;
+            
+            // Verifica autenticação usando o auth.js existente
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    console.log("Usuário autenticado:", user.uid);
+                    
+                    // Carrega dados do usuário logado
+                    firebase.firestore().collection('users').doc(user.uid).get()
+                        .then(doc => {
+                            if (doc.exists) {
+                                const userData = doc.data();
+                                document.getElementById('sidebar-user-name').textContent = userData.name || '';
+                                document.getElementById('sidebar-user-unit').textContent = userData.unit || '';
+                                
+                                // Verifica se é líder e redireciona se necessário
+                                const normalizedRole = normalizeRole(userData.role || '');
+                                if (normalizedRole.includes('lider')) {
+                                    console.log("Líder detectado, redirecionando...");
+                                    window.location.href = 'google_forms.html';
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Erro ao carregar dados do usuário:", error);
+                        });
+                    
+                    // Carrega lista de técnicos
+                    carregarTecnicos();
+                    
+                } else {
+                    console.log("Usuário não autenticado, redirecionando para login");
+                    window.location.href = '../index.html';
+                }
+            });
+            
+            // Função para normalizar role (copiada do auth.js)
+            function normalizeRole(role) {
+                if (!role) return '';
+                return role.toString()
+                    .toLowerCase()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .trim();
+            }
+            
+            // Carrega lista de técnicos
+            function carregarTecnicos() {
+                firebase.firestore().collection('users')
+                    .orderBy('name')
+                    .get()
+                    .then((querySnapshot) => {
+                        tecnicoSelect.innerHTML = '<option value="">Selecione o técnico...</option>';
+                        
+                        querySnapshot.forEach((doc) => {
+                            const user = doc.data();
+                            const option = document.createElement('option');
+                            option.value = doc.id;
+                            option.textContent = `${user.name} (${user.email || ''})`;
+                            option.setAttribute('data-unidade', user.unit || '');
+                            option.setAttribute('data-nome', user.name || '');
+                            tecnicoSelect.appendChild(option);
+                        });
+                    })
+                    .catch((error) => {
+                        console.error("Erro ao carregar técnicos:", error);
+                        showErrorMessage("Erro ao carregar lista de técnicos");
+                    });
+            }
+            
+            // Função para carregar foto do técnico
+            function carregarFotoTecnico(userId, nome, unidade) {
+                // Primeiro tenta buscar a foto do usuário
+                firebase.firestore().collection('users').doc(userId).get()
+                    .then((doc) => {
+                        if (doc.exists) {
+                            const userData = doc.data();
+                            
+                            // Atualiza informações de exibição
+                            tecnicoNomeExibicao.textContent = nome;
+                            tecnicoUnidadeExibicao.textContent = unidade || 'Unidade não informada';
+                            
+                            // Verifica se tem foto em base64
+                            if (userData.photoBase64) {
+                                // Exibe a foto
+                                tecnicoFotoDiv.innerHTML = `
+                                    <img src="data:image/jpeg;base64,${userData.photoBase64}" 
+                                         class="tecnico-foto" 
+                                         alt="Foto de ${nome}"
+                                         onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\"sem-foto\"><i></i></div>
+                                `;
+                            } else {
+                                // Exibe ícone padrão se não tiver foto
+                                tecnicoFotoDiv.innerHTML = '<div class="sem-foto"><i class="fas fa-user"></i></div>';
+                            }
+                        } else {
+                            showErrorMessage("Usuário não encontrado no banco de dados");
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Erro ao carregar foto do técnico:", error);
+                        tecnicoFotoDiv.innerHTML = '<div class="sem-foto"><i class="fas fa-user"></i></div>';
+                        tecnicoNomeExibicao.textContent = nome;
+                        tecnicoUnidadeExibicao.textContent = unidade || 'Erro ao carregar unidade';
+                    });
+            }
+            
+            // Atualiza unidade e foto quando seleciona técnico
+            tecnicoSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const userId = this.value;
+                const nome = selectedOption.getAttribute('data-nome') || '';
+                const unidade = selectedOption.getAttribute('data-unidade') || '';
+                
+                unidadeInput.value = unidade;
+                
+                if (userId) {
+                    // Carrega a foto do técnico selecionado
+                    carregarFotoTecnico(userId, nome, unidade);
+                } else {
+                    // Limpa a exibição se nenhum técnico selecionado
+                    tecnicoFotoDiv.innerHTML = '<div class="sem-foto"><i class="fas fa-user"></i></div>';
+                    tecnicoNomeExibicao.textContent = '-';
+                    tecnicoUnidadeExibicao.textContent = 'Selecione um técnico';
+                }
+            });
+            
+            // Atualiza resumo quando os valores mudam
+            function atualizarResumo() {
+                // Campos operacionais
+                const auditoria = parseFloat(document.getElementById('auditoriaComportamental').value) || 0;
+                const dto = parseFloat(document.getElementById('dto').value) || 0;
+                const cartaoVerde = parseFloat(document.getElementById('cartaoVerde').value) || 0;
+                const relatoDesvio = parseFloat(document.getElementById('relatoDesvio').value) || 0;
+                const ronda = parseFloat(document.getElementById('ronda').value) || 0;
+                
+                // Campos documentais
+                const sistema = parseFloat(document.getElementById('sistema').value) || 0;
+                const gestaoPlano = parseFloat(document.getElementById('gestaoPlanoAcao').value) || 0;
+                
+                // Campos de ocorrência
+                const incidente = parseFloat(document.getElementById('incidente').value) || 0;
+                const osa = parseFloat(document.getElementById('osa').value) || 0;
+                const saf = parseFloat(document.getElementById('saf').value) || 0;
+                const caf = parseFloat(document.getElementById('caf').value) || 0;
+                const deflator = parseFloat(document.getElementById('deflator').value) || 0;
+                const participação = parseFloat(document.getElementById('Participação').value) || 0;
+                const campanhas = parseFloat(document.getElementById('Campanhas').value) || 0;
+                
+                // Calcula totais
+                const totalOperacional = Math.min(auditoria + dto + cartaoVerde + relatoDesvio + ronda, 45);
+                const totalDocumental = Math.min(sistema + gestaoPlano, 20);
+                const totalOcorrencia = Math.min(35 - incidente - osa - saf - caf, 35);
+                const deflatortotal = Math.min(deflator + participação + campanhas, 30);
+                const totalGeral = Math.min(totalOperacional + totalDocumental + totalOcorrencia - deflatortotal, 100);
+                let resultado;
+                let background;
+
+                if (totalGeral >= 90) {
+                    resultado = 'Excelente';
+                    background = 'linear-gradient(135deg, #56ab2f 0%, #a8e063 100%)';
+                } 
+                else if (totalGeral >= 75) {
+                    resultado = 'Bom';
+                    background = 'linear-gradient(135deg, #00c6ff 0%, #0072ff 100%)';
+                } 
+                else if (totalGeral >= 60) {
+                    resultado = 'Desenvolvimento';
+                    background = 'linear-gradient(135deg, #f7971e 0%, #ffd200 100%)';
+                } 
+                else if (totalGeral >= 40) {
+                    resultado = 'Crítico';
+                    background = 'linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%)';
+                } 
+                else {
+                    resultado = 'Crítico';
+                    background = 'linear-gradient(135deg, #232526 0%, #414345 100%)';
+                }
+
+                // Atualiza displays
+                resumoOperacional.textContent = totalOperacional.toFixed(1) + ' pts';
+                resumoDocumental.textContent = totalDocumental.toFixed(1) + ' pts';
+                resumoOcorrencia.textContent = totalOcorrencia.toFixed(1) + ' pts';
+                resumoDeflator.textContent = deflatortotal.toFixed(1) + ' pts';
+                resumoTotal.textContent = totalGeral.toFixed(1) + ' pts';
+                notaFinal.textContent = resultado;
+                cardResultado.style.background = background;
+            }
+            
+            // Adiciona eventos aos campos numéricos
+            const camposNumericos = document.querySelectorAll('input[type="number"]');
+            camposNumericos.forEach(campo => {
+                campo.addEventListener('input', atualizarResumo);
+            });
+            
+            // Envio do formulário
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const user = firebase.auth().currentUser;
+                if (!user) {
+                    alert('Usuário não autenticado. Faça login novamente.');
+                    window.location.href = '../index.html';
+                    return;
+                }
+                
+                if (!tecnicoSelect.value) {
+                    alert('Por favor, selecione um técnico.');
+                    return;
+                }
+                
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+                
+                // Coleta dados do formulário
+                const selectedTecnico = tecnicoSelect.options[tecnicoSelect.selectedIndex];
+                const rankingData = {
+                    tecnicoId: tecnicoSelect.value,
+                    tecnicoNome: selectedTecnico.getAttribute('data-nome') || '',
+                    unidade: unidadeInput.value,
+                    porteUnidade: document.getElementById('porteUnidade').value,
+                    dataHora: new Date(dataHoraInput.value),
+                    
+                    // Pontuação Operacional
+                    auditoriaComportamental: parseFloat(document.getElementById('auditoriaComportamental').value) || 0,
+                    dto: parseFloat(document.getElementById('dto').value) || 0,
+                    cartaoVerde: parseFloat(document.getElementById('cartaoVerde').value) || 0,
+                    relatoDesvio: parseFloat(document.getElementById('relatoDesvio').value) || 0,
+                    ronda: parseFloat(document.getElementById('ronda').value) || 0,
+                    
+                    // Pontuação Documental
+                    sistema: parseFloat(document.getElementById('sistema').value) || 0,
+                    gestaoPlanoAcao: parseFloat(document.getElementById('gestaoPlanoAcao').value) || 0,
+                    
+                    // Pontuação Ocorrência
+                    incidente: parseFloat(document.getElementById('incidente').value) || 0,
+                    osa: parseFloat(document.getElementById('osa').value) || 0,
+                    saf: parseFloat(document.getElementById('saf').value) || 0,
+                    caf: parseFloat(document.getElementById('caf').value) || 0,
+                    deflator: parseFloat(document.getElementById('deflator').value) || 0,
+                    participacao: parseFloat(document.getElementById('Participação').value) || 0,
+                    campanhas: parseFloat(document.getElementById('Campanhas').value) || 0,
+                    
+                    // Totais calculados
+                    totalOperacional: parseFloat(resumoOperacional.textContent),
+                    totalDocumental: parseFloat(resumoDocumental.textContent),
+                    totalOcorrencia: parseFloat(resumoOcorrencia.textContent),
+                    totalDeflator: parseFloat(resumoDeflator.textContent),
+                    totalGeral: parseFloat(resumoTotal.textContent),
+                    resultadoFinal: document.getElementById('notafinal').textContent,
+                    
+                    // Metadados
+                    avaliadorId: user.uid,
+                    avaliadorNome: document.getElementById('sidebar-user-name').textContent,
+                    avaliadorUnidade: document.getElementById('sidebar-user-unit').textContent,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                // Gera ID único para o registro
+                const rankingId = `RANK_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                
+                // Salva no Firestore
+                firebase.firestore().collection('ranking-tst').doc(rankingId).set(rankingData)
+                    .then(() => {
+                        console.log('Ranking salvo com ID:', rankingId);
+                        
+                        // Atualiza o modal com os dados
+                        document.getElementById('modalTotalPontos').textContent = 
+                            rankingData.totalGeral.toFixed(1);
+                        
+                        // Mostra modal de confirmação
+                        const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                        modal.show();
+                        
+                        // Limpa o formulário
+                        form.reset();
+                        unidadeInput.value = '';
+                        
+                        // Limpa a foto do técnico
+                        tecnicoFotoDiv.innerHTML = '<div class="sem-foto"><i class="fas fa-user"></i></div>';
+                        tecnicoNomeExibicao.textContent = '-';
+                        tecnicoUnidadeExibicao.textContent = 'Selecione um técnico';
+                        
+                        // Restaura data atual
+                        dataHoraInput.value = localISOTime;
+                        
+                        // Atualiza resumo
+                        atualizarResumo();
+                    })
+                    .catch((error) => {
+                        console.error('Erro ao salvar ranking:', error);
+                        alert('Erro ao salvar pontuação: ' + error.message);
+                    })
+                    .finally(() => {
+                        btnSubmit.disabled = false;
+                        btnSubmit.innerHTML = '<i class="fas fa-save"></i> Salvar Pontuação';
+                    });
+            });
+            
+            // Menu Hamburguer
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            
+            if (sidebarToggle && sidebar) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                });
+            }
+            
+            // Logout (usando a função do auth.js)
+            const logoutBtn = document.getElementById('sidebar-logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    firebase.auth().signOut().then(() => {
+                        window.location.href = '../index.html';
+                    });
+                });
+            }
+            
+            // Função para mostrar mensagens de erro
+            function showErrorMessage(message) {
+                // Você pode implementar um sistema de notificações mais sofisticado aqui
+                console.error(message);
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed top-0 end-0 m-3';
+                alertDiv.style.zIndex = '9999';
+                alertDiv.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.body.appendChild(alertDiv);
+                
+                // Remove após 5 segundos
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.remove();
+                    }
+                }, 5000);
+            }
+            
+            // Calcula resumo inicial
+            atualizarResumo();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabela de Ranking TST - Brasileirão dos Técnicos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .table-container {
+            background-color: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow-x: auto;
+        }
+
+        .filters {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+
+        .ranking-table thead {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+        }
+
+        .ranking-table th {
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            border: none;
+            position: sticky;
+            top: 0;
+        }
+
+        .ranking-table tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .ranking-table tbody tr:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .ranking-table td {
+            padding: 15px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .posicao {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            width: 60px;
+        }
+
+        .posicao-1 { background-color: #ffd700; color: #333; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+        .posicao-2 { background-color: #c0c0c0; color: #333; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+        .posicao-3 { background-color: #cd7f32; color: #333; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+
+        .tecnico-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .tecnico-foto {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--secondary-color);
+        }
+
+        .sem-foto {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .tecnico-nome {
+            font-weight: 600;
+            color: var(--primary-color);
+            text-align: left;
+        }
+
+        .tecnico-unidade {
+            font-size: 0.85rem;
+            color: #666;
+            text-align: left;
+        }
+
+        .pontos-total {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--success-color);
+        }
+
+        .mes-pontos {
+            font-weight: 600;
+            color: #2c3e50;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 8px 12px;
+            min-width: 70px;
+            display: inline-block;
+        }
+
+        .mes-sem-pontos {
+            color: #999;
+            font-style: italic;
+        }
+
+        .nav-buttons {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .nav-buttons .btn {
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-export {
+            background: linear-gradient(135deg, #27ae60 0%, #219653 100%);
+            color: white;
+            border: none;
+        }
+
+        .btn-export:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-home {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+        }
+
+        .btn-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .search-box input {
+            padding-left: 45px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+        }
+
+        .mes-header {
+            background-color: #e8f4fc;
+            color: var(--primary-color);
+            font-weight: 600;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .mes-valor {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .table-container {
+                padding: 10px;
+            }
+            
+            .ranking-table {
+                font-size: 0.9rem;
+            }
+            
+            .ranking-table td, .ranking-table th {
+                padding: 10px 5px;
+            }
+            
+            .tecnico-info {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .tecnico-nome, .tecnico-unidade {
+                text-align: center;
+            }
+        }
+
+        .mes-filter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .mes-filter select {
+            max-width: 150px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Cabeçalho -->
+        <div class="header">
+            <h1><i class="fas fa-trophy"></i> Ranking TST - Brasileirão dos Técnicos</h1>
+            <p>Classificação anual baseada nas pontuações mensais</p>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Buscar por nome do técnico...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="filterUnidade">
+                        <option value="">Todas as unidades</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="filterAno">
+                        <option value="2026">2026</option>
+                        <option value="2025">2025</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="mes-filter">
+                        <span class="fw-bold">Filtrar por mês:</span>
+                        <select class="form-select" id="filterMes" style="max-width: 200px;">
+                            <option value="0">Todos os meses</option>
+                            <option value="1">Janeiro</option>
+                            <option value="2">Fevereiro</option>
+                            <option value="3">Março</option>
+                            <option value="4">Abril</option>
+                            <option value="5">Maio</option>
+                            <option value="6">Junho</option>
+                            <option value="7">Julho</option>
+                            <option value="8">Agosto</option>
+                            <option value="9">Setembro</option>
+                            <option value="10">Outubro</option>
+                            <option value="11">Novembro</option>
+                            <option value="12">Dezembro</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela de Ranking -->
+        <div class="table-container">
+            <table class="ranking-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Técnico</th>
+                        <th>Pontos Totais</th>
+                        <th>
+                            <div class="mes-header">JAN</div>
+                        </th>
+                        <th>
+                            <div class="mes-header">FEV</div>
+                        </th>
+                        <th>
+                            <div class="mes-header">MAR</div>
+                        </th>
+                        <th>
+                            <div class="mes-header">ABR</div>
+                        </th>
+                        <th>
+                            <div class="mes-header">MAI</div>
+                        </th>
+                        <th>
+                            <div class="mes-header">JUN</div>
+                        </th>
+                        <th>
+                            <div class="mes-header">JUL</div>
+                        </th>
+                        <th>
+                            <div class="mes-header">AGO</div>
+                        </th>
+                        <th>
+                            <div class="mes-header">SET</div>
+                        </th>
+                        <th>
+                            <div class="mes-header">OUT</div>
+                        </th>
+                        <th>
+                            <div class="mes-header">NOV</div>
+                        </th>
+                        <th>
+                            <div class="mes-header">DEZ</div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="rankingBody">
+                    <!-- Os dados serão carregados via JavaScript -->
+                    <tr>
+                        <td colspan="15" class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Carregando...</span>
+                            </div>
+                            <p class="mt-3">Carregando dados do ranking...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Botões de Navegação -->
+        <div class="nav-buttons">
+            <button class="btn btn-home" onclick="window.location.href='home.html'">
+                <i class="fas fa-home"></i> Voltar para Home
+            </button>
+            <button class="btn btn-export" id="exportBtn">
+                <i class="fas fa-download"></i> Exportar para Excel
+            </button>
+        </div>
+    </div>
+
+    <!-- Firebase e Bootstrap JS -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Seu auth.js existente -->
+    <script src="../js/auth.js"></script>
+    
+    <!-- SheetJS para exportar Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verifica autenticação
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    console.log("Usuário autenticado:", user.uid);
+                    carregarDadosRanking();
+                } else {
+                    console.log("Usuário não autenticado, redirecionando para login");
+                    window.location.href = '../index.html';
+                }
+            });
+
+            // Referências
+            const searchInput = document.getElementById('searchInput');
+            const filterUnidade = document.getElementById('filterUnidade');
+            const filterAno = document.getElementById('filterAno');
+            const filterMes = document.getElementById('filterMes');
+            const rankingBody = document.getElementById('rankingBody');
+            const exportBtn = document.getElementById('exportBtn');
+
+            let dadosRanking = [];
+            let tecnicoFotos = {};
+            let unidadesDisponiveis = new Set();
+
+            // Carrega dados do ranking
+            async function carregarDadosRanking() {
+                try {
+                    rankingBody.innerHTML = `
+                        <tr>
+                            <td colspan="15" class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Carregando...</span>
+                                </div>
+                                <p class="mt-3">Carregando dados do ranking...</p>
+                            </td>
+                        </tr>`;
+
+                    // Carrega todos os registros do ranking
+                    const snapshot = await firebase.firestore()
+                        .collection('ranking-tst')
+                        .orderBy('createdAt', 'desc')
+                        .get();
+
+                    if (snapshot.empty) {
+                        rankingBody.innerHTML = `
+                            <tr>
+                                <td colspan="15" class="text-center py-5">
+                                    <i class="fas fa-database fa-3x text-muted mb-3"></i>
+                                    <p>Nenhum dado de ranking encontrado.</p>
+                                </td>
+                            </tr>`;
+                        return;
+                    }
+
+                    // Processa os dados
+                    const registros = [];
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        data.id = doc.id;
+                        registros.push(data);
+                    });
+
+                    // Agrupa por técnico e ano/mês
+                    const rankingPorTecnico = {};
+                    
+                    registros.forEach(registro => {
+                        const data = registro.dataHora ? registro.dataHora.toDate() : new Date();
+                        const ano = data.getFullYear();
+                        const mes = data.getMonth() + 1;
+                        const anoAtual = parseInt(filterAno.value);
+                        
+                        if (ano !== anoAtual) return;
+                        
+                        const tecnicoId = registro.tecnicoId;
+                        const tecnicoNome = registro.tecnicoNome || 'Técnico desconhecido';
+                        const unidade = registro.unidade || 'Sem unidade';
+                        
+                        if (!rankingPorTecnico[tecnicoId]) {
+                            rankingPorTecnico[tecnicoId] = {
+                                tecnicoId: tecnicoId,
+                                tecnicoNome: tecnicoNome,
+                                unidade: unidade,
+                                meses: {},
+                                total: 0
+                            };
+                        }
+                        
+                        // Adiciona pontos do mês
+                        const pontosMes = registro.totalGeral || 0;
+                        rankingPorTecnico[tecnicoId].meses[mes] = pontosMes;
+                        
+                        // Acumula total
+                        rankingPorTecnico[tecnicoId].total += pontosMes;
+                        
+                        // Adiciona unidade ao conjunto
+                        if (unidade) unidadesDisponiveis.add(unidade);
+                    });
+
+                    // Converte para array e ordena por total
+                    dadosRanking = Object.values(rankingPorTecnico)
+                        .sort((a, b) => b.total - a.total);
+
+                    // Preenche filtro de unidades
+                    preencherFiltroUnidades();
+
+                    // Carrega fotos dos técnicos
+                    await carregarFotosTecnicos();
+
+                    // Atualiza tabela
+                    atualizarTabela();
+
+                } catch (error) {
+                    console.error('Erro ao carregar ranking:', error);
+                    rankingBody.innerHTML = `
+                        <tr>
+                            <td colspan="15" class="text-center py-5 text-danger">
+                                <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                                <p>Erro ao carregar dados: ${error.message}</p>
+                            </td>
+                        </tr>`;
+                }
+            }
+
+            // Carrega fotos dos técnicos
+            async function carregarFotosTecnicos() {
+                try {
+                    const tecnicosSnapshot = await firebase.firestore()
+                        .collection('users')
+                        .get();
+
+                    tecnicosSnapshot.forEach(doc => {
+                        const userData = doc.data();
+                        if (userData.photoBase64) {
+                            tecnicoFotos[doc.id] = userData.photoBase64;
+                        }
+                    });
+                } catch (error) {
+                    console.error('Erro ao carregar fotos:', error);
+                }
+            }
+
+            // Preenche filtro de unidades
+            function preencherFiltroUnidades() {
+                filterUnidade.innerHTML = '<option value="">Todas as unidades</option>';
+                unidadesDisponiveis.forEach(unidade => {
+                    const option = document.createElement('option');
+                    option.value = unidade;
+                    option.textContent = unidade;
+                    filterUnidade.appendChild(option);
+                });
+            }
+
+            // Atualiza tabela com filtros aplicados
+            function atualizarTabela() {
+                const busca = searchInput.value.toLowerCase();
+                const unidadeFiltro = filterUnidade.value;
+                const mesFiltro = parseInt(filterMes.value);
+                
+                // Aplica filtros
+                let dadosFiltrados = dadosRanking.filter(tecnico => {
+                    const nomeMatch = tecnico.tecnicoNome.toLowerCase().includes(busca);
+                    const unidadeMatch = !unidadeFiltro || tecnico.unidade === unidadeFiltro;
+                    const mesMatch = !mesFiltro || tecnico.meses[mesFiltro];
+                    
+                    return nomeMatch && unidadeMatch && mesMatch;
+                });
+
+                // Se filtro por mês, ordena pelos pontos daquele mês
+                if (mesFiltro) {
+                    dadosFiltrados.sort((a, b) => {
+                        const pontosA = a.meses[mesFiltro] || 0;
+                        const pontosB = b.meses[mesFiltro] || 0;
+                        return pontosB - pontosA;
+                    });
+                }
+
+                // Gera HTML da tabela
+                rankingBody.innerHTML = '';
+
+                if (dadosFiltrados.length === 0) {
+                    rankingBody.innerHTML = `
+                        <tr>
+                            <td colspan="15" class="text-center py-5">
+                                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                                <p>Nenhum técnico encontrado com os filtros atuais.</p>
+                            </td>
+                        </tr>`;
+                    return;
+                }
+
+                dadosFiltrados.forEach((tecnico, index) => {
+                    const posicao = index + 1;
+                    const foto = tecnicoFotos[tecnico.tecnicoId];
+                    
+                    // Gera células dos meses
+                    let celulasMeses = '';
+                    for (let mes = 1; mes <= 12; mes++) {
+                        const pontos = tecnico.meses[mes] || 0;
+                        const classe = pontos > 0 ? 'mes-valor' : 'mes-sem-pontos';
+                        const valor = pontos > 0 ? pontos.toFixed(1) : '-';
+                        
+                        celulasMeses += `
+                            <td>
+                                <div class="${classe}">${valor}</div>
+                            </td>`;
+                    }
+
+                    // Determina classe da posição
+                    let posicaoClass = '';
+                    if (posicao === 1) posicaoClass = 'posicao-1';
+                    else if (posicao === 2) posicaoClass = 'posicao-2';
+                    else if (posicao === 3) posicaoClass = 'posicao-3';
+
+                    const row = `
+                        <tr>
+                            <td class="posicao">
+                                <div class="${posicaoClass}">${posicao}</div>
+                            </td>
+                            <td>
+                                <div class="tecnico-info">
+                                    <div>
+                                        ${foto ? 
+                                            `<img src="data:image/jpeg;base64,${foto}" class="tecnico-foto" alt="${tecnico.tecnicoNome}">` : 
+                                            `<div class="sem-foto"><i class="fas fa-user"></i></div>`
+                                        }
+                                    </div>
+                                    <div>
+                                        <div class="tecnico-nome">${tecnico.tecnicoNome}</div>
+                                        <div class="tecnico-unidade">${tecnico.unidade}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="pontos-total">${tecnico.total.toFixed(1)}</div>
+                            </td>
+                            ${celulasMeses}
+                        </tr>`;
+
+                    rankingBody.insertAdjacentHTML('beforeend', row);
+                });
+            }
+
+            // Event Listeners para filtros
+            searchInput.addEventListener('input', atualizarTabela);
+            filterUnidade.addEventListener('change', atualizarTabela);
+            filterAno.addEventListener('change', carregarDadosRanking);
+            filterMes.addEventListener('change', atualizarTabela);
+
+            // Exportar para Excel
+            exportBtn.addEventListener('click', function() {
+                exportarParaExcel();
+            });
+
+            // Função para exportar dados para Excel
+            function exportarParaExcel() {
+                try {
+                    const busca = searchInput.value.toLowerCase();
+                    const unidadeFiltro = filterUnidade.value;
+                    const mesFiltro = parseInt(filterMes.value);
+                    
+                    // Aplica os mesmos filtros da tabela
+                    let dadosExportar = dadosRanking.filter(tecnico => {
+                        const nomeMatch = tecnico.tecnicoNome.toLowerCase().includes(busca);
+                        const unidadeMatch = !unidadeFiltro || tecnico.unidade === unidadeFiltro;
+                        const mesMatch = !mesFiltro || tecnico.meses[mesFiltro];
+                        
+                        return nomeMatch && unidadeMatch && mesMatch;
+                    });
+
+                    if (mesFiltro) {
+                        dadosExportar.sort((a, b) => {
+                            const pontosA = a.meses[mesFiltro] || 0;
+                            const pontosB = b.meses[mesFiltro] || 0;
+                            return pontosB - pontosA;
+                        });
+                    }
+
+                    // Prepara dados para a planilha
+                    const wsData = [
+                        ['Ranking TST - Brasileirão dos Técnicos'],
+                        [`Ano: ${filterAno.value}`],
+                        [''],
+                        ['Posição', 'Nome do Técnico', 'Unidade', 'Pontos Totais', 
+                         'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 
+                         'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+                    ];
+
+                    dadosExportar.forEach((tecnico, index) => {
+                        const row = [
+                            index + 1,
+                            tecnico.tecnicoNome,
+                            tecnico.unidade,
+                            tecnico.total.toFixed(1)
+                        ];
+
+                        // Adiciona pontos de cada mês
+                        for (let mes = 1; mes <= 12; mes++) {
+                            row.push(tecnico.meses[mes] ? tecnico.meses[mes].toFixed(1) : '-');
+                        }
+
+                        wsData.push(row);
+                    });
+
+                    // Cria a planilha
+                    const ws = XLSX.utils.aoa_to_sheet(wsData);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "Ranking TST");
+
+                    // Define largura das colunas
+                    const colWidths = [
+                        { wch: 8 },   // Posição
+                        { wch: 25 },  // Nome
+                        { wch: 15 },  // Unidade
+                        { wch: 12 },  // Total
+                        { wch: 8 },   // Jan
+                        { wch: 8 },   // Fev
+                        { wch: 8 },   // Mar
+                        { wch: 8 },   // Abr
+                        { wch: 8 },   // Mai
+                        { wch: 8 },   // Jun
+                        { wch: 8 },   // Jul
+                        { wch: 8 },   // Ago
+                        { wch: 8 },   // Set
+                        { wch: 8 },   // Out
+                        { wch: 8 },   // Nov
+                        { wch: 8 }    // Dez
+                    ];
+                    ws['!cols'] = colWidths;
+
+                    // Mescla células do título
+                    if (!ws['!merges']) ws['!merges'] = [];
+                    ws['!merges'].push({ s: { r: 0, c: 0 }, e: { r: 0, c: 15 } });
+                    ws['!merges'].push({ s: { r: 1, c: 0 }, e: { r: 1, c: 15 } });
+
+                    // Exporta o arquivo
+                    const fileName = `ranking_tst_${filterAno.value}_${new Date().toISOString().slice(0,10)}.xlsx`;
+                    XLSX.writeFile(wb, fileName);
+
+                    // Feedback visual
+                    const originalText = exportBtn.innerHTML;
+                    exportBtn.innerHTML = '<i class="fas fa-check"></i> Exportado!';
+                    exportBtn.classList.remove('btn-export');
+                    exportBtn.classList.add('btn-success');
+                    
+                    setTimeout(() => {
+                        exportBtn.innerHTML = originalText;
+                        exportBtn.classList.remove('btn-success');
+                        exportBtn.classList.add('btn-export');
+                    }, 2000);
+
+                } catch (error) {
+                    console.error('Erro ao exportar:', error);
+                    alert('Erro ao exportar para Excel: ' + error.message);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
