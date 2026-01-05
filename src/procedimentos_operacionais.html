@@ -1,5 +1,3 @@
-<!--VERSION 3.7a-->
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -12,16 +10,19 @@
     <link rel="stylesheet" href="../css/procedimentos_op.css">
 </head>
 <body>
-    <!-- Hamburger Menu Button (visível apenas em mobile) -->
+    <!-- Hamburger Menu Toggle -->
     <button class="sidebar-toggle" id="sidebarToggle">
         <span></span>
         <span></span>
         <span></span>
     </button>
 
+    <!-- Overlay para mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <div class="app-container">
         <!-- Menu Lateral -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="user-profile">
                     <i class="fas fa-user-circle user-avatar"></i>
@@ -94,13 +95,13 @@
                             <span>Histórico de Relatos</span>
                         </a>
                     </li>
-                    <li >
+                    <li>
                         <a href="padrinho.html">
                             <i class="fas fa-handshake"></i>
                             <span>Cadastro de Apadrinhamento</span>
                         </a>
                     </li>
-                    <li >
+                    <li>
                         <a href="Controle_padrinho.html">
                             <i class="fas fa-face-smile"></i>
                             <span>Visualização de Apadrinhamento</span>
@@ -113,7 +114,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="google_forms.html" >
+                        <a href="google_forms.html">
                             <i class="fab fa-google"></i>
                             <span>Formulários Google</span>
                         </a>
@@ -125,7 +126,7 @@
                 <button class="btn btn-danger btn-sm w-100" id="sidebar-logout-btn">
                     <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Sair</span>
                 </button>
-            </div>  
+            </div>
         </aside>
 
         <!-- Conteúdo Principal -->
@@ -136,62 +137,101 @@
             </div>
 
             <!-- Seção de Upload (visível apenas para gestão corp) -->
-            <div id="upload-section" class="upload-section" style="display: none;">
+            <div id="upload-section" class="upload-section fade-in" style="display: none;">
                 <h4><i class="fas fa-upload me-2"></i>Enviar Novo Documento</h4>
                 <form id="upload-form" class="upload-form">
-                    <div class="form-group">
-                        <label for="document-title">Título do Documento</label>
-                        <input type="text" class="form-control" id="document-title" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="document-group">Grupo de Procedimento</label>
-                        <select class="form-control" id="document-group" required>
-                            <option value="">Selecione um grupo</option>
-                            <option value="SST CORPORATIVO">SST CORPORATIVO</option>
-                            <option value="GESTÃO CORPORATIVA">GESTÃO CORPORATIVA</option>
-                            <option value="SUZANO UNBC">SUZANO UNBC</option>
-                            <option value="SUZANO UNPE">SUZANO UNPE</option>
-                            <option value="SAINT GOBAIN">SAINT GOBAIN</option>
-                            <option value="JOHN DEERE">JOHN DEERE</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="document-file">Arquivo</label>
-                        <input type="file" class="form-control" id="document-file" required>
-                    </div>
-                    <div class="progress" style="display: none;">
-                        <div class="progress-bar" role="progressbar" style="width: 0%"></div>
-                    </div>
-                    <button type="submit" class="btn btn-upload" id="upload-btn">
-                        <i class="fas fa-upload me-2"></i>Enviar Documento
-                    </button>
-                </form>
-            </div>
-
-            <!-- Lista de Documentos -->
-            <div class="filter-section">
-                <h4><i class="fas fa-file-alt me-2"></i>Documentos Disponíveis</h4>
-                
-                <div class="filters-container">
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-filter"></i></span>
-                                <select class="form-control" id="group-filter">
-                                    <option value="all">Todos os Grupos</option>
-                                    <option value="SST CORPORATIVO">SST CORPORATIVO</option>
+                            <div class="form-group">
+                                <label for="document-title">Título do Documento</label>
+                                <input type="text" class="form-control" id="document-title" required
+                                    placeholder="Digite o título do documento">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="document-group">Grupo</label>
+                                <select class="form-control" id="document-group" required>
+                                    <option value="">Selecione um grupo</option>
                                     <option value="GESTÃO CORPORATIVA">GESTÃO CORPORATIVA</option>
                                     <option value="SUZANO UNBC">SUZANO UNBC</option>
                                     <option value="SUZANO UNPE">SUZANO UNPE</option>
                                     <option value="SAINT GOBAIN">SAINT GOBAIN</option>
                                     <option value="JOHN DEERE">JOHN DEERE</option>
+                                    <option value="OUTROS">OUTROS</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="document-subgroup-upload">Subgrupo</label>
+                                <select class="form-control" id="document-subgroup-upload" required>
+                                    <option value="">Selecione um subgrupo</option>
+                                    <!-- Subgrupos serão carregados dinamicamente -->
                                 </select>
                             </div>
                         </div>
                         <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="document-file">Arquivo</label>
+                                <input type="file" class="form-control" id="document-file" required
+                                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
+                                <small class="form-text text-muted">Formatos aceitos: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress" style="display: none;" id="upload-progress">
+                        <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-upload" id="upload-btn">
+                            <i class="fas fa-upload me-2"></i>Enviar Documento
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Lista de Documentos -->
+            <div class="filter-section fade-in">
+                <h4><i class="fas fa-file-alt me-2"></i>Documentos Disponíveis</h4>
+                
+                <div class="filters-container mb-4">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-filter"></i></span>
+                                <select class="form-control" id="group-filter">
+                                    <option value="all">Todos os Grupos</option>
+                                    <option value="GESTÃO CORPORATIVA">GESTÃO CORPORATIVA</option>
+                                    <option value="SUZANO UNBC">SUZANO UNBC</option>
+                                    <option value="SUZANO UNPE">SUZANO UNPE</option>
+                                    <option value="SAINT GOBAIN">SAINT GOBAIN</option>
+                                    <option value="JOHN DEERE">JOHN DEERE</option>
+                                    <option value="OUTROS">OUTROS</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-sitemap"></i></span>
+                                <select class="form-control" id="subgroup-filter">
+                                    <option value="all">Todos os Subgrupos</option>
+                                    <!-- Subgrupos serão carregados dinamicamente -->
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                <input type="text" id="search-input" class="form-control" placeholder="Pesquisar por nome do documento...">
+                                <input type="text" id="search-input" class="form-control" 
+                                    placeholder="Pesquisar por nome do documento...">
                             </div>
                         </div>
                     </div>
@@ -254,7 +294,819 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
     <script src="../js/auth.js"></script>
-    <script src="../js/procedimento_operacional.js"></script>
-    <script src="../js/hamb.js"></script>
+    
+    <script>
+        // ============================================
+        // VARIÁVEIS GLOBAIS
+        // ============================================
+        let currentUser = null;
+        let isGestaoCorp = false;
+        let deleteDocId = null;
+        let currentViewingDocId = null;
+        let confirmModal = null;
+        let documentViewerModal = null;
+        let allDocuments = [];
+
+        // ============================================
+        // CONFIGURAÇÃO DE SUBGRUPOS
+        // ============================================
+        const allSubgroups = [
+            'gestão corp',
+            'CD SUZANLOG',
+            'CDR SUZANO',
+            'CD SUZANO MARACANAU',
+            'CD SUZANO SERRA',
+            'CD SUZANO SÃO JOSE DOS PINHAIS',
+            'CD SUZANO CARIACICA',
+            'CD TRIANGULO',
+            'CD TSUZUKI',
+            'CD YAMAHA SÃO PAULO',
+            'FABRICA AHLSTROM JACAREÍ',
+            'FABRICA BOSTIK SÃO ROQUE',
+            'FABRICA IMERYS CACHOEIRO DO ITAPEMIRIM',
+            'FABRICA IMERYS LIMEIRA',
+            'FABRICA JOHN DEREE HORIZONTINA',
+            'FABRICA JOHN DEREE INDAIATUBA',
+            'FABRICA JOHN DEREE MONTENEGRO',
+            'FABRICA JOHN DEREE CATALÃO',
+            'FABRICA JOHN DEREE CAMPINAS',
+            'FABRICA NITERRA MOGI DAS CRUZES',
+            'FABRICA OJI PAPEIS PIRACICABA',
+            'FABRICA PLACO MOGI DAS CRUZES',
+            'FABRICA SUZANO SUZANO',
+            'FABRICA SUZANO RIO VERDE',
+            'FABRICA WHITE MARTINS JACAREÍ',
+            'FABRICA SUZANO ARACRUZ',
+            'FABRICA SUZANO BELEM',
+            'FABRICA SUZANO IMPERATRIZ',
+            'FABRICA SUZANO JACAREÍ',
+            'FABRICA SUZANO LIMEIRA',
+            'FABRICA QUARTZOLIT CAMAÇARI',
+            'FABRICA QUARTZOLIT JANDIRA',
+            'FABRICA QUARTZOLIT MOGI DAS CRUZES',
+            'FABRICA SUZANO MOGI DAS CRUZES',
+            'FABRICA IBEMA'
+        ];
+
+        const subgroupMapping = {
+    // GRUPO 1
+    'GESTÃO CORPORATIVA': allSubgroups,
+
+    // GRUPO 2
+    'SUZANO UNBC': [
+        'CD SUZANO MARACANAU',
+        'CD SUZANO CARIACICA',
+        'FABRICA SUZANO ARACRUZ',
+        'FABRICA SUZANO BELEM',
+        'FABRICA SUZANO IMPERATRIZ',
+        'FABRICA SUZANO MOGI DAS CRUZES'
+    ],
+
+    // GRUPO 3
+    'SUZANO UNPE': [
+        'FABRICA SUZANO LIMEIRA',
+        'FABRICA SUZANO SUZANO',
+        'CDR SUZANO',
+        'FABRICA SUZANO RIO VERDE',
+        'CD SUZANO SÃO JOSE DOS PINHAIS',
+        'CD CHAPECO'
+    ],
+
+    // GRUPO 4
+    'SAINT GOBAIN': [
+        'FABRICA PLACO MOGI DAS CRUZES',
+        'FABRICA QUARTZOLIT CAMAÇARI',
+        'FABRICA QUARTZOLIT JANDIRA'
+    ],
+
+    // GRUPO 5
+    'JOHN DEERE': [
+        'FABRICA JOHN DEREE HORIZONTINA',
+        'FABRICA JOHN DEREE INDAIATUBA',
+        'FABRICA JOHN DEREE MONTENEGRO',
+        'FABRICA JOHN DEREE CATALÃO',
+        'FABRICA JOHN DEREE CAMPINAS'
+    ]
+};
+
+// GRUPO 6 - OUTROS (TUDO QUE SOBRAR)
+subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
+    !Object.entries(subgroupMapping)
+        .filter(([grupo]) => grupo !== 'GESTÃO CORPORATIVA') // ignora o grupo 1
+        .flatMap(([, unidades]) => unidades)
+        .includes(subgroup)
+);
+
+
+        // ============================================
+        // INICIALIZAÇÃO DA PÁGINA
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM carregado - Inicializando página...');
+            
+            // Configurar hamburger menu
+            setupHamburgerMenu();
+            
+            // Configurar listeners dos grupos
+            setupGroupListeners();
+            
+            // Inicializa os subgrupos
+            initializeSubgroups();
+            
+            // Verifica autenticação
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    console.log('Usuário autenticado:', user.email);
+                    currentUser = user;
+                    loadUserData(user);
+                    checkGestaoCorp(user);
+                    loadDocuments();
+                } else {
+                    console.log('Usuário não autenticado - redirecionando...');
+                    window.location.href = 'index.html';
+                }
+            });
+
+            // Configura o formulário de upload
+            const uploadForm = document.getElementById('upload-form');
+            if (uploadForm) {
+                uploadForm.addEventListener('submit', handleUpload);
+            }
+
+            // Configura o botão de logout
+            const logoutBtn = document.getElementById('sidebar-logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', logoutUser);
+            }
+
+            // Configura a busca
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', filterDocuments);
+            }
+
+            // Configura o filtro de grupo
+            const groupFilter = document.getElementById('group-filter');
+            if (groupFilter) {
+                groupFilter.addEventListener('change', function() {
+                    updateSubgroupOptions(this.value, 'filter');
+                    filterDocuments();
+                });
+            }
+
+            // Configura o filtro de subgrupo
+            const subgroupFilter = document.getElementById('subgroup-filter');
+            if (subgroupFilter) {
+                subgroupFilter.addEventListener('change', filterDocuments);
+            }
+
+            // Inicializa os modais
+            const confirmModalElement = document.getElementById('confirmModal');
+            if (confirmModalElement) {
+                confirmModal = new bootstrap.Modal(confirmModalElement);
+            }
+            
+            const documentViewerModalElement = document.getElementById('documentViewerModal');
+            if (documentViewerModalElement) {
+                documentViewerModal = new bootstrap.Modal(documentViewerModalElement);
+            }
+
+            // Configura o botão de confirmação de exclusão
+            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.addEventListener('click', function() {
+                    if (deleteDocId) {
+                        deleteDocument(deleteDocId);
+                        confirmModal.hide();
+                    }
+                });
+            }
+
+            // Configura o botão de download no visualizador
+            const downloadFromViewerBtn = document.getElementById('downloadFromViewerBtn');
+            if (downloadFromViewerBtn) {
+                downloadFromViewerBtn.addEventListener('click', function() {
+                    if (currentViewingDocId) {
+                        downloadDocument(currentViewingDocId);
+                    }
+                });
+            }
+        });
+
+        // ============================================
+        // FUNÇÕES DE CONFIGURAÇÃO
+        // ============================================
+        function setupHamburgerMenu() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            if (sidebarToggle && sidebar) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                    overlay.classList.toggle('active');
+                    this.classList.toggle('active');
+                });
+                
+                if (overlay) {
+                    overlay.addEventListener('click', function() {
+                        sidebar.classList.remove('active');
+                        this.classList.remove('active');
+                        if (sidebarToggle) sidebarToggle.classList.remove('active');
+                    });
+                }
+            }
+        }
+
+        function setupGroupListeners() {
+            // Configura o select de grupo no upload
+            const uploadGroup = document.getElementById('document-group');
+            if (uploadGroup) {
+                uploadGroup.addEventListener('change', function() {
+                    updateSubgroupOptions(this.value, 'upload');
+                });
+            }
+        }
+
+        // ============================================
+        // FUNÇÕES DE SUBGRUPOS
+        // ============================================
+        function initializeSubgroups() {
+            console.log('Inicializando subgrupos...');
+            
+            // Carrega todos os subgrupos no filtro
+            const filterSubgroup = document.getElementById('subgroup-filter');
+            if (filterSubgroup) {
+                filterSubgroup.innerHTML = '<option value="all">Todos os Subgrupos</option>';
+                allSubgroups.forEach(subgroup => {
+                    const option = document.createElement('option');
+                    option.value = subgroup;
+                    option.textContent = subgroup;
+                    filterSubgroup.appendChild(option);
+                });
+                console.log('Filtro de subgrupos carregado com', allSubgroups.length, 'opções');
+            }
+            
+            // Inicializa o select de subgrupos no upload
+            const uploadSubgroup = document.getElementById('document-subgroup-upload');
+            if (uploadSubgroup) {
+                uploadSubgroup.innerHTML = '<option value="">Selecione um subgrupo</option>';
+                console.log('Select de upload de subgrupos inicializado');
+            }
+        }
+
+        function updateSubgroupOptions(group, type = 'filter') {
+            console.log('Atualizando subgrupos para grupo:', group, 'tipo:', type);
+            
+            let selectElement;
+            if (type === 'upload') {
+                selectElement = document.getElementById('document-subgroup-upload');
+            } else {
+                selectElement = document.getElementById('subgroup-filter');
+            }
+            
+            if (!selectElement) {
+                console.error('Elemento select não encontrado para tipo:', type);
+                return;
+            }
+            
+            // Salva o valor selecionado atual
+            const currentValue = selectElement.value;
+            
+            // Limpa as opções existentes
+            if (type === 'upload') {
+                selectElement.innerHTML = '<option value="">Selecione um subgrupo</option>';
+            } else {
+                selectElement.innerHTML = '<option value="all">Todos os Subgrupos</option>';
+            }
+            
+            // Se não houver grupo selecionado ou grupo for vazio, mostra todos os subgrupos
+            if (!group || group === 'all' || group === '') {
+                allSubgroups.forEach(subgroup => {
+                    const option = document.createElement('option');
+                    option.value = subgroup;
+                    option.textContent = subgroup;
+                    selectElement.appendChild(option);
+                });
+                
+                if (type === 'filter') {
+                    selectElement.disabled = false;
+                }
+            } else if (subgroupMapping[group]) {
+                // Mostra apenas os subgrupos específicos do grupo
+                subgroupMapping[group].forEach(subgroup => {
+                    const option = document.createElement('option');
+                    option.value = subgroup;
+                    option.textContent = subgroup;
+                    selectElement.appendChild(option);
+                });
+                
+                if (type === 'filter') {
+                    selectElement.disabled = subgroupMapping[group].length === 0;
+                }
+            } else {
+                // Se o grupo não estiver no mapeamento, mostra todos
+                allSubgroups.forEach(subgroup => {
+                    const option = document.createElement('option');
+                    option.value = subgroup;
+                    option.textContent = subgroup;
+                    selectElement.appendChild(option);
+                });
+                
+                if (type === 'filter') {
+                    selectElement.disabled = false;
+                }
+            }
+            
+            // Tenta restaurar o valor selecionado anteriormente
+            if (currentValue && Array.from(selectElement.options).some(opt => opt.value === currentValue)) {
+                selectElement.value = currentValue;
+            }
+            
+            // Dispara evento de change se for o filtro
+            if (type === 'filter') {
+                selectElement.dispatchEvent(new Event('change'));
+            }
+        }
+
+        // ============================================
+        // FUNÇÕES DE USUÁRIO
+        // ============================================
+        function loadUserData(user) {
+            db.collection('users').doc(user.uid).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        const userNameElement = document.getElementById('sidebar-user-name');
+                        const userUnitElement = document.getElementById('sidebar-user-unit');
+                        
+                        if (userNameElement) {
+                            userNameElement.textContent = userData.name || 'Usuário';
+                        }
+                        if (userUnitElement) {
+                            userUnitElement.textContent = userData.unit || 'Não definida';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar dados do usuário:', error);
+                });
+        }
+
+        function checkGestaoCorp(user) {
+            db.collection('users').doc(user.uid).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        isGestaoCorp = userData.unit && userData.unit.toLowerCase() === 'gestão corp';
+
+                        if (isGestaoCorp) {
+                            const uploadSection = document.getElementById('upload-section');
+                            if (uploadSection) {
+                                uploadSection.style.display = 'block';
+                            }
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao verificar gestão corp:', error);
+                });
+        }
+
+        // ============================================
+        // FUNÇÕES DE DOCUMENTOS
+        // ============================================
+        function loadDocuments() {
+            const container = document.getElementById('documents-container');
+            if (!container) return;
+            
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i><h5>Carregando documentos...</h5></div>';
+
+            db.collection('procedimentos_operacionais').orderBy('createdAt', 'desc').get()
+                .then(querySnapshot => {
+                    allDocuments = [];
+
+                    if (querySnapshot.empty) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-folder-open"></i>
+                                <h5>Nenhum documento encontrado</h5>
+                                <p>Não há procedimentos operacionais cadastrados ainda.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    querySnapshot.forEach(doc => {
+                        const data = doc.data();
+                        allDocuments.push({
+                            id: doc.id,
+                            ...data
+                        });
+                    });
+
+                    renderDocuments(allDocuments);
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar documentos:', error);
+                    container.innerHTML = '<div class="alert alert-danger">Erro ao carregar documentos. Tente novamente.</div>';
+                });
+        }
+
+        function renderDocuments(documents) {
+            const container = document.getElementById('documents-container');
+
+            if (documents.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h5>Nenhum documento encontrado</h5>
+                        <p>Não há documentos que correspondam aos filtros selecionados.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const list = document.createElement('div');
+            list.className = 'document-list';
+
+            documents.forEach((doc, index) => {
+                const card = document.createElement('div');
+                card.className = 'document-card';
+                card.style.animationDelay = `${index * 0.05}s`;
+                
+                const fileIcon = getFileIcon(doc.fileName || doc.type);
+                
+                card.innerHTML = `
+                    <div class="document-header">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="${fileIcon}" style="font-size: 1.5rem; color: var(--primary);"></i>
+                            <div class="document-title">${doc.title || 'Documento sem título'}</div>
+                        </div>
+                        <div class="document-badges">
+                            <span class="badge-group">${doc.group || 'Sem grupo'}</span>
+                            ${doc.subgroup ? `<span class="badge-subgroup">${doc.subgroup}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="document-meta">
+                        <div class="document-meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>Enviado em: ${formatDate(doc.createdAt)}</span>
+                        </div>
+                        <div class="document-meta-item">
+                            <i class="fas fa-user"></i>
+                            <span>Por: ${doc.uploadedByName || 'Usuário'}</span>
+                        </div>
+                        <div class="document-meta-item">
+                            <i class="fas fa-file"></i>
+                            <span>Tipo: ${getFileType(doc.fileName || doc.type)}</span>
+                        </div>
+                        ${doc.size ? `
+                        <div class="document-meta-item">
+                            <i class="fas fa-weight-hanging"></i>
+                            <span>Tamanho: ${formatFileSize(doc.size)}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    <div class="document-actions">
+                        <button class="btn btn-view document-action-btn" data-id="${doc.id}" title="Visualizar documento">
+                            <i class="fas fa-eye"></i> Visualizar
+                        </button>
+                        <button class="btn btn-download document-action-btn" data-id="${doc.id}" title="Baixar documento">
+                            <i class="fas fa-download"></i> Baixar
+                        </button>
+                        ${isGestaoCorp ? `
+                        <button class="btn btn-delete document-action-btn" data-id="${doc.id}" title="Excluir documento">
+                            <i class="fas fa-trash"></i> Excluir
+                        </button>
+                        ` : ''}
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+
+            container.innerHTML = '';
+            container.appendChild(list);
+            assignButtonEvents();
+        }
+
+        function assignButtonEvents() {
+            // Visualizar
+            document.querySelectorAll('.btn-view').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const docId = this.getAttribute('data-id');
+                    viewDocument(docId);
+                });
+            });
+            
+            // Baixar
+            document.querySelectorAll('.btn-download').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const docId = this.getAttribute('data-id');
+                    downloadDocument(docId);
+                });
+            });
+            
+            // Excluir (apenas para gestão corp)
+            if (isGestaoCorp) {
+                document.querySelectorAll('.btn-delete').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        deleteDocId = this.getAttribute('data-id');
+                        confirmModal.show();
+                    });
+                });
+            }
+        }
+
+        function filterDocuments() {
+            const searchText = document.getElementById('search-input').value.toLowerCase();
+            const groupFilter = document.getElementById('group-filter').value;
+            const subgroupFilter = document.getElementById('subgroup-filter').value;
+            
+            const filteredDocs = allDocuments.filter(doc => {
+                // Filtro por grupo
+                const matchesGroup = groupFilter === 'all' || doc.group === groupFilter;
+                
+                // Filtro por subgrupo
+                const matchesSubgroup = subgroupFilter === 'all' || doc.subgroup === subgroupFilter;
+                
+                // Filtro por texto de busca
+                const matchesSearch = !searchText || 
+                    (doc.title && doc.title.toLowerCase().includes(searchText)) ||
+                    (doc.group && doc.group.toLowerCase().includes(searchText)) ||
+                    (doc.subgroup && doc.subgroup.toLowerCase().includes(searchText));
+                
+                return matchesGroup && matchesSubgroup && matchesSearch;
+            });
+            
+            renderDocuments(filteredDocs);
+        }
+
+        // ============================================
+        // FUNÇÕES DE UPLOAD
+        // ============================================
+        function handleUpload(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('document-title').value;
+            const group = document.getElementById('document-group').value;
+            const subgroup = document.getElementById('document-subgroup-upload').value;
+            const file = document.getElementById('document-file').files[0];
+
+            if (!title || !group || !subgroup || !file) {
+                alert('Preencha todos os campos');
+                return;
+            }
+
+            const uploadBtn = document.getElementById('upload-btn');
+            const progress = document.getElementById('upload-progress');
+            const progressBar = progress?.querySelector('.progress-bar');
+            
+            if (uploadBtn) {
+                uploadBtn.disabled = true;
+                uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Enviando...';
+            }
+            
+            if (progress) {
+                progress.style.display = 'block';
+            }
+            
+            if (progressBar) {
+                progressBar.style.width = '0%';
+            }
+
+            // Ler o arquivo como base64
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const fileBase64 = event.target.result;
+
+                // Simula progresso
+                let progressValue = 0;
+                const progressInterval = setInterval(() => {
+                    progressValue += 10;
+                    if (progressBar) {
+                        progressBar.style.width = `${progressValue}%`;
+                    }
+                    
+                    if (progressValue >= 100) {
+                        clearInterval(progressInterval);
+                        
+                        // Salva no Firestore
+                        db.collection('procedimentos_operacionais').add({
+                            title: title,
+                            group: group,
+                            subgroup: subgroup,
+                            arquivoBase64: fileBase64,
+                            fileName: file.name,
+                            type: file.type,
+                            size: file.size,
+                            uploadedBy: currentUser.uid,
+                            uploadedByName: currentUser.displayName || currentUser.email,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        })
+                        .then((docRef) => {
+                            if (uploadBtn) {
+                                uploadBtn.disabled = false;
+                                uploadBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Enviar Documento';
+                            }
+                            
+                            if (progress) {
+                                progress.style.display = 'none';
+                            }
+                            
+                            if (progressBar) {
+                                progressBar.style.width = '0%';
+                            }
+                            
+                            // Resetar o formulário
+                            const uploadForm = document.getElementById('upload-form');
+                            if (uploadForm) {
+                                uploadForm.reset();
+                                updateSubgroupOptions('', 'upload');
+                            }
+                            
+                            // Recarregar documentos
+                            loadDocuments();
+                            
+                            alert('Documento enviado com sucesso!');
+                        })
+                        .catch(error => {
+                            console.error('Erro ao salvar documento:', error);
+                            alert('Erro ao salvar informações do documento');
+                            
+                            if (uploadBtn) {
+                                uploadBtn.disabled = false;
+                                uploadBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Enviar Documento';
+                            }
+                            
+                            if (progress) {
+                                progress.style.display = 'none';
+                            }
+                            
+                            if (progressBar) {
+                                progressBar.style.width = '0%';
+                            }
+                        });
+                    }
+                }, 100);
+            };
+
+            reader.onerror = function(error) {
+                console.error('Erro ao ler arquivo:', error);
+                alert('Erro ao ler o arquivo. Tente novamente.');
+                
+                if (uploadBtn) {
+                    uploadBtn.disabled = false;
+                    uploadBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Enviar Documento';
+                }
+                
+                if (progress) {
+                    progress.style.display = 'none';
+                }
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        // ============================================
+        // FUNÇÕES DE MANIPULAÇÃO DE DOCUMENTOS
+        // ============================================
+        function viewDocument(docId) {
+            currentViewingDocId = docId;
+            
+            db.collection('procedimentos_operacionais').doc(docId).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        document.getElementById('documentViewerTitle').textContent = data.title || 'Visualização do Documento';
+                        document.getElementById('documentViewerIframe').src = data.arquivoBase64;
+                        documentViewerModal.show();
+                    } else {
+                        alert('Documento não encontrado');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar documento:', error);
+                    alert('Erro ao abrir o documento para visualização');
+                });
+        }
+
+        function deleteDocument(docId) {
+            db.collection('procedimentos_operacionais').doc(docId).delete()
+                .then(() => {
+                    loadDocuments();
+                    alert('Documento excluído com sucesso!');
+                })
+                .catch(error => {
+                    console.error('Erro ao excluir documento:', error);
+                    alert('Erro ao excluir documento');
+                });
+        }
+
+        function downloadDocument(docId) {
+            db.collection('procedimentos_operacionais').doc(docId).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        const link = document.createElement('a');
+                        link.href = data.arquivoBase64;
+                        link.download = data.fileName || 'documento.pdf';
+                        link.style.display = 'none';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    } else {
+                        alert('Documento não encontrado');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao baixar documento:', error);
+                    alert('Erro ao baixar o documento');
+                });
+        }
+
+        // ============================================
+        // FUNÇÕES AUXILIARES
+        // ============================================
+        function getFileIcon(fileName) {
+            if (!fileName) return 'fas fa-file';
+            
+            const extension = fileName.split('.').pop().toLowerCase();
+            const iconMap = {
+                'pdf': 'fas fa-file-pdf',
+                'doc': 'fas fa-file-word',
+                'docx': 'fas fa-file-word',
+                'xls': 'fas fa-file-excel',
+                'xlsx': 'fas fa-file-excel',
+                'ppt': 'fas fa-file-powerpoint',
+                'pptx': 'fas fa-file-powerpoint',
+                'txt': 'fas fa-file-alt',
+                'jpg': 'fas fa-file-image',
+                'jpeg': 'fas fa-file-image',
+                'png': 'fas fa-file-image',
+                'zip': 'fas fa-file-archive',
+                'rar': 'fas fa-file-archive'
+            };
+            
+            return iconMap[extension] || 'fas fa-file';
+        }
+
+        function formatDate(timestamp) {
+            if (!timestamp) return 'Data não disponível';
+            try {
+                const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+                return date.toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (error) {
+                return 'Data inválida';
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (!bytes || bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function getFileType(fileName) {
+            if (!fileName) return 'Documento';
+            const extension = fileName.split('.').pop().toLowerCase();
+            const types = {
+                'pdf': 'PDF',
+                'doc': 'Word',
+                'docx': 'Word',
+                'xls': 'Excel',
+                'xlsx': 'Excel',
+                'ppt': 'PowerPoint',
+                'pptx': 'PowerPoint',
+                'txt': 'Texto',
+                'jpg': 'Imagem',
+                'jpeg': 'Imagem',
+                'png': 'Imagem',
+                'zip': 'Compactado',
+                'rar': 'Compactado'
+            };
+            return types[extension] || extension.toUpperCase();
+        }
+
+        function logoutUser() {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            }).catch(error => {
+                console.error('Erro ao fazer logout:', error);
+                alert('Erro ao fazer logout. Tente novamente.');
+            });
+        }
+    </script>
 </body>
 </html>
