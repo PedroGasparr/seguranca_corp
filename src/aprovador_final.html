@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprovador Final - Documentos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="icon" href="../img/engenheiro.png" type="image/x-icon">
+    <link rel="stylesheet" href="../css/procedimentos_op.css">
+    <style>
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+        .status-pendente {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status-aprovado {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-rejeitado {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .review-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #dee2e6;
+        }
+        .historico-container {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .historico-item {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f8f9fa;
+            border-left: 3px solid #6c757d;
+            font-size: 0.85rem;
+        }
+        .historico-item.aprovacao {
+            border-left-color: #28a745;
+        }
+        .historico-item.rejeicao {
+            border-left-color: #dc3545;
+        }
+        .observacoes-box {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <i class="fas fa-user-circle user-avatar"></i>
+                    <div class="user-info">
+                        <span class="user-name" id="sidebar-user-name"></span>
+                        <span class="user-unit" id="sidebar-user-unit"></span>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <ul>
+                    <li>
+                        <a href="home.html">
+                            <i class="fas fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="aprovador_final.html">
+                            <i class="fas fa-user-shield"></i>
+                            <span>Aprovador Final</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-danger btn-sm w-100" id="sidebar-logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Sair</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-header">
+                <h1><i class="fas fa-user-shield me-2"></i>Aprovador Final</h1>
+                <div class="breadcrumb">Aprovação final de documentos</div>
+            </div>
+
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Você tem a decisão final sobre a publicação dos documentos.
+            </div>
+
+            <div class="filter-section fade-in">
+                <div class="filters-container mb-4">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-filter"></i></span>
+                                <select class="form-control" id="status-filter">
+                                    <option value="pendente_aprovador_final">Pendentes</option>
+                                    <option value="todos">Todos</option>
+                                    <option value="aprovado">Aprovados</option>
+                                    <option value="rejeitado">Rejeitados</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <input type="text" id="search-input" class="form-control" 
+                                    placeholder="Pesquisar por título...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="documents-container">
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <h5>Nenhum documento pendente</h5>
+                        <p>Não há documentos aguardando aprovação final.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de Detalhes -->
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detalhes do Documento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="detail-content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Visualização -->
+    <div class="modal fade" id="viewerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewerTitle"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <iframe id="viewerIframe" style="width:100%; height:500px; border:none;"></iframe>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" id="downloadBtn">
+                        <i class="fas fa-download"></i> Baixar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="../js/auth.js"></script>
+    
+    <script>
+        let currentUser = null;
+        let isAprovadorFinal = false;
+        let documentos = [];
+        let detailModal = null;
+        let viewerModal = null;
+        let currentDocumentId = null;
+        let currentFileBase64 = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setupHamburgerMenu();
+            
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    currentUser = user;
+                    loadUserData(user);
+                    verificarPermissaoAprovadorFinal(user);
+                    carregarDocumentos();
+                } else {
+                    window.location.href = 'index.html';
+                }
+            });
+
+            document.getElementById('status-filter').addEventListener('change', filtrarDocumentos);
+            document.getElementById('search-input').addEventListener('input', filtrarDocumentos);
+
+            detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+            viewerModal = new bootstrap.Modal(document.getElementById('viewerModal'));
+
+            document.getElementById('sidebar-logout-btn').addEventListener('click', logoutUser);
+            document.getElementById('downloadBtn').addEventListener('click', function() {
+                if (currentFileBase64) {
+                    const link = document.createElement('a');
+                    link.href = currentFileBase64;
+                    link.download = 'documento.pdf';
+                    link.click();
+                }
+            });
+        });
+
+        function setupHamburgerMenu() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            if (sidebarToggle && sidebar) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                    overlay.classList.toggle('active');
+                    this.classList.toggle('active');
+                });
+                
+                if (overlay) {
+                    overlay.addEventListener('click', function() {
+                        sidebar.classList.remove('active');
+                        this.classList.remove('active');
+                        if (sidebarToggle) sidebarToggle.classList.remove('active');
+                    });
+                }
+            }
+        }
+
+        function loadUserData(user) {
+            db.collection('users').doc(user.uid).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        const userNameElement = document.getElementById('sidebar-user-name');
+                        const userUnitElement = document.getElementById('sidebar-user-unit');
+                        
+                        if (userNameElement) {
+                            userNameElement.textContent = userData.name || 'Usuário';
+                        }
+                        if (userUnitElement) {
+                            userUnitElement.textContent = userData.unit || 'Não definida';
+                        }
+                    }
+                });
+        }
+
+        function verificarPermissaoAprovadorFinal(user) {
+            db.collection('users').doc(user.uid).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        // Verifica se o usuário tem permissão de aprovador final
+                        isAprovadorFinal = userData.role && (
+                            userData.role.toLowerCase().includes('aprovadorfinal') || 
+                            userData.role.toLowerCase().includes('diretor') ||
+                            userData.role.toLowerCase().includes('gerente') ||
+                            userData.unit === 'gestão corp'
+                        );
+                        
+                        if (!isAprovadorFinal) {
+                            alert('Você não tem permissão para acessar esta página');
+                            window.location.href = 'home.html';
+                        }
+                    }
+                });
+        }
+
+        function carregarDocumentos() {
+            const container = document.getElementById('documents-container');
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i><h5>Carregando documentos...</h5></div>';
+
+            db.collection('procedimentos_pendentes_aprovador_final')
+                .orderBy('createdAt', 'desc')
+                .get()
+                .then(querySnapshot => {
+                    documentos = [];
+                    
+                    if (querySnapshot.empty) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-folder-open"></i>
+                                <h5>Nenhum documento pendente</h5>
+                                <p>Não há documentos aguardando aprovação final.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    querySnapshot.forEach(doc => {
+                        const data = doc.data();
+                        documentos.push({
+                            id: doc.id,
+                            ...data
+                        });
+                    });
+
+                    renderizarDocumentos(documentos);
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar documentos:', error);
+                    container.innerHTML = '<div class="alert alert-danger">Erro ao carregar documentos.</div>';
+                });
+        }
+
+        function renderizarDocumentos(docs) {
+            const container = document.getElementById('documents-container');
+            
+            if (docs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h5>Nenhum documento encontrado</h5>
+                        <p>Não há documentos que correspondam aos filtros.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const list = document.createElement('div');
+            list.className = 'document-list';
+
+            docs.forEach((doc, index) => {
+                const card = document.createElement('div');
+                card.className = 'document-card';
+                card.style.animationDelay = `${index * 0.05}s`;
+                
+                const statusClass = doc.status === 'pendente_aprovador_final' ? 'status-pendente' : 
+                                  doc.status === 'aprovado' ? 'status-aprovado' : 'status-rejeitado';
+                const statusText = doc.status === 'pendente_aprovador_final' ? 'Pendente' :
+                                 doc.status === 'aprovado' ? 'Aprovado' : 'Rejeitado';
+                
+                card.innerHTML = `
+                    <div class="document-header">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-file-alt" style="font-size: 1.5rem; color: var(--primary);"></i>
+                            <div class="document-title">${doc.title || 'Documento sem título'}</div>
+                        </div>
+                        <div class="document-badges">
+                            <span class="badge-group">${doc.group || 'Sem grupo'}</span>
+                            <span class="badge status-badge ${statusClass}">${statusText}</span>
+                        </div>
+                    </div>
+                    <div class="document-meta">
+                        <div class="document-meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>Enviado: ${formatDate(doc.createdAt)}</span>
+                        </div>
+                        <div class="document-meta-item">
+                            <i class="fas fa-user-check"></i>
+                            <span>Aprovador 1: ${doc.aprovador1PorNome || 'Não informado'}</span>
+                        </div>
+                        ${doc.observacoesAprovador1 ? `
+                        <div class="observacoes-box">
+                            <strong>Obs. Aprovador 1:</strong> ${doc.observacoesAprovador1}
+                        </div>
+                        ` : ''}
+                    </div>
+                    <div class="review-actions">
+                        <button class="btn btn-primary btn-sm" onclick="visualizarDocumento('${doc.id}')">
+                            <i class="fas fa-eye"></i> Visualizar
+                        </button>
+                        <button class="btn btn-info btn-sm" onclick="verDetalhes('${doc.id}')">
+                            <i class="fas fa-info-circle"></i> Detalhes
+                        </button>
+                        ${doc.status === 'pendente_aprovador_final' ? `
+                        <button class="btn btn-success btn-sm" onclick="aprovarFinalmente('${doc.id}')">
+                            <i class="fas fa-check-double"></i> Aprovar Finalmente
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="rejeitarFinalmente('${doc.id}')">
+                            <i class="fas fa-ban"></i> Rejeitar
+                        </button>
+                        ` : ''}
+                    </div>
+                `;
+                
+                list.appendChild(card);
+            });
+
+            container.innerHTML = '';
+            container.appendChild(list);
+        }
+
+        function filtrarDocumentos() {
+            const status = document.getElementById('status-filter').value;
+            const search = document.getElementById('search-input').value.toLowerCase();
+            
+            const docsFiltrados = documentos.filter(doc => {
+                const matchStatus = status === 'todos' || doc.status === status;
+                const matchSearch = !search || 
+                    (doc.title && doc.title.toLowerCase().includes(search)) ||
+                    (doc.uploadedByName && doc.uploadedByName.toLowerCase().includes(search));
+                
+                return matchStatus && matchSearch;
+            });
+            
+            renderizarDocumentos(docsFiltrados);
+        }
+
+        function visualizarDocumento(docId) {
+            const doc = documentos.find(d => d.id === docId);
+            if (!doc) return;
+            
+            currentFileBase64 = doc.arquivoBase64;
+            document.getElementById('viewerTitle').textContent = doc.title;
+            document.getElementById('viewerIframe').src = doc.arquivoBase64;
+            viewerModal.show();
+        }
+
+        function verDetalhes(docId) {
+            const doc = documentos.find(d => d.id === docId);
+            if (!doc) return;
+            
+            document.getElementById('detail-content').innerHTML = `
+                <h6>${doc.title}</h6>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Grupo:</strong> ${doc.group || 'Não informado'}<br>
+                        <strong>Subgrupo:</strong> ${doc.subgroup || 'Não informado'}<br>
+                        <strong>Enviado por:</strong> ${doc.uploadedByName || 'Não informado'}<br>
+                        <strong>Data de envio:</strong> ${formatDate(doc.createdAt)}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Aprovador 1:</strong> ${doc.aprovador1PorNome || 'Não informado'}<br>
+                        <strong>Data aprovação 1:</strong> ${formatDate(doc.aprovador1Em)}<br>
+                        <strong>Status:</strong> ${doc.status || 'Não informado'}
+                    </div>
+                </div>
+                
+                ${doc.observacoes ? `
+                <div class="observacoes-box">
+                    <strong>Observações do envio:</strong>
+                    <p>${doc.observacoes}</p>
+                </div>
+                ` : ''}
+                
+                ${doc.observacoesAprovador1 ? `
+                <div class="observacoes-box">
+                    <strong>Observações do Aprovador 1:</strong>
+                    <p>${doc.observacoesAprovador1}</p>
+                </div>
+                ` : ''}
+                
+                <div class="historico-container">
+                    <h6>Histórico</h6>
+                    ${doc.historico ? doc.historico.map(item => `
+                        <div class="historico-item ${item.acao.includes('aprovado') ? 'aprovacao' : 
+                                                     item.acao.includes('rejeitado') ? 'rejeicao' : ''}">
+                            <strong>${item.acao.toUpperCase()}</strong> por ${item.usuario}<br>
+                            <small>${formatDate(item.data)}</small>
+                            ${item.observacoes ? `<p class="mb-0"><small>${item.observacoes}</small></p>` : ''}
+                        </div>
+                    `).join('') : '<p>Sem histórico</p>'}
+                </div>
+            `;
+            
+            detailModal.show();
+        }
+
+        function aprovarFinalmente(docId) {
+    if (!confirm('Tem certeza que deseja aprovar este documento definitivamente?')) {
+        return;
+    }
+    
+    const doc = documentos.find(d => d.id === docId);
+    if (!doc) return;
+    
+    const observacoes = prompt('Observações da aprovação final (opcional):') || '';
+    
+    // Criar novo item de histórico
+    const historicoItem = {
+        acao: 'aprovado_finalmente',
+        usuario: currentUser.displayName || currentUser.email,
+        data: new Date(),
+        observacoes: observacoes
+    };
+    
+    // Preparar histórico existente (certificando-se de converter tudo)
+    let historicoAtual = [];
+    if (doc.historico && Array.isArray(doc.historico)) {
+        historicoAtual = doc.historico.map(item => {
+            // Garantir que todos os campos sejam primitivos
+            const novoItem = {
+                acao: String(item.acao || ''),
+                usuario: String(item.usuario || ''),
+                observacoes: String(item.observacoes || '')
+            };
+            
+            // Converter a data para um objeto Date normal
+            if (item.data) {
+                if (item.data.toDate && typeof item.data.toDate === 'function') {
+                    novoItem.data = item.data.toDate();
+                } else if (item.data instanceof Date) {
+                    novoItem.data = item.data;
+                } else if (typeof item.data === 'string') {
+                    novoItem.data = new Date(item.data);
+                } else if (typeof item.data === 'number') {
+                    novoItem.data = new Date(item.data);
+                } else if (item.data._seconds) {
+                    novoItem.data = new Date(item.data._seconds * 1000);
+                } else {
+                    novoItem.data = new Date();
+                }
+            } else {
+                novoItem.data = new Date();
+            }
+            
+            return novoItem;
+        });
+    }
+    
+    // Adicionar o novo item ao histórico
+    historicoAtual.push(historicoItem);
+    
+    // Função para converter qualquer timestamp para Date
+    const converterParaDate = (timestamp) => {
+        if (!timestamp) return new Date();
+        
+        if (timestamp.toDate && typeof timestamp.toDate === 'function') {
+            return timestamp.toDate();
+        }
+        
+        if (timestamp instanceof Date) {
+            return timestamp;
+        }
+        
+        if (typeof timestamp === 'string') {
+            return new Date(timestamp);
+        }
+        
+        if (typeof timestamp === 'number') {
+            return new Date(timestamp);
+        }
+        
+        if (timestamp && timestamp._seconds) {
+            return new Date(timestamp._seconds * 1000);
+        }
+        
+        return new Date();
+    };
+    
+    // Preparar dados para a coleção final
+    const dadosAprovados = {
+        title: String(doc.title || ''),
+        group: String(doc.group || ''),
+        subgroup: String(doc.subgroup || ''),
+        arquivoBase64: String(doc.arquivoBase64 || ''),
+        fileName: String(doc.fileName || ''),
+        type: String(doc.type || ''),
+        size: Number(doc.size || 0),
+        uploadedBy: String(doc.uploadedBy || ''),
+        uploadedByName: String(doc.uploadedByName || ''),
+        observacoes: String(doc.observacoes || ''),
+        observacoesAprovador1: String(doc.observacoesAprovador1 || ''),
+        aprovador1Por: String(doc.aprovador1Por || ''),
+        aprovador1PorNome: String(doc.aprovador1PorNome || ''),
+        aprovadorFinal: currentUser.uid,
+        aprovadorFinalName: currentUser.displayName || currentUser.email,
+        aprovadoEm: new Date(),
+        // Histórico com todas as datas convertidas para objetos Date
+        historico: historicoAtual.map(item => ({
+            acao: String(item.acao),
+            usuario: String(item.usuario),
+            data: item.data instanceof Date ? item.data : converterParaDate(item.data),
+            observacoes: String(item.observacoes)
+        })),
+        // Converter createdAt
+        createdAt: converterParaDate(doc.createdAt),
+        // Converter outras datas se existirem
+        aprovador1Em: converterParaDate(doc.aprovador1Em)
+    };
+    
+    console.log('Enviando para documentos aprovados:', dadosAprovados);
+    
+    // Adicionar à coleção final de documentos aprovados
+    db.collection('procedimentos_operacionais').add(dadosAprovados)
+        .then(() => {
+            // Remover da coleção de pendentes
+            return db.collection('procedimentos_pendentes_aprovador_final').doc(docId).delete();
+        })
+        .then(() => {
+            alert('Documento aprovado e publicado com sucesso!');
+            carregarDocumentos();
+        })
+        .catch(error => {
+            console.error('Erro ao aprovar documento:', error, error.message);
+            alert('Erro ao aprovar documento: ' + error.message);
+        });
+}
+
+    function rejeitarFinalmente(docId) {
+    const motivo = prompt('Digite o motivo da rejeição final:');
+    if (!motivo) return;
+    
+    const doc = documentos.find(d => d.id === docId);
+    if (!doc) return;
+    
+    // Criar novo item de histórico
+    const historicoItem = {
+        acao: 'rejeitado_finalmente',
+        usuario: currentUser.displayName || currentUser.email,
+        data: new Date(),
+        observacoes: motivo
+    };
+    
+    // Preparar histórico existente
+    let historicoAtual = [];
+    if (doc.historico && Array.isArray(doc.historico)) {
+        historicoAtual = doc.historico.map(item => {
+            const novoItem = {
+                acao: String(item.acao || ''),
+                usuario: String(item.usuario || ''),
+                observacoes: String(item.observacoes || '')
+            };
+            
+            // Converter data
+            if (item.data) {
+                if (item.data.toDate && typeof item.data.toDate === 'function') {
+                    novoItem.data = item.data.toDate();
+                } else if (item.data instanceof Date) {
+                    novoItem.data = item.data;
+                } else if (typeof item.data === 'string') {
+                    novoItem.data = new Date(item.data);
+                } else if (typeof item.data === 'number') {
+                    novoItem.data = new Date(item.data);
+                } else if (item.data._seconds) {
+                    novoItem.data = new Date(item.data._seconds * 1000);
+                } else {
+                    novoItem.data = new Date();
+                }
+            } else {
+                novoItem.data = new Date();
+            }
+            
+            return novoItem;
+        });
+    }
+    
+    // Adicionar novo item
+    historicoAtual.push(historicoItem);
+    
+    // Função de conversão
+    const converterParaDate = (timestamp) => {
+        if (!timestamp) return new Date();
+        
+        if (timestamp.toDate && typeof timestamp.toDate === 'function') {
+            return timestamp.toDate();
+        }
+        
+        if (timestamp instanceof Date) {
+            return timestamp;
+        }
+        
+        if (typeof timestamp === 'string') {
+            return new Date(timestamp);
+        }
+        
+        if (typeof timestamp === 'number') {
+            return new Date(timestamp);
+        }
+        
+        if (timestamp && timestamp._seconds) {
+            return new Date(timestamp._seconds * 1000);
+        }
+        
+        return new Date();
+    };
+    
+    // Preparar dados para coleção de rejeitados
+    const dadosRejeitados = {
+        title: String(doc.title || ''),
+        group: String(doc.group || ''),
+        subgroup: String(doc.subgroup || ''),
+        arquivoBase64: String(doc.arquivoBase64 || ''),
+        fileName: String(doc.fileName || ''),
+        type: String(doc.type || ''),
+        size: Number(doc.size || 0),
+        uploadedBy: String(doc.uploadedBy || ''),
+        uploadedByName: String(doc.uploadedByName || ''),
+        observacoes: String(doc.observacoes || ''),
+        observacoesAprovador1: String(doc.observacoesAprovador1 || ''),
+        aprovador1Por: String(doc.aprovador1Por || ''),
+        aprovador1PorNome: String(doc.aprovador1PorNome || ''),
+        status: 'rejeitado_final',
+        motivoRejeicaoFinal: String(motivo),
+        rejeitadoFinalPor: currentUser.uid,
+        rejeitadoFinalPorNome: currentUser.displayName || currentUser.email,
+        rejeitadoFinalEm: new Date(),
+        // Histórico convertido
+        historico: historicoAtual.map(item => ({
+            acao: String(item.acao),
+            usuario: String(item.usuario),
+            data: item.data instanceof Date ? item.data : converterParaDate(item.data),
+            observacoes: String(item.observacoes)
+        })),
+        // Converter outras datas
+        createdAt: converterParaDate(doc.createdAt),
+        aprovador1Em: converterParaDate(doc.aprovador1Em)
+    };
+    
+    // Mover para a coleção de rejeitados
+    db.collection('procedimentos_rejeitados').add(dadosRejeitados)
+        .then(() => {
+            return db.collection('procedimentos_pendentes_aprovador_final').doc(docId).delete();
+        })
+        .then(() => {
+            alert('Documento rejeitado e movido para o histórico de rejeições!');
+            carregarDocumentos();
+        })
+        .catch(error => {
+            console.error('Erro ao rejeitar documento:', error);
+            alert('Erro ao rejeitar documento: ' + error.message);
+        });
+}
+    
+        function formatDate(timestamp) {
+    if (!timestamp) return 'Data não disponível';
+    
+    try {
+        // Usar a função de conversão universal
+        const date = converterParaDateUniversal(timestamp);
+        
+        if (isNaN(date.getTime())) {
+            return 'Data inválida';
+        }
+        
+        return date.toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    } catch (error) {
+        console.error('Erro ao formatar data:', error, timestamp);
+        return 'Data inválida';
+    }
+}
+
+        function logoutUser() {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            });
+        }
+    </script>
+</body>
+</html>

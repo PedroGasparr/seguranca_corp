@@ -8,6 +8,139 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="icon" href="../img/engenheiro.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/procedimentos_op.css">
+    <style>
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+        .status-pendente {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status-aprovado {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-rejeitado {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .observacoes-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 0.9rem;
+        }
+        .document-actions-review {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .review-section {
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+        }
+        .revision-history {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        /* Estilos para contadores no menu */
+        .menu-badge {
+            position: absolute;
+            right: 20px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .menu-badge-warning {
+            background-color: #ffc107;
+            color: #000;
+        }
+        .menu-item-with-badge {
+            position: relative;
+        }
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .dashboard-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+        .dashboard-card i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        .dashboard-card .count {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .card-aprovados {
+            border-top: 4px solid #28a745;
+        }
+        .card-pendentes-1 {
+            border-top: 4px solid #ffc107;
+        }
+        .card-pendentes-final {
+            border-top: 4px solid #fd7e14;
+        }
+        .card-rejeitados {
+            border-top: 4px solid #dc3545;
+        }
+        .stats-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .progress-bar-custom {
+            height: 8px;
+            border-radius: 4px;
+        }
+        .document-version {
+            font-size: 0.8rem;
+            color: #6c757d;
+            background-color: #f8f9fa;
+            padding: 2px 8px;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .document-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+    </style>
 </head>
 <body>
     <!-- Hamburger Menu Toggle -->
@@ -84,18 +217,6 @@
                         </a>
                     </li>
                     <li>
-                        <a href="relato_desvio.html">
-                            <i class="fas fa-clipboard-list"></i>
-                            <span>Relatos de Desvio</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="historicoRD.html">
-                            <i class="fas fa-history"></i>
-                            <span>Histórico de Relatos</span>
-                        </a>
-                    </li>
-                    <li>
                         <a href="padrinho.html">
                             <i class="fas fa-handshake"></i>
                             <span>Cadastro de Apadrinhamento</span>
@@ -136,112 +257,193 @@
                 <div class="breadcrumb">Gestão de documentos e procedimentos</div>
             </div>
 
+            <!-- Dashboard de Estatísticas -->
+            <div class="dashboard-cards fade-in">
+                <div class="dashboard-card card-aprovados">
+                    <i class="fas fa-check-circle text-success"></i>
+                    <h5>Documentos Aprovados</h5>
+                    <div class="count" id="count-aprovados">0</div>
+                    <p>Total de documentos publicados</p>
+                </div>
+                
+                <div class="dashboard-card card-pendentes-1">
+                    <i class="fas fa-clock text-warning"></i>
+                    <h5>Pendentes Aprovador 1</h5>
+                    <div class="count" id="count-pendentes-1">0</div>
+                    <p>Aguardando primeira revisão</p>
+                </div>
+                
+                <div class="dashboard-card card-pendentes-final">
+                    <i class="fas fa-user-shield text-info"></i>
+                    <h5>Pendentes Aprovador Final</h5>
+                    <div class="count" id="count-pendentes-final">0</div>
+                    <p>Aguardando aprovação final</p>
+                </div>
+                
+                <div class="dashboard-card card-rejeitados">
+                    <i class="fas fa-times-circle text-danger"></i>
+                    <h5>Documentos Rejeitados</h5>
+                    <div class="count" id="count-rejeitados">0</div>
+                    <p>Total de documentos rejeitados</p>
+                </div>
+            </div>
+
             <!-- Seção de Upload (visível apenas para gestão corp) -->
             <div id="upload-section" class="upload-section fade-in" style="display: none;">
-                <h4><i class="fas fa-upload me-2"></i>Enviar Novo Documento</h4>
-                <form id="upload-form" class="upload-form">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="document-title">Título do Documento</label>
-                                <input type="text" class="form-control" id="document-title" required
-                                    placeholder="Digite o título do documento">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="document-group">Grupo</label>
-                                <select class="form-control" id="document-group" required>
-                                    <option value="">Selecione um grupo</option>
-                                    <option value="GESTÃO CORPORATIVA">GESTÃO CORPORATIVA</option>
-                                    <option value="SUZANO UNBC">SUZANO UNBC</option>
-                                    <option value="SUZANO UNPE">SUZANO UNPE</option>
-                                    <option value="SAINT GOBAIN">SAINT GOBAIN</option>
-                                    <option value="JOHN DEERE">JOHN DEERE</option>
-                                    <option value="OUTROS">OUTROS</option>
-                                </select>
-                            </div>
-                        </div>
+                <div class="card">
+                    <div class="card-header bg-white text-white">
+                        <h4 class="mb-0"><i class="fas fa-upload me-2"></i>Enviar Novo Documento para Aprovação</h4>
                     </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="document-subgroup-upload">Subgrupo</label>
-                                <select class="form-control" id="document-subgroup-upload" required>
-                                    <option value="">Selecione um subgrupo</option>
-                                    <!-- Subgrupos serão carregados dinamicamente -->
-                                </select>
-                            </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Após o upload, o documento será enviado para o Aprovador 1 para revisão inicial.
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="document-file">Arquivo</label>
-                                <input type="file" class="form-control" id="document-file" required
-                                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
-                                <small class="form-text text-muted">Formatos aceitos: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX</small>
+                        <form id="upload-form" class="upload-form">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="document-title" class="form-label">Título do Documento *</label>
+                                        <input type="text" class="form-control" id="document-title" required
+                                            placeholder="Digite o título do documento">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="document-group" class="form-label">Grupo *</label>
+                                        <select class="form-control" id="document-group" required>
+                                            <option value="">Selecione um grupo</option>
+                                            <option value="GESTÃO CORPORATIVA">GESTÃO CORPORATIVA</option>
+                                            <option value="SUZANO UNBC">SUZANO UNBC</option>
+                                            <option value="SUZANO UNPE">SUZANO UNPE</option>
+                                            <option value="SAINT GOBAIN">SAINT GOBAIN</option>
+                                            <option value="JOHN DEERE">JOHN DEERE</option>
+                                            <option value="OUTROS">OUTROS</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="document-subgroup-upload" class="form-label">Subgrupo *</label>
+                                        <select class="form-control" id="document-subgroup-upload" required>
+                                            <option value="">Selecione um subgrupo</option>
+                                            <!-- Subgrupos serão carregados dinamicamente -->
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="document-file" class="form-label">Arquivo PDF *</label>
+                                        <input type="file" class="form-control" id="document-file" required
+                                            accept=".pdf">
+                                        <div class="form-text">Formato aceito: PDF (Máx: 10MB)</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group mb-3">
+                                        <label for="document-observations" class="form-label">Observações (opcional)</label>
+                                        <textarea class="form-control" id="document-observations" 
+                                            rows="3" placeholder="Informações adicionais sobre o documento..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="progress mb-3" style="display: none;" id="upload-progress">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                    role="progressbar" style="width: 0%"></div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="form-text">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    Todos os campos marcados com * são obrigatórios
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg" id="upload-btn">
+                                    <i class="fas fa-upload me-2"></i>Enviar para Aprovação
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                    
-                    <div class="progress" style="display: none;" id="upload-progress">
-                        <div class="progress-bar" role="progressbar" style="width: 0%"></div>
-                    </div>
-                    
-                    <div class="mt-3">
-                        <button type="submit" class="btn btn-upload" id="upload-btn">
-                            <i class="fas fa-upload me-2"></i>Enviar Documento
-                        </button>
-                    </div>
-                </form>
+                </div>
             </div>
 
             <!-- Lista de Documentos -->
-            <div class="filter-section fade-in">
-                <h4><i class="fas fa-file-alt me-2"></i>Documentos Disponíveis</h4>
-                
-                <div class="filters-container mb-4">
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-filter"></i></span>
-                                <select class="form-control" id="group-filter">
-                                    <option value="all">Todos os Grupos</option>
-                                    <option value="GESTÃO CORPORATIVA">GESTÃO CORPORATIVA</option>
-                                    <option value="SUZANO UNBC">SUZANO UNBC</option>
-                                    <option value="SUZANO UNPE">SUZANO UNPE</option>
-                                    <option value="SAINT GOBAIN">SAINT GOBAIN</option>
-                                    <option value="JOHN DEERE">JOHN DEERE</option>
-                                    <option value="OUTROS">OUTROS</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-4 mb-3">
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-sitemap"></i></span>
-                                <select class="form-control" id="subgroup-filter">
-                                    <option value="all">Todos os Subgrupos</option>
-                                    <!-- Subgrupos serão carregados dinamicamente -->
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-4 mb-3">
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                <input type="text" id="search-input" class="form-control" 
-                                    placeholder="Pesquisar por nome do documento...">
-                            </div>
-                        </div>
+            <div class="filter-section fade-in mt-4">
+                <div class="card">
+                    <div class="card-header bg-white text-white">
+                        <h4 class="mb-0"><i class="fas fa-file-alt me-2"></i>Documentos Aprovados e Disponíveis</h4>
                     </div>
-                </div>
-                
-                <div id="documents-container">
-                    <div class="empty-state">
-                        <i class="fas fa-folder-open"></i>
-                        <h5>Nenhum documento encontrado</h5>
-                        <p>Não há procedimentos operacionais cadastrados ainda.</p>
+                    <div class="card-body">
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Estes documentos já passaram pelo processo de aprovação e estão disponíveis para visualização.
+                        </div>
+                        
+                        <div class="filters-container mb-4">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-filter"></i></span>
+                                        <select class="form-control" id="group-filter">
+                                            <option value="all">Todos os Grupos</option>
+                                            <option value="GESTÃO CORPORATIVA">GESTÃO CORPORATIVA</option>
+                                            <option value="SUZANO UNBC">SUZANO UNBC</option>
+                                            <option value="SUZANO UNPE">SUZANO UNPE</option>
+                                            <option value="SAINT GOBAIN">SAINT GOBAIN</option>
+                                            <option value="JOHN DEERE">JOHN DEERE</option>
+                                            <option value="OUTROS">OUTROS</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-sitemap"></i></span>
+                                        <select class="form-control" id="subgroup-filter">
+                                            <option value="all">Todos os Subgrupos</option>
+                                            <!-- Subgrupos serão carregados dinamicamente -->
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                        <input type="text" id="search-input" class="form-control" 
+                                            placeholder="Pesquisar por nome, grupo ou subgrupo...">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mt-3">
+                                <div class="col-md-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="badge bg-success" id="document-count">0 documentos</span>
+                                        </div>
+                                        <div>
+                                            <button class="btn btn-sm btn-outline-secondary" id="refresh-btn">
+                                                <i class="fas fa-sync-alt me-1"></i> Atualizar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="documents-container">
+                            <div class="empty-state">
+                                <i class="fas fa-folder-open fa-3x mb-3"></i>
+                                <h5>Nenhum documento encontrado</h5>
+                                <p>Não há procedimentos operacionais aprovados ainda.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -258,10 +460,16 @@
                 </div>
                 <div class="modal-body">
                     <p>Tem certeza que deseja excluir este documento? Esta ação não pode ser desfeita.</p>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Esta ação removerá permanentemente o documento do sistema.
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger" id="confirm-delete-btn">Excluir</button>
+                    <button type="button" class="btn btn-danger" id="confirm-delete-btn">
+                        <i class="fas fa-trash me-1"></i> Excluir Permanentemente
+                    </button>
                 </div>
             </div>
         </div>
@@ -269,17 +477,30 @@
 
     <!-- Modal de Visualização do Documento -->
     <div class="modal fade" id="documentViewerModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg modal-document-viewer">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title document-viewer-title" id="documentViewerTitle"></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <iframe id="documentViewerIframe" class="document-viewer-iframe" frameborder="0"></iframe>
+                    <div class="document-info mb-3">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <small class="text-muted" id="documentInfo"></small>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <span class="badge bg-success" id="documentStatusBadge">Aprovado</span>
+                            </div>
+                        </div>
+                    </div>
+                    <iframe id="documentViewerIframe" class="document-viewer-iframe" 
+                        style="width:100%; height:70vh; border:none; border-radius: 5px;"></iframe>
                 </div>
-                <div class="modal-footer document-viewer-actions">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Fechar
+                    </button>
                     <button type="button" class="btn btn-primary" id="downloadFromViewerBtn">
                         <i class="fas fa-download me-1"></i> Baixar Documento
                     </button>
@@ -301,11 +522,14 @@
         // ============================================
         let currentUser = null;
         let isGestaoCorp = false;
+        let isAprovador1 = false;
+        let isAprovadorFinal = false;
         let deleteDocId = null;
         let currentViewingDocId = null;
         let confirmModal = null;
         let documentViewerModal = null;
         let allDocuments = [];
+        let statsInterval = null;
 
         // ============================================
         // CONFIGURAÇÃO DE SUBGRUPOS
@@ -349,54 +573,43 @@
         ];
 
         const subgroupMapping = {
-    // GRUPO 1
-    'GESTÃO CORPORATIVA': allSubgroups,
+            'GESTÃO CORPORATIVA': allSubgroups,
+            'SUZANO UNBC': [
+                'CD SUZANO MARACANAU',
+                'CD SUZANO CARIACICA',
+                'FABRICA SUZANO ARACRUZ',
+                'FABRICA SUZANO BELEm',
+                'FABRICA SUZANO IMPERATRIZ',
+                'FABRICA SUZANO MOGI DAS CRUZES'
+            ],
+            'SUZANO UNPE': [
+                'FABRICA SUZANO LIMEIRA',
+                'FABRICA SUZANO SUZANO',
+                'CDR SUZANO',
+                'FABRICA SUZANO RIO VERDE',
+                'CD SUZANO SÃO JOSE DOS PINHAIS',
+                'CD CHAPECO'
+            ],
+            'SAINT GOBAIN': [
+                'FABRICA PLACO MOGI DAS CRUZES',
+                'FABRICA QUARTZOLIT CAMAÇARI',
+                'FABRICA QUARTZOLIT JANDIRA'
+            ],
+            'JOHN DEERE': [
+                'FABRICA JOHN DEREE HORIZONTINA',
+                'FABRICA JOHN DEREE INDAIATUBA',
+                'FABRICA JOHN DEREE MONTENEGRO',
+                'FABRICA JOHN DEREE CATALÃO',
+                'FABRICA JOHN DEREE CAMPINAS'
+            ]
+        };
 
-    // GRUPO 2
-    'SUZANO UNBC': [
-        'CD SUZANO MARACANAU',
-        'CD SUZANO CARIACICA',
-        'FABRICA SUZANO ARACRUZ',
-        'FABRICA SUZANO BELEM',
-        'FABRICA SUZANO IMPERATRIZ',
-        'FABRICA SUZANO MOGI DAS CRUZES'
-    ],
-
-    // GRUPO 3
-    'SUZANO UNPE': [
-        'FABRICA SUZANO LIMEIRA',
-        'FABRICA SUZANO SUZANO',
-        'CDR SUZANO',
-        'FABRICA SUZANO RIO VERDE',
-        'CD SUZANO SÃO JOSE DOS PINHAIS',
-        'CD CHAPECO'
-    ],
-
-    // GRUPO 4
-    'SAINT GOBAIN': [
-        'FABRICA PLACO MOGI DAS CRUZES',
-        'FABRICA QUARTZOLIT CAMAÇARI',
-        'FABRICA QUARTZOLIT JANDIRA'
-    ],
-
-    // GRUPO 5
-    'JOHN DEERE': [
-        'FABRICA JOHN DEREE HORIZONTINA',
-        'FABRICA JOHN DEREE INDAIATUBA',
-        'FABRICA JOHN DEREE MONTENEGRO',
-        'FABRICA JOHN DEREE CATALÃO',
-        'FABRICA JOHN DEREE CAMPINAS'
-    ]
-};
-
-// GRUPO 6 - OUTROS (TUDO QUE SOBRAR)
-subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
-    !Object.entries(subgroupMapping)
-        .filter(([grupo]) => grupo !== 'GESTÃO CORPORATIVA') // ignora o grupo 1
-        .flatMap(([, unidades]) => unidades)
-        .includes(subgroup)
-);
-
+        subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
+            !Object.entries(subgroupMapping)
+                .filter(([grupo]) => grupo !== 'GESTÃO CORPORATIVA')
+                .flatMap(([, unidades]) => unidades)
+                .includes(subgroup)
+        );
 
         // ============================================
         // INICIALIZAÇÃO DA PÁGINA
@@ -404,48 +617,41 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM carregado - Inicializando página...');
             
-            // Configurar hamburger menu
             setupHamburgerMenu();
-            
-            // Configurar listeners dos grupos
             setupGroupListeners();
-            
-            // Inicializa os subgrupos
             initializeSubgroups();
             
-            // Verifica autenticação
             auth.onAuthStateChanged(user => {
                 if (user) {
                     console.log('Usuário autenticado:', user.email);
                     currentUser = user;
                     loadUserData(user);
-                    checkGestaoCorp(user);
+                    checkUserPermissions(user);
                     loadDocuments();
+                    loadStatistics();
+                    // Atualizar estatísticas a cada 30 segundos
+                    statsInterval = setInterval(loadStatistics, 30000);
                 } else {
                     console.log('Usuário não autenticado - redirecionando...');
                     window.location.href = 'index.html';
                 }
             });
 
-            // Configura o formulário de upload
             const uploadForm = document.getElementById('upload-form');
             if (uploadForm) {
                 uploadForm.addEventListener('submit', handleUpload);
             }
 
-            // Configura o botão de logout
             const logoutBtn = document.getElementById('sidebar-logout-btn');
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', logoutUser);
             }
 
-            // Configura a busca
             const searchInput = document.getElementById('search-input');
             if (searchInput) {
                 searchInput.addEventListener('input', filterDocuments);
             }
 
-            // Configura o filtro de grupo
             const groupFilter = document.getElementById('group-filter');
             if (groupFilter) {
                 groupFilter.addEventListener('change', function() {
@@ -454,13 +660,20 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
                 });
             }
 
-            // Configura o filtro de subgrupo
             const subgroupFilter = document.getElementById('subgroup-filter');
             if (subgroupFilter) {
                 subgroupFilter.addEventListener('change', filterDocuments);
             }
 
-            // Inicializa os modais
+            const refreshBtn = document.getElementById('refresh-btn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function() {
+                    loadDocuments();
+                    loadStatistics();
+                    showToast('Dados atualizados com sucesso!', 'success');
+                });
+            }
+
             const confirmModalElement = document.getElementById('confirmModal');
             if (confirmModalElement) {
                 confirmModal = new bootstrap.Modal(confirmModalElement);
@@ -471,7 +684,6 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
                 documentViewerModal = new bootstrap.Modal(documentViewerModalElement);
             }
 
-            // Configura o botão de confirmação de exclusão
             const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
             if (confirmDeleteBtn) {
                 confirmDeleteBtn.addEventListener('click', function() {
@@ -482,7 +694,6 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
                 });
             }
 
-            // Configura o botão de download no visualizador
             const downloadFromViewerBtn = document.getElementById('downloadFromViewerBtn');
             if (downloadFromViewerBtn) {
                 downloadFromViewerBtn.addEventListener('click', function() {
@@ -519,7 +730,6 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
         }
 
         function setupGroupListeners() {
-            // Configura o select de grupo no upload
             const uploadGroup = document.getElementById('document-group');
             if (uploadGroup) {
                 uploadGroup.addEventListener('change', function() {
@@ -534,7 +744,6 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
         function initializeSubgroups() {
             console.log('Inicializando subgrupos...');
             
-            // Carrega todos os subgrupos no filtro
             const filterSubgroup = document.getElementById('subgroup-filter');
             if (filterSubgroup) {
                 filterSubgroup.innerHTML = '<option value="all">Todos os Subgrupos</option>';
@@ -544,20 +753,15 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
                     option.textContent = subgroup;
                     filterSubgroup.appendChild(option);
                 });
-                console.log('Filtro de subgrupos carregado com', allSubgroups.length, 'opções');
             }
             
-            // Inicializa o select de subgrupos no upload
             const uploadSubgroup = document.getElementById('document-subgroup-upload');
             if (uploadSubgroup) {
                 uploadSubgroup.innerHTML = '<option value="">Selecione um subgrupo</option>';
-                console.log('Select de upload de subgrupos inicializado');
             }
         }
 
         function updateSubgroupOptions(group, type = 'filter') {
-            console.log('Atualizando subgrupos para grupo:', group, 'tipo:', type);
-            
             let selectElement;
             if (type === 'upload') {
                 selectElement = document.getElementById('document-subgroup-upload');
@@ -565,22 +769,16 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
                 selectElement = document.getElementById('subgroup-filter');
             }
             
-            if (!selectElement) {
-                console.error('Elemento select não encontrado para tipo:', type);
-                return;
-            }
+            if (!selectElement) return;
             
-            // Salva o valor selecionado atual
             const currentValue = selectElement.value;
             
-            // Limpa as opções existentes
             if (type === 'upload') {
                 selectElement.innerHTML = '<option value="">Selecione um subgrupo</option>';
             } else {
                 selectElement.innerHTML = '<option value="all">Todos os Subgrupos</option>';
             }
             
-            // Se não houver grupo selecionado ou grupo for vazio, mostra todos os subgrupos
             if (!group || group === 'all' || group === '') {
                 allSubgroups.forEach(subgroup => {
                     const option = document.createElement('option');
@@ -588,42 +786,26 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
                     option.textContent = subgroup;
                     selectElement.appendChild(option);
                 });
-                
-                if (type === 'filter') {
-                    selectElement.disabled = false;
-                }
             } else if (subgroupMapping[group]) {
-                // Mostra apenas os subgrupos específicos do grupo
                 subgroupMapping[group].forEach(subgroup => {
                     const option = document.createElement('option');
                     option.value = subgroup;
                     option.textContent = subgroup;
                     selectElement.appendChild(option);
                 });
-                
-                if (type === 'filter') {
-                    selectElement.disabled = subgroupMapping[group].length === 0;
-                }
             } else {
-                // Se o grupo não estiver no mapeamento, mostra todos
                 allSubgroups.forEach(subgroup => {
                     const option = document.createElement('option');
                     option.value = subgroup;
                     option.textContent = subgroup;
                     selectElement.appendChild(option);
                 });
-                
-                if (type === 'filter') {
-                    selectElement.disabled = false;
-                }
             }
             
-            // Tenta restaurar o valor selecionado anteriormente
             if (currentValue && Array.from(selectElement.options).some(opt => opt.value === currentValue)) {
                 selectElement.value = currentValue;
             }
             
-            // Dispara evento de change se for o filtro
             if (type === 'filter') {
                 selectElement.dispatchEvent(new Event('change'));
             }
@@ -653,12 +835,26 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
                 });
         }
 
-        function checkGestaoCorp(user) {
+        function checkUserPermissions(user) {
             db.collection('users').doc(user.uid).get()
                 .then(doc => {
                     if (doc.exists) {
                         const userData = doc.data();
                         isGestaoCorp = userData.unit && userData.unit.toLowerCase() === 'gestão corp';
+                        
+                        // Verificar se é aprovador 1
+                        isAprovador1 = userData.role && (
+                            userData.role.toLowerCase().includes('aprovador1') ||
+                            userData.role.toLowerCase().includes('gestor') ||
+                            userData.unit.toLowerCase() === 'gestão corp'
+                        );
+                        
+                        // Verificar se é aprovador final
+                        isAprovadorFinal = userData.role && (
+                            userData.role.toLowerCase().includes('aprovadorfinal') ||
+                            userData.role.toLowerCase().includes('diretor') ||
+                            userData.role.toLowerCase().includes('gerente')
+                        );
 
                         if (isGestaoCorp) {
                             const uploadSection = document.getElementById('upload-section');
@@ -669,7 +865,72 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
                     }
                 })
                 .catch(error => {
-                    console.error('Erro ao verificar gestão corp:', error);
+                    console.error('Erro ao verificar permissões:', error);
+                });
+        }
+
+        // ============================================
+        // FUNÇÕES DE ESTATÍSTICAS
+        // ============================================
+        function loadStatistics() {
+            // Contar documentos aprovados
+            db.collection('procedimentos_operacionais').get()
+                .then(snapshot => {
+                    document.getElementById('count-aprovados').textContent = snapshot.size;
+                })
+                .catch(error => {
+                    console.error('Erro ao contar documentos aprovados:', error);
+                });
+            
+            // Contar documentos pendentes no Aprovador 1
+            db.collection('procedimentos_pendentes_aprovador1')
+                .where('status', '==', 'pendente')
+                .get()
+                .then(snapshot => {
+                    const count = snapshot.size;
+                    document.getElementById('count-pendentes-1').textContent = count;
+                    document.getElementById('badge-aprovador1').textContent = count;
+                    
+                    // Mostrar/ocultar badge
+                    const badge1 = document.getElementById('badge-aprovador1');
+                    if (count > 0) {
+                        badge1.style.display = 'flex';
+                    } else {
+                        badge1.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao contar documentos pendentes aprovador 1:', error);
+                });
+            
+            // Contar documentos pendentes no Aprovador Final
+            db.collection('procedimentos_pendentes_aprovador_final')
+                .where('status', '==', 'pendente_aprovador_final')
+                .get()
+                .then(snapshot => {
+                    const count = snapshot.size;
+                    document.getElementById('count-pendentes-final').textContent = count;
+                    document.getElementById('badge-aprovador-final').textContent = count;
+                    
+                    // Mostrar/ocultar badge
+                    const badgeFinal = document.getElementById('badge-aprovador-final');
+                    if (count > 0) {
+                        badgeFinal.style.display = 'flex';
+                    } else {
+                        badgeFinal.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao contar documentos pendentes aprovador final:', error);
+                });
+            
+            // Contar documentos rejeitados
+            db.collection('procedimentos_rejeitados').get()
+                .then(snapshot => {
+                    document.getElementById('count-rejeitados').textContent = snapshot.size;
+                })
+                .catch(error => {
+                    console.error('Erro ao contar documentos rejeitados:', error);
                 });
         }
 
@@ -680,20 +941,33 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
             const container = document.getElementById('documents-container');
             if (!container) return;
             
-            container.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i><h5>Carregando documentos...</h5></div>';
+            container.innerHTML = `
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                    <p class="mt-3">Carregando documentos...</p>
+                </div>
+            `;
 
-            db.collection('procedimentos_operacionais').orderBy('createdAt', 'desc').get()
+            db.collection('procedimentos_operacionais').orderBy('aprovadoEm', 'desc').get()
                 .then(querySnapshot => {
                     allDocuments = [];
 
                     if (querySnapshot.empty) {
                         container.innerHTML = `
                             <div class="empty-state">
-                                <i class="fas fa-folder-open"></i>
+                                <i class="fas fa-folder-open fa-3x mb-3"></i>
                                 <h5>Nenhum documento encontrado</h5>
-                                <p>Não há procedimentos operacionais cadastrados ainda.</p>
+                                <p>Não há procedimentos operacionais aprovados ainda.</p>
+                                ${isGestaoCorp ? `
+                                <button class="btn btn-primary mt-3" onclick="document.getElementById('upload-section').scrollIntoView()">
+                                    <i class="fas fa-upload me-2"></i>Enviar Primeiro Documento
+                                </button>
+                                ` : ''}
                             </div>
                         `;
+                        updateDocumentCount(0);
                         return;
                     }
 
@@ -706,10 +980,19 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
                     });
 
                     renderDocuments(allDocuments);
+                    updateDocumentCount(allDocuments.length);
                 })
                 .catch(error => {
                     console.error('Erro ao carregar documentos:', error);
-                    container.innerHTML = '<div class="alert alert-danger">Erro ao carregar documentos. Tente novamente.</div>';
+                    container.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Erro ao carregar documentos. Tente novamente.
+                            <button class="btn btn-sm btn-outline-danger ms-2" onclick="loadDocuments()">
+                                <i class="fas fa-redo"></i>
+                            </button>
+                        </div>
+                    `;
                 });
         }
 
@@ -719,7 +1002,7 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
             if (documents.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <i class="fas fa-search"></i>
+                        <i class="fas fa-search fa-3x mb-3"></i>
                         <h5>Nenhum documento encontrado</h5>
                         <p>Não há documentos que correspondam aos filtros selecionados.</p>
                     </div>
@@ -732,52 +1015,80 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
 
             documents.forEach((doc, index) => {
                 const card = document.createElement('div');
-                card.className = 'document-card';
+                card.className = 'document-card fade-in';
                 card.style.animationDelay = `${index * 0.05}s`;
                 
                 const fileIcon = getFileIcon(doc.fileName || doc.type);
+                const formattedDate = formatDate(doc.aprovadoEm || doc.createdAt);
+                const fileSize = doc.size ? formatFileSize(doc.size) : 'Tamanho não disponível';
                 
                 card.innerHTML = `
                     <div class="document-header">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <i class="${fileIcon}" style="font-size: 1.5rem; color: var(--primary);"></i>
-                            <div class="document-title">${doc.title || 'Documento sem título'}</div>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="document-icon">
+                                <i class="${fileIcon} fa-2x" style="color: #dc3545;"></i>
+                            </div>
+                            <div class="document-title-wrapper">
+                                <div class="document-title">${doc.title || 'Documento sem título'}</div>
+                                <div class="d-flex align-items-center gap-2 mt-1">
+                                    <span class="document-version">v1.0</span>
+                                    <span class="document-status status-aprovado">
+                                        <i class="fas fa-check-circle"></i> Aprovado
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                         <div class="document-badges">
-                            <span class="badge-group">${doc.group || 'Sem grupo'}</span>
-                            ${doc.subgroup ? `<span class="badge-subgroup">${doc.subgroup}</span>` : ''}
+                            <span class="badge bg-primary">${doc.group || 'Sem grupo'}</span>
+                            ${doc.subgroup ? `<span class="badge bg-secondary">${doc.subgroup}</span>` : ''}
                         </div>
                     </div>
                     <div class="document-meta">
-                        <div class="document-meta-item">
-                            <i class="fas fa-calendar"></i>
-                            <span>Enviado em: ${formatDate(doc.createdAt)}</span>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="document-meta-item">
+                                    <i class="fas fa-calendar-check text-primary"></i>
+                                    <span><strong>Aprovado em:</strong> ${formattedDate}</span>
+                                </div>
+                                <div class="document-meta-item">
+                                    <i class="fas fa-user text-primary"></i>
+                                    <span><strong>Enviado por:</strong> ${doc.uploadedByName || 'Usuário'}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="document-meta-item">
+                                    <i class="fas fa-file-pdf text-primary"></i>
+                                    <span><strong>Tipo:</strong> PDF</span>
+                                </div>
+                                <div class="document-meta-item">
+                                    <i class="fas fa-weight-hanging text-primary"></i>
+                                    <span><strong>Tamanho:</strong> ${fileSize}</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="document-meta-item">
-                            <i class="fas fa-user"></i>
-                            <span>Por: ${doc.uploadedByName || 'Usuário'}</span>
-                        </div>
-                        <div class="document-meta-item">
-                            <i class="fas fa-file"></i>
-                            <span>Tipo: ${getFileType(doc.fileName || doc.type)}</span>
-                        </div>
-                        ${doc.size ? `
-                        <div class="document-meta-item">
-                            <i class="fas fa-weight-hanging"></i>
-                            <span>Tamanho: ${formatFileSize(doc.size)}</span>
+                        ${doc.aprovadorFinalName ? `
+                        <div class="document-meta-item mt-2">
+                            <i class="fas fa-user-shield text-success"></i>
+                            <span><strong>Aprovador Final:</strong> ${doc.aprovadorFinalName}</span>
                         </div>
                         ` : ''}
                     </div>
-                    <div class="document-actions">
-                        <button class="btn btn-view document-action-btn" data-id="${doc.id}" title="Visualizar documento">
-                            <i class="fas fa-eye"></i> Visualizar
+                    ${doc.observacoes ? `
+                    <div class="observacoes-box">
+                        <strong><i class="fas fa-comment me-1"></i>Observações:</strong>
+                        <p class="mb-0">${doc.observacoes}</p>
+                    </div>
+                    ` : ''}
+                    <div class="action-buttons">
+                        <button class="btn btn-outline-primary btn-sm document-action-btn" data-id="${doc.id}" title="Visualizar documento">
+                            <i class="fas fa-eye me-1"></i> Visualizar
                         </button>
-                        <button class="btn btn-download document-action-btn" data-id="${doc.id}" title="Baixar documento">
-                            <i class="fas fa-download"></i> Baixar
+                        <button class="btn btn-outline-success btn-sm document-action-btn" data-id="${doc.id}" title="Baixar documento">
+                            <i class="fas fa-download me-1"></i> Baixar
                         </button>
                         ${isGestaoCorp ? `
-                        <button class="btn btn-delete document-action-btn" data-id="${doc.id}" title="Excluir documento">
-                            <i class="fas fa-trash"></i> Excluir
+                        <button class="btn btn-outline-danger btn-sm document-action-btn" data-id="${doc.id}" title="Excluir documento">
+                            <i class="fas fa-trash me-1"></i> Excluir
                         </button>
                         ` : ''}
                     </div>
@@ -790,33 +1101,43 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
             assignButtonEvents();
         }
 
+        function updateDocumentCount(count) {
+            const countElement = document.getElementById('document-count');
+            if (countElement) {
+                countElement.textContent = `${count} documento${count !== 1 ? 's' : ''}`;
+            }
+        }
+
         function assignButtonEvents() {
-            // Visualizar
-            document.querySelectorAll('.btn-view').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const docId = this.getAttribute('data-id');
-                    viewDocument(docId);
-                });
-            });
-            
-            // Baixar
-            document.querySelectorAll('.btn-download').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const docId = this.getAttribute('data-id');
-                    downloadDocument(docId);
-                });
-            });
-            
-            // Excluir (apenas para gestão corp)
-            if (isGestaoCorp) {
-                document.querySelectorAll('.btn-delete').forEach(btn => {
+            document.querySelectorAll('.btn-outline-primary').forEach(btn => {
+                if (btn.classList.contains('document-action-btn')) {
                     btn.addEventListener('click', function(e) {
                         e.preventDefault();
-                        deleteDocId = this.getAttribute('data-id');
-                        confirmModal.show();
+                        const docId = this.getAttribute('data-id');
+                        viewDocument(docId);
                     });
+                }
+            });
+            
+            document.querySelectorAll('.btn-outline-success').forEach(btn => {
+                if (btn.classList.contains('document-action-btn')) {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const docId = this.getAttribute('data-id');
+                        downloadDocument(docId);
+                    });
+                }
+            });
+            
+            if (isGestaoCorp) {
+                document.querySelectorAll('.btn-outline-danger').forEach(btn => {
+                    if (btn.classList.contains('document-action-btn')) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            deleteDocId = this.getAttribute('data-id');
+                            confirmModal.show();
+                        });
+                    }
                 });
             }
         }
@@ -827,37 +1148,45 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
             const subgroupFilter = document.getElementById('subgroup-filter').value;
             
             const filteredDocs = allDocuments.filter(doc => {
-                // Filtro por grupo
                 const matchesGroup = groupFilter === 'all' || doc.group === groupFilter;
-                
-                // Filtro por subgrupo
                 const matchesSubgroup = subgroupFilter === 'all' || doc.subgroup === subgroupFilter;
-                
-                // Filtro por texto de busca
                 const matchesSearch = !searchText || 
                     (doc.title && doc.title.toLowerCase().includes(searchText)) ||
                     (doc.group && doc.group.toLowerCase().includes(searchText)) ||
-                    (doc.subgroup && doc.subgroup.toLowerCase().includes(searchText));
+                    (doc.subgroup && doc.subgroup.toLowerCase().includes(searchText)) ||
+                    (doc.uploadedByName && doc.uploadedByName.toLowerCase().includes(searchText));
                 
                 return matchesGroup && matchesSubgroup && matchesSearch;
             });
             
             renderDocuments(filteredDocs);
+            updateDocumentCount(filteredDocs.length);
         }
 
         // ============================================
-        // FUNÇÕES DE UPLOAD
+        // FUNÇÕES DE UPLOAD PARA APROVAÇÃO
         // ============================================
         function handleUpload(e) {
             e.preventDefault();
 
-            const title = document.getElementById('document-title').value;
+            const title = document.getElementById('document-title').value.trim();
             const group = document.getElementById('document-group').value;
             const subgroup = document.getElementById('document-subgroup-upload').value;
             const file = document.getElementById('document-file').files[0];
+            const observations = document.getElementById('document-observations').value.trim();
 
             if (!title || !group || !subgroup || !file) {
-                alert('Preencha todos os campos');
+                showToast('Preencha todos os campos obrigatórios', 'warning');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) { // 10MB
+                showToast('O arquivo é muito grande. Tamanho máximo: 10MB', 'warning');
+                return;
+            }
+
+            if (file.type !== 'application/pdf') {
+                showToast('Apenas arquivos PDF são permitidos', 'warning');
                 return;
             }
 
@@ -878,12 +1207,10 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
                 progressBar.style.width = '0%';
             }
 
-            // Ler o arquivo como base64
             const reader = new FileReader();
             reader.onload = function(event) {
                 const fileBase64 = event.target.result;
 
-                // Simula progresso
                 let progressValue = 0;
                 const progressInterval = setInterval(() => {
                     progressValue += 10;
@@ -894,8 +1221,14 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
                     if (progressValue >= 100) {
                         clearInterval(progressInterval);
                         
-                        // Salva no Firestore
-                        db.collection('procedimentos_operacionais').add({
+                        const historicoItem = {
+                            acao: 'enviado',
+                            usuario: currentUser.displayName || currentUser.email,
+                            data: new Date(),
+                            observacoes: observations
+                        };
+                        
+                        db.collection('procedimentos_pendentes_aprovador1').add({
                             title: title,
                             group: group,
                             subgroup: subgroup,
@@ -905,12 +1238,15 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
                             size: file.size,
                             uploadedBy: currentUser.uid,
                             uploadedByName: currentUser.displayName || currentUser.email,
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                            observacoes: observations,
+                            status: 'pendente',
+                            createdAt: new Date(),
+                            historico: [historicoItem]
                         })
                         .then((docRef) => {
                             if (uploadBtn) {
                                 uploadBtn.disabled = false;
-                                uploadBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Enviar Documento';
+                                uploadBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Enviar para Aprovação';
                             }
                             
                             if (progress) {
@@ -921,25 +1257,27 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
                                 progressBar.style.width = '0%';
                             }
                             
-                            // Resetar o formulário
                             const uploadForm = document.getElementById('upload-form');
                             if (uploadForm) {
                                 uploadForm.reset();
                                 updateSubgroupOptions('', 'upload');
                             }
                             
-                            // Recarregar documentos
-                            loadDocuments();
+                            showToast('Documento enviado para aprovação com sucesso!', 'success');
+                            loadStatistics();
                             
-                            alert('Documento enviado com sucesso!');
+                            // Scroll para mostrar o status
+                            document.querySelector('.dashboard-cards').scrollIntoView({
+                                behavior: 'smooth'
+                            });
                         })
                         .catch(error => {
                             console.error('Erro ao salvar documento:', error);
-                            alert('Erro ao salvar informações do documento');
+                            showToast('Erro ao salvar informações do documento', 'error');
                             
                             if (uploadBtn) {
                                 uploadBtn.disabled = false;
-                                uploadBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Enviar Documento';
+                                uploadBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Enviar para Aprovação';
                             }
                             
                             if (progress) {
@@ -956,11 +1294,11 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
 
             reader.onerror = function(error) {
                 console.error('Erro ao ler arquivo:', error);
-                alert('Erro ao ler o arquivo. Tente novamente.');
+                showToast('Erro ao ler o arquivo. Tente novamente.', 'error');
                 
                 if (uploadBtn) {
                     uploadBtn.disabled = false;
-                    uploadBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Enviar Documento';
+                    uploadBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Enviar para Aprovação';
                 }
                 
                 if (progress) {
@@ -981,16 +1319,25 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
                 .then(doc => {
                     if (doc.exists) {
                         const data = doc.data();
-                        document.getElementById('documentViewerTitle').textContent = data.title || 'Visualização do Documento';
-                        document.getElementById('documentViewerIframe').src = data.arquivoBase64;
+                        const title = data.title || 'Visualização do Documento';
+                        const formattedDate = formatDate(data.aprovadoEm || data.createdAt);
+                        
+                        document.getElementById('documentViewerTitle').textContent = title;
+                        document.getElementById('documentInfo').textContent = 
+                            `Enviado por: ${data.uploadedByName || 'Usuário'} | Aprovado em: ${formattedDate}`;
+                        
+                        // Configurar visualizador PDF
+                        const pdfUrl = data.arquivoBase64;
+                        document.getElementById('documentViewerIframe').src = pdfUrl;
+                        
                         documentViewerModal.show();
                     } else {
-                        alert('Documento não encontrado');
+                        showToast('Documento não encontrado', 'warning');
                     }
                 })
                 .catch(error => {
                     console.error('Erro ao carregar documento:', error);
-                    alert('Erro ao abrir o documento para visualização');
+                    showToast('Erro ao abrir o documento para visualização', 'error');
                 });
         }
 
@@ -998,11 +1345,12 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
             db.collection('procedimentos_operacionais').doc(docId).delete()
                 .then(() => {
                     loadDocuments();
-                    alert('Documento excluído com sucesso!');
+                    loadStatistics();
+                    showToast('Documento excluído com sucesso!', 'success');
                 })
                 .catch(error => {
                     console.error('Erro ao excluir documento:', error);
-                    alert('Erro ao excluir documento');
+                    showToast('Erro ao excluir documento', 'error');
                 });
         }
 
@@ -1018,13 +1366,14 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
+                        showToast('Download iniciado', 'success');
                     } else {
-                        alert('Documento não encontrado');
+                        showToast('Documento não encontrado', 'warning');
                     }
                 })
                 .catch(error => {
                     console.error('Erro ao baixar documento:', error);
-                    alert('Erro ao baixar o documento');
+                    showToast('Erro ao baixar o documento', 'error');
                 });
         }
 
@@ -1032,32 +1381,45 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
         // FUNÇÕES AUXILIARES
         // ============================================
         function getFileIcon(fileName) {
-            if (!fileName) return 'fas fa-file';
+            if (!fileName) return 'fas fa-file-pdf';
             
             const extension = fileName.split('.').pop().toLowerCase();
             const iconMap = {
-                'pdf': 'fas fa-file-pdf',
-                'doc': 'fas fa-file-word',
-                'docx': 'fas fa-file-word',
-                'xls': 'fas fa-file-excel',
-                'xlsx': 'fas fa-file-excel',
-                'ppt': 'fas fa-file-powerpoint',
-                'pptx': 'fas fa-file-powerpoint',
-                'txt': 'fas fa-file-alt',
-                'jpg': 'fas fa-file-image',
-                'jpeg': 'fas fa-file-image',
-                'png': 'fas fa-file-image',
-                'zip': 'fas fa-file-archive',
-                'rar': 'fas fa-file-archive'
+                'pdf': 'fas fa-file-pdf'
             };
             
-            return iconMap[extension] || 'fas fa-file';
+            return iconMap[extension] || 'fas fa-file-pdf';
         }
 
         function formatDate(timestamp) {
             if (!timestamp) return 'Data não disponível';
             try {
-                const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+                let date;
+                
+                // Se for um Firestore Timestamp
+                if (timestamp.toDate && typeof timestamp.toDate === 'function') {
+                    date = timestamp.toDate();
+                }
+                // Se já for um objeto Date
+                else if (timestamp instanceof Date) {
+                    date = timestamp;
+                }
+                // Se for uma string
+                else if (typeof timestamp === 'string') {
+                    date = new Date(timestamp);
+                }
+                // Se for um número
+                else if (typeof timestamp === 'number') {
+                    date = new Date(timestamp);
+                }
+                else {
+                    return 'Data inválida';
+                }
+                
+                if (isNaN(date.getTime())) {
+                    return 'Data inválida';
+                }
+                
                 return date.toLocaleDateString('pt-BR', {
                     day: '2-digit',
                     month: '2-digit',
@@ -1066,6 +1428,7 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
                     minute: '2-digit'
                 });
             } catch (error) {
+                console.error('Erro ao formatar data:', error);
                 return 'Data inválida';
             }
         }
@@ -1078,33 +1441,60 @@ subgroupMapping['OUTROS'] = allSubgroups.filter(subgroup =>
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        function getFileType(fileName) {
-            if (!fileName) return 'Documento';
-            const extension = fileName.split('.').pop().toLowerCase();
-            const types = {
-                'pdf': 'PDF',
-                'doc': 'Word',
-                'docx': 'Word',
-                'xls': 'Excel',
-                'xlsx': 'Excel',
-                'ppt': 'PowerPoint',
-                'pptx': 'PowerPoint',
-                'txt': 'Texto',
-                'jpg': 'Imagem',
-                'jpeg': 'Imagem',
-                'png': 'Imagem',
-                'zip': 'Compactado',
-                'rar': 'Compactado'
-            };
-            return types[extension] || extension.toUpperCase();
+        function showToast(message, type = 'info') {
+            // Criar toast container se não existir
+            let toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toast-container';
+                toastContainer.style.position = 'fixed';
+                toastContainer.style.top = '20px';
+                toastContainer.style.right = '20px';
+                toastContainer.style.zIndex = '9999';
+                document.body.appendChild(toastContainer);
+            }
+            
+            const toastId = 'toast-' + Date.now();
+            const bgColor = type === 'success' ? 'bg-success' : 
+                           type === 'error' ? 'bg-danger' : 
+                           type === 'warning' ? 'bg-warning' : 'bg-info';
+            
+            const toastHtml = `
+                <div id="${toastId}" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header ${bgColor} text-white">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : 
+                                      type === 'error' ? 'exclamation-circle' : 
+                                      type === 'warning' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+                        <strong class="me-auto">${type.charAt(0).toUpperCase() + type.slice(1)}</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                </div>
+            `;
+            
+            toastContainer.insertAdjacentHTML('afterbegin', toastHtml);
+            
+            // Remover toast após 5 segundos
+            setTimeout(() => {
+                const toast = document.getElementById(toastId);
+                if (toast) {
+                    toast.remove();
+                }
+            }, 5000);
         }
 
         function logoutUser() {
+            if (statsInterval) {
+                clearInterval(statsInterval);
+            }
+            
             auth.signOut().then(() => {
                 window.location.href = 'index.html';
             }).catch(error => {
                 console.error('Erro ao fazer logout:', error);
-                alert('Erro ao fazer logout. Tente novamente.');
+                showToast('Erro ao fazer logout. Tente novamente.', 'error');
             });
         }
     </script>
