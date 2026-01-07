@@ -552,19 +552,39 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="sistema" class="form-label">Sistema (VPN, Portal e SGG):</label>
+                                    <label for="sistema" class="form-label">Rede + Sistemas:</label>
                                     <div class="number-input-group">
-                                        <input type="number" class="form-control" id="sistema" name="sistema" min="0" max="10" step="10" required>
+                                        <input type="number" class="form-control" id="sistema" name="sistema" min="0" max="5" step="5" required>
                                         <span class="input-helper">pts</span>
                                     </div>
-                                    <small class="text-muted">Pontuação de 0 ou 10</small>
+                                    <small class="text-muted">Pontuação de 0 ou 5</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="gestaoPlanoAcao" class="form-label">Gestão do Plano de Ação:</label>
                                     <div class="number-input-group">
-                                        <input type="number" class="form-control" id="gestaoPlanoAcao" name="gestaoPlanoAcao" min="0" max="10" step="10" required>
+                                        <input type="number" class="form-control" id="gestaoPlanoAcao" name="gestaoPlanoAcao" min="0" max="5" step="5" required>
+                                        <span class="input-helper">pts</span>
+                                    </div>
+                                    <small class="text-muted">Pontuação de 0 ou 5</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="Portal" class="form-label">Portal:</label>
+                                    <div class="number-input-group">
+                                        <input type="number" class="form-control" id="Portal" name="Portal" min="0" max="5" step="5" required>
+                                        <span class="input-helper">pts</span>
+                                    </div>
+                                    <small class="text-muted">Pontuação de 0 ou 5</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="Ofensores" class="form-label">Gestão dos Principais Ofensores:</label>
+                                    <div class="number-input-group">
+                                        <input type="number" class="form-control" id="Ofensores" name="Ofensores" min="0" max="5" step="5" required>
                                         <span class="input-helper">pts</span>
                                     </div>
                                     <small class="text-muted">Pontuação de 0 ou 10</small>
@@ -662,6 +682,33 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Seção 6: Além do 100-->
+                    <div class="form-section">
+                        <h3>Além do 100</h3>         
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="ProjetosAprovados" class="form-label">Projetos Aprovados:</label>
+                                    <div class="number-input-group">
+                                        <input type="number" class="form-control" id="ProjetosAprovados" name="ProjetosAprovados" min="0" max="50" step="50" required>
+                                        <span class="input-helper">pts</span>
+                                    </div>
+                                    <small class="text-muted">Dedução de 0 ou 50</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="deducaopontos" class="form-label">Atendimento ao Cliente:</label>
+                                    <div class="number-input-group">
+                                        <input type="number" class="form-control" id="deducaopontos" name="deducaopontos" min="-25" max="25" step="25" required>
+                                        <span class="input-helper">pts</span>
+                                    </div>
+                                    <small class="text-muted">Dedução de -25 a 25</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     
                     <!-- Cards de Resumo -->
                     <div class="row mb-4">
@@ -687,6 +734,12 @@
                             <div class="info-card" style="background: linear-gradient(135deg, #93d1fb 0%, #066bbe 100%);">
                                 <h4>Deflator Geral</h4>
                                 <p id="resumoDeflator">0.0 pts</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-card" style="background: linear-gradient(135deg, #4facfe 0%, #0077fe 100%);">
+                                <h4>Além do 100</h4>
+                                <p id="resumoalem100">0.0 pts</p>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -762,6 +815,7 @@
             const resumoDocumental = document.getElementById('resumoDocumental');
             const resumoOcorrencia = document.getElementById('resumoOcorrencia');
             const resumoDeflator = document.getElementById('resumoDeflator');
+            const resumoalem100 = document.getElementById('resumoalem100'); 
             const resumoTotal = document.getElementById('resumoTotal');
             const notaFinal = document.getElementById('notafinal');
             const cardResultado = document.getElementById('cardResultado');
@@ -910,51 +964,71 @@
                 // Campos documentais
                 const sistema = parseFloat(document.getElementById('sistema').value) || 0;
                 const gestaoPlano = parseFloat(document.getElementById('gestaoPlanoAcao').value) || 0;
+                const portal = parseFloat(document.getElementById('Portal').value) || 0;
+                const ofensores = parseFloat(document.getElementById('Ofensores').value) || 0;
                 
                 // Campos de ocorrência
                 const incidente = parseFloat(document.getElementById('incidente').value) || 0;
                 const osa = parseFloat(document.getElementById('osa').value) || 0;
                 const saf = parseFloat(document.getElementById('saf').value) || 0;
                 const caf = parseFloat(document.getElementById('caf').value) || 0;
+
+                 // Deflatores
                 const deflator = parseFloat(document.getElementById('deflator').value) || 0;
                 const participação = parseFloat(document.getElementById('Participação').value) || 0;
                 const campanhas = parseFloat(document.getElementById('Campanhas').value) || 0;
+
+                //alem do 100
+                const projetosAprovados = parseFloat(document.getElementById('ProjetosAprovados').value) || 0;
+                const deducaopontos = parseFloat(document.getElementById('deducaopontos').value) || 0;
                 
+
                 // Calcula totais
                 const totalOperacional = Math.min(auditoria + dto + cartaoVerde + relatoDesvio + ronda, 45);
-                const totalDocumental = Math.min(sistema + gestaoPlano, 20);
+                const totalDocumental = Math.min(sistema + gestaoPlano + portal + ofensores, 20);
                 const totalOcorrencia = Math.min(35 - incidente - osa - saf - caf, 35);
                 const deflatortotal = Math.min(deflator + participação + campanhas, 30);
-                const totalGeral = Math.min(totalOperacional + totalDocumental + totalOcorrencia - deflatortotal, 100);
+                const alem100 = projetosAprovados + deducaopontos;
+                const totalGeral = totalOperacional + totalDocumental + totalOcorrencia - deflatortotal + alem100;
                 let resultado;
                 let background;
 
-                if (totalGeral >= 90) {
+                if (totalGeral > 174) {
+                    resultado = 'Referência';
+                    background = 'linear-gradient(135deg, #FFD700 0%, #FFB347 100%)'; // Dourado absoluto
+                }
+                else if (totalGeral > 124) {
+                    resultado = 'Destaque';
+                    background = 'linear-gradient(135deg, #2ECC71 0%, #27AE60 100%)'; // Verde elite
+                }
+                else if (totalGeral >= 90) {
                     resultado = 'Excelente';
-                    background = 'linear-gradient(135deg, #56ab2f 0%, #a8e063 100%)';
-                } 
+                    background = 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)'; // Azul excelência
+                }
                 else if (totalGeral >= 75) {
                     resultado = 'Bom';
-                    background = 'linear-gradient(135deg, #00c6ff 0%, #0072ff 100%)';
-                } 
+                    background = 'linear-gradient(135deg, #4FACFE 0%, #00C6FF 100%)'; // Azul positivo
+                }
                 else if (totalGeral >= 60) {
                     resultado = 'Desenvolvimento';
-                    background = 'linear-gradient(135deg, #f7971e 0%, #ffd200 100%)';
-                } 
+                    background = 'linear-gradient(135deg, #F7971E 0%, #FFD200 100%)'; // Amarelo atenção
+                }
                 else if (totalGeral >= 40) {
                     resultado = 'Crítico';
-                    background = 'linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%)';
-                } 
+                    background = 'linear-gradient(135deg, #FF512F 0%, #DD2476 100%)'; // Vermelho alerta
+                }
                 else {
                     resultado = 'Crítico';
-                    background = 'linear-gradient(135deg, #232526 0%, #414345 100%)';
+                    background = 'linear-gradient(135deg, #FF512F 0%, #DD2476 100%)'; // Vermelho alerta
                 }
+
 
                 // Atualiza displays
                 resumoOperacional.textContent = totalOperacional.toFixed(1) + ' pts';
                 resumoDocumental.textContent = totalDocumental.toFixed(1) + ' pts';
                 resumoOcorrencia.textContent = totalOcorrencia.toFixed(1) + ' pts';
                 resumoDeflator.textContent = deflatortotal.toFixed(1) + ' pts';
+                resumoalem100.textContent = alem100.toFixed(1) + ' pts';
                 resumoTotal.textContent = totalGeral.toFixed(1) + ' pts';
                 notaFinal.textContent = resultado;
                 cardResultado.style.background = background;
@@ -1004,6 +1078,8 @@
                     // Pontuação Documental
                     sistema: parseFloat(document.getElementById('sistema').value) || 0,
                     gestaoPlanoAcao: parseFloat(document.getElementById('gestaoPlanoAcao').value) || 0,
+                    Portal: parseFloat(document.getElementById('Portal').value) || 0,
+                    Ofensores: parseFloat(document.getElementById('Ofensores').value) || 0,
                     
                     // Pontuação Ocorrência
                     incidente: parseFloat(document.getElementById('incidente').value) || 0,
@@ -1019,6 +1095,7 @@
                     totalDocumental: parseFloat(resumoDocumental.textContent),
                     totalOcorrencia: parseFloat(resumoOcorrencia.textContent),
                     totalDeflator: parseFloat(resumoDeflator.textContent),
+                    totalalem100: parseFloat(resumoalem100.textContent),
                     totalGeral: parseFloat(resumoTotal.textContent),
                     resultadoFinal: document.getElementById('notafinal').textContent,
                     
