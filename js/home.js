@@ -799,7 +799,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const senhaInserida = prompt("🔒 Acesso Restrito\nPor favor, insira a senha para acessar o Gerenciamento de Unidades:");
             
             // Senha correta: "corp1234"
-            if (senhaInserida === "corp1234") {
+            if (senhaInserida === "SH$#%0293C!!") {
                 window.location.href = "gerenciamento_user_units.html"; // Redireciona se a senha estiver correta
             } else {
                 alert("❌ Senha incorreta! Acesso negado."); // Exibe erro se a senha estiver errada

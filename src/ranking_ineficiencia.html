@@ -3,1031 +3,2032 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Análise de Ineficiências - Dashboard</title>
-    
-    <!-- CSS Libraries -->
+    <title>Análise de Desempenho - Pontos Perdidos</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root {
-            --azul-principal: #1a5f7a;
-            --azul-secundario: #2c8fb5;
-            --verde-sucesso: #28a745;
-            --laranja-alerta: #fd7e14;
-            --vermelho-perigo: #dc3545;
-            --amarelo-destaque: #ffc107;
-            --roxo-analise: #6f42c1;
-            --cinza-claro: #f8f9fa;
-            --cinza-medio: #e9ecef;
-            --cinza-escuro: #6c757d;
-            --branco: #ffffff;
-            --preto: #212529;
-            --sombra-suave: 0 2px 10px rgba(0, 0, 0, 0.08);
-            --sombra-media: 0 4px 20px rgba(0, 0, 0, 0.12);
-            --transicao: all 0.3s ease;
-        }
+        /* ===== RESET E CONFIGURAÇÕES GERAIS ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    color: #333;
+    min-height: 100vh;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
 
-        body {
-            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+/* ===== OVERLAY DE LOGIN ===== */
+.login-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.3s ease;
+}
 
-        .app-container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+.login-overlay .text-center {
+    background: white;
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+}
 
-        /* Header */
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 25px;
-            box-shadow: var(--sombra-media);
-            backdrop-filter: blur(10px);
-        }
+.login-overlay .spinner-border {
+    width: 4rem;
+    height: 4rem;
+    border-width: 0.3em;
+}
 
-        .header h1 {
-            color: var(--azul-principal);
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-        }
+.login-overlay p {
+    font-size: 1.2rem;
+    color: #555;
+    margin-top: 1.5rem;
+    font-weight: 500;
+}
 
-        .header-subtitle {
-            color: var(--cinza-escuro);
-            font-size: 1.1rem;
-        }
+/* ===== LAYOUT PRINCIPAL ===== */
+#appContent {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    animation: fadeIn 0.5s ease-out;
+}
 
-        /* Dashboard Grid */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 25px;
-            height: calc(100vh - 180px);
-        }
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
-        @media (max-width: 992px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-                height: auto;
-            }
-        }
+/* ===== HEADER ===== */
+.dashboard-header {
+    background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+    color: white;
+    padding: 2rem 2.5rem;
+    border-radius: 0 0 20px 20px;
+    margin-bottom: 2rem;
+}
 
-        /* Sidebar */
-        .sidebar {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: var(--sombra-media);
-            overflow-y: auto;
-        }
+.dashboard-header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
 
-        .sidebar-title {
-            font-size: 1.3rem;
-            color: var(--azul-principal);
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--azul-secundario);
-        }
+.dashboard-header h1 i {
+    font-size: 1.8rem;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 12px;
+    border-radius: 12px;
+    margin-right: 15px;
+}
 
-        .tecnico-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+.dashboard-header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    max-width: 800px;
+}
 
-        .tecnico-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-            background: var(--cinza-claro);
-            cursor: pointer;
-            transition: var(--transicao);
-            border: 2px solid transparent;
-        }
+/* ===== CARDS DE FILTROS ===== */
+.filter-card {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 1.8rem;
+    margin-bottom: 2rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-        .tecnico-item:hover {
-            background: var(--branco);
-            border-color: var(--azul-secundario);
-            transform: translateX(5px);
-        }
+.filter-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
 
-        .tecnico-item.active {
-            background: linear-gradient(135deg, var(--azul-secundario), var(--azul-principal));
-            color: white;
-            border-color: var(--azul-secundario);
-        }
+.filter-card .form-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
 
-        .tecnico-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--azul-secundario), var(--azul-principal));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.2rem;
-        }
+.filter-card .form-select {
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    height: 48px;
+}
 
-        .tecnico-info {
-            flex: 1;
-        }
+.filter-card .form-select:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
 
-        .tecnico-name {
-            font-weight: 600;
-            margin-bottom: 3px;
-        }
+.filter-card #btnFiltrar {
+    height: 48px;
+    border-radius: 10px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    border: none;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
 
-        .tecnico-unit {
-            font-size: 0.85rem;
-            color: var(--cinza-escuro);
-        }
+.filter-card #btnFiltrar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+}
 
-        .tecnico-item.active .tecnico-unit {
-            color: rgba(255, 255, 255, 0.8);
-        }
+/* ===== CARDS DE MÉTRICAS ===== */
+.metric-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    height: 100%;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
 
-        /* Main Content */
-        .main-content {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: var(--sombra-media);
-            overflow-y: auto;
-        }
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background: linear-gradient(to bottom, #3498db, #2ecc71);
+    border-radius: 5px 0 0 5px;
+}
 
-        .content-header {
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid var(--cinza-medio);
-        }
+.metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
 
-        .content-title {
-            font-size: 1.8rem;
-            color: var(--azul-principal);
-            margin-bottom: 5px;
-        }
+.metric-card h6 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
-        .content-subtitle {
-            color: var(--cinza-escuro);
-            font-size: 1rem;
-        }
+.metric-card h2, .metric-card h4 {
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0.5rem 0;
+    font-size: 2.2rem;
+}
 
-        /* Loading States */
-        .loading-state {
-            text-align: center;
-            padding: 60px 20px;
-        }
+.metric-card h4 {
+    font-size: 1.8rem;
+}
 
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid var(--cinza-medio);
-            border-top-color: var(--azul-secundario);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
+.metric-card .progress-custom {
+    height: 8px;
+    border-radius: 10px;
+    background-color: #f1f5f9;
+    overflow: hidden;
+}
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+.metric-card .progress-custom .progress-bar {
+    border-radius: 10px;
+    transition: width 1s ease-in-out;
+}
 
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--cinza-escuro);
-        }
+/* ===== CARDS DE EVOLUÇÃO ===== */
+.evolution-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.8rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+}
 
-        .empty-icon {
-            font-size: 4rem;
-            color: var(--cinza-medio);
-            margin-bottom: 20px;
-        }
+.evolution-card:hover {
+    transform: translateY(-3px);
+}
+
+.evolution-card h5 {
+    font-weight: 600;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    font-size: 1.3rem;
+}
+
+.evolution-card h5 i {
+    font-size: 1.2rem;
+    margin-right: 10px;
+    background: rgba(52, 152, 219, 0.1);
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.sidebar{
+    display: none;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+    margin-top: 1.5rem;
+}
+
+/* ===== TABELA DE PERDAS ===== */
+.losses-table {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+}
+
+.losses-table .p-3 {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-bottom: 2px solid #3498db;
+}
+
+.losses-table h5 {
+    font-weight: 600;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    font-size: 1.3rem;
+}
+
+.losses-table h5 i {
+    margin-right: 10px;
+    background: rgba(241, 196, 15, 0.1);
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.losses-table table {
+    margin-bottom: 0;
+}
+
+.losses-table thead {
+    background: #f1f5f9;
+}
+
+.losses-table th {
+    font-weight: 600;
+    color: #475569;
+    font-size: 0.9rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 2px solid #e2e8f0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.losses-table td {
+    padding: 1.2rem 1.5rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.2s ease;
+}
+
+.losses-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.losses-table .category-badge {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.badge-operacional {
+    background: rgba(52, 152, 219, 0.1);
+    color: #2980b9;
+    border: 1px solid rgba(52, 152, 219, 0.2);
+}
+
+.badge-documental {
+    background: rgba(155, 89, 182, 0.1);
+    color: #8e44ad;
+    border: 1px solid rgba(155, 89, 182, 0.2);
+}
+
+.badge-ocorrencia {
+    background: rgba(241, 196, 15, 0.1);
+    color: #f39c12;
+    border: 1px solid rgba(241, 196, 15, 0.2);
+}
+
+.badge-deflator {
+    background: rgba(46, 204, 113, 0.1);
+    color: #27ae60;
+    border: 1px solid rgba(46, 204, 113, 0.2);
+}
+
+/* ===== INDICADORES DE TENDÊNCIA ===== */
+.trend-up {
+    color: #27ae60;
+    font-weight: 600;
+}
+
+.trend-down {
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+.trend-stable {
+    color: #f39c12;
+    font-weight: 600;
+}
+
+/* ===== ÁREAS DE MELHORIA ===== */
+.loss-item {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    height: 100%;
+    border-left: 4px solid #3498db;
+    transition: all 0.3s ease;
+}
+
+.loss-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.loss-high {
+    border-left-color: #e74c3c;
+}
+
+.loss-medium {
+    border-left-color: #f39c12;
+}
+
+.loss-low {
+    border-left-color: #27ae60;
+}
+
+.loss-item h6 {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 1.1rem;
+}
+
+/* ===== ACORDEÃO MENSAL ===== */
+.accordion-item {
+    border: none;
+    margin-bottom: 1rem;
+    border-radius: 12px !important;
+    overflow: hidden;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+}
+
+.accordion-button {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border: none;
+    padding: 1.5rem;
+    font-weight: 600;
+    color: #1e293b;
+    border-radius: 12px !important;
+    transition: all 0.3s ease;
+}
+
+.accordion-button:not(.collapsed) {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    box-shadow: none;
+}
+
+.accordion-button:focus {
+    box-shadow: none;
+    border: none;
+}
+
+.accordion-button::after {
+    background-size: 1.2rem;
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+.accordion-body {
+    padding: 1.5rem;
+    background: white;
+}
+
+/* ===== BADGES E ALERTAS ===== */
+.badge {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.4rem 0.8rem;
+}
+
+.alert {
+    border-radius: 12px;
+    border: none;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.alert-info {
+    background: rgba(52, 152, 219, 0.1);
+    color: #2980b9;
+    border-left: 4px solid #3498db;
+}
+
+.alert-success {
+    background: rgba(46, 204, 113, 0.1);
+    color: #27ae60;
+    border-left: 4px solid #2ecc71;
+}
+
+.alert-warning {
+    background: rgba(241, 196, 15, 0.1);
+    color: #f39c12;
+    border-left: 4px solid #f1c40f;
+}
+
+.alert-danger {
+    background: rgba(231, 76, 60, 0.1);
+    color: #c0392b;
+    border-left: 4px solid #e74c3c;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 1200px) {
+    .dashboard-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .metric-card h2 {
+        font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 992px) {
+    #appContent {
+        border-radius: 20px;
+    }
+    
+    .dashboard-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .dashboard-header h1 {
+        justify-content: center;
+        font-size: 1.6rem;
+    }
+    
+    .filter-card .row > div {
+        margin-bottom: 1rem;
+    }
+    
+    .filter-card .row > div:last-child {
+        margin-bottom: 0;
+    }
+    
+    .losses-table {
+        overflow-x: auto;
+    }
+    
+    .losses-table table {
+        min-width: 900px;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+        background: white;
+    }
+    
+    #appContent {
+        border-radius: 16px;
+        box-shadow: none;
+    }
+    
+    .dashboard-header {
+        border-radius: 0 0 16px 16px;
+    }
+    
+    .filter-card, .evolution-card, .losses-table {
+        padding: 1.2rem;
+    }
+    
+    .chart-container {
+        height: 250px;
+    }
+    
+    .accordion-button {
+        padding: 1rem;
+        font-size: 0.95rem;
+    }
+    
+    .accordion-body {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .dashboard-header h1 {
+        font-size: 1.4rem;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .dashboard-header h1 i {
+        margin-right: 0;
+    }
+    
+    .metric-card {
+        padding: 1.2rem;
+    }
+    
+    .metric-card h2 {
+        font-size: 1.6rem;
+    }
+    
+    .evolution-card h5 {
+        font-size: 1.1rem;
+    }
+    
+    .losses-table h5 {
+        font-size: 1.1rem;
+    }
+}
+
+/* ===== ANIMAÇÕES ADICIONAIS ===== */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.metric-card, .evolution-card, .loss-item {
+    animation: slideIn 0.5s ease-out;
+}
+
+/* ===== UTILITÁRIOS ===== */
+.text-center {
+    text-align: center;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+.mb-0 { margin-bottom: 0 !important; }
+.mb-2 { margin-bottom: 0.5rem !important; }
+.mb-3 { margin-bottom: 1rem !important; }
+.mb-4 { margin-bottom: 1.5rem !important; }
+.mt-2 { margin-top: 0.5rem !important; }
+.mt-3 { margin-top: 1rem !important; }
+.mt-4 { margin-top: 1.5rem !important; }
+.me-1 { margin-right: 0.25rem !important; }
+.me-2 { margin-right: 0.5rem !important; }
+.ms-2 { margin-left: 0.5rem !important; }
+.p-3 { padding: 1rem !important; }
+
+/* ===== ESTADOS DE CARREGAMENTO ===== */
+.loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: inherit;
+    z-index: 10;
+}
+
+
+
+.loading::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 11;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ===== SCROLL PERSONALIZADO ===== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Header -->
-        <div class="header">
-            <h1>🔍 Análise de Ineficiências Detalhada</h1>
-            <p class="header-subtitle">Clique em um técnico para analisar perdas ponto a ponto em todos os meses</p>
+    <!-- Overlay de Login (inicialmente visível) -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Verificando autenticação...</span>
+            </div>
+            <p class="mt-3">Verificando autenticação...</p>
+        </div>
+    </div>
+
+    <!-- Conteúdo principal (inicialmente escondido) -->
+    <div id="appContent" style="display: none;">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="p-3">
+                <h4 class="text-white mb-4">
+                    <i class="fas fa-chart-line me-2"></i>Análise de Desempenho
+                </h4>
+            </div>
+            
+            <div class="sidebar-menu">
+                <a href="home.html">
+                    <i class="fas fa-home me-2"></i>Home
+                </a>
+                <a href="ficha_performance.html">
+                    <i class="fas fa-clipboard-check me-2"></i>Ficha de Performance
+                </a>
+                <a href="analise_pontos.html" class="active">
+                    <i class="fas fa-search me-2"></i>Análise de Pontos
+                </a>
+            </div>
+            
+            <div class="p-3 mt-4">
+                <div class="user-info mb-3 p-2 bg-dark rounded">
+                    <small class="d-block">Usuário:</small>
+                    <strong id="userName">-</strong>
+                    <small class="d-block mt-1">Unidade:</small>
+                    <span id="userUnit">-</span>
+                </div>
+                <button id="logoutBtn" class="btn btn-danger w-100">
+                    <i class="fas fa-sign-out-alt me-2"></i>Sair
+                </button>
+            </div>
         </div>
 
-        <!-- Dashboard Grid -->
-        <div class="dashboard-grid">
-            <!-- Sidebar - Lista de Técnicos -->
-            <div class="sidebar">
-                <h3 class="sidebar-title">
-                    <i class="fas fa-users me-2"></i>Técnicos Disponíveis
-                </h3>
-                
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" id="searchTecnico" placeholder="Buscar técnico...">
-                    <button class="btn btn-outline-primary" type="button" id="btnSearch">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-                
-                <div class="d-flex gap-2 mb-3">
-                    <button class="btn btn-sm btn-outline-primary" id="btnTodos">Todos</button>
-                    <button class="btn btn-sm btn-outline-danger" id="btnMaisPerdas">+ Perdas</button>
-                    <button class="btn btn-sm btn-outline-success" id="btnMelhores">Melhores</button>
-                </div>
-                
-                <ul class="tecnico-list" id="tecnicoList">
-                    <li class="loading-state">
-                        <div class="spinner"></div>
-                        <p>Carregando lista de técnicos...</p>
-                    </li>
-                </ul>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="dashboard-header">
+                <h1 class="mb-3">
+                    <i class="fas fa-chart-bar text-primary me-2"></i>
+                    Análise de Pontos Perdidos
+                </h1>
+                <p class="text-white  mb-0">
+                    Visualize onde os técnicos estão perdendo pontos e acompanhe a evolução ao longo do tempo
+                </p>
             </div>
 
-            <!-- Main Content - Análise Detalhada -->
-            <div class="main-content">
-                <div id="contentEmpty" class="empty-state">
-                    <div class="empty-icon">
-                        <i class="fas fa-user-check"></i>
+            <!-- Filters -->
+            <div class="filter-card">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label class="form-label">Técnico:</label>
+                        <select id="tecnicoSelect" class="form-select">
+                            <option value="">Todos os técnicos</option>
+                        </select>
                     </div>
-                    <h4 class="empty-title">Selecione um Técnico</h4>
-                    <p class="empty-text">Clique em um técnico na lista ao lado para visualizar a análise detalhada de suas ineficiências.</p>
+                    <div class="col-md-3">
+                        <label class="form-label">Unidade:</label>
+                        <select id="unidadeSelect" class="form-select">
+                            <option value="">Todas as unidades</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Período:</label>
+                        <select id="periodoSelect" class="form-select">
+                            <option value="3">Últimos 3 meses</option>
+                            <option value="6" selected>Últimos 6 meses</option>
+                            <option value="12">Últimos 12 meses</option>
+                            <option value="all">Todo o período</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button id="btnFiltrar" class="btn btn-primary w-100">
+                            <i class="fas fa-filter me-1"></i>Filtrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="metric-card">
+                        <h6 class="text-muted mb-2">Pontuação Média</h6>
+                        <h2 id="avgScore">-</h2>
+                        <div class="d-flex align-items-center">
+                            <span id="scoreTrend" class="me-2">
+                                <i class="fas fa-minus"></i>
+                            </span>
+                            <small id="scoreChange" class="text-muted">vs período anterior</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="metric-card">
+                        <h6 class="text-muted mb-2">Pontos Perdidos/Mês</h6>
+                        <h2 id="avgLoss">-</h2>
+                        <div class="progress progress-custom mt-2">
+                            <div id="lossProgress" class="progress-bar bg-danger" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="metric-card">
+                        <h6 class="text-muted mb-2">Maior Perda</h6>
+                        <h4 id="biggestLoss">-</h4>
+                        <small id="lossCategory" class="text-muted">Categoria</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="metric-card">
+                        <h6 class="text-muted mb-2">Evolução</h6>
+                        <h4 id="evolutionStatus">-</h4>
+                        <small id="evolutionDetail" class="text-muted">Tendência</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts and Tables -->
+            <div class="row">
+                <!-- Evolution Chart -->
+                <div class="col-md-8">
+                    <div class="evolution-card">
+                        <h5 class="mb-3">
+                            <i class="fas fa-chart-line me-2 text-primary"></i>
+                            Evolução Mensal
+                        </h5>
+                        <div class="chart-container">
+                            <canvas id="evolutionChart"></canvas>
+                        </div>
+                    </div>
                 </div>
 
-                <div id="contentAnalise" style="display: none;">
-                    <!-- Conteúdo será carregado dinamicamente -->
+                <!-- Category Distribution -->
+                <div class="col-md-4">
+                    <div class="evolution-card">
+                        <h5 class="mb-3">
+                            <i class="fas fa-chart-pie me-2 text-primary"></i>
+                            Distribuição das Perdas
+                        </h5>
+                        <div class="chart-container">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Losses -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="losses-table">
+                        <div class="p-3 border-bottom">
+                            <h5 class="mb-0">
+                                <i class="fas fa-exclamation-triangle me-2 text-warning"></i>
+                                Principais Pontos Perdidos
+                            </h5>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Categoria</th>
+                                        <th>Pontos Perdidos</th>
+                                        <th>Frequência</th>
+                                        <th>Tendência</th>
+                                        <th>Pontos Máximos</th>
+                                        <th>% Perdido</th>
+                                        <th>Recomendação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lossesTable">
+                                    <!-- Dados serão preenchidos via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Improvement Areas -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="evolution-card">
+                        <h5 class="mb-3">
+                            <i class="fas fa-lightbulb me-2 text-success"></i>
+                            Áreas para Melhoria
+                        </h5>
+                        <div id="improvementAreas" class="row">
+                            <!-- Recomendações serão geradas dinamicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monthly Details -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="evolution-card">
+                        <h5 class="mb-3">
+                            <i class="fas fa-calendar-alt me-2 text-primary"></i>
+                            Detalhamento Mensal
+                        </h5>
+                        <div id="monthlyDetails" class="accordion">
+                            <!-- Acordeão será gerado dinamicamente -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript Libraries -->
+    <!-- Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    
-    <!-- Main Application Script -->
+
     <script>
-        // Configuração do Firebase (adicione sua configuração aqui)
+        // Configuração EXATA do Firebase (igual ao seu arquivo original)
         const firebaseConfig = {
-            apiKey: "SUA_API_KEY",
-            authDomain: "SEU_DOMINIO.firebaseapp.com",
-            projectId: "SEU_PROJECT_ID",
-            storageBucket: "SEU_BUCKET.appspot.com",
-            messagingSenderId: "SEU_SENDER_ID",
-            appId: "SEU_APP_ID"
+        apiKey: "AIzaSyDZwa4XNqlupNDLs7-CRQbhr5pRT4NyFBA",
+        authDomain: "application-gzl.firebaseapp.com",
+        databaseURL: "https://application-gzl-default-rtdb.firebaseio.com",
+        projectId: "application-gzl",
+        storageBucket: "application-gzl.appspot.com",
+        messagingSenderId: "319900903265",
+        appId: "1:319900903265:web:a8f400aeb7a697fc168720",
+        measurementId: "G-ZRRFQZXT54"
         };
 
-        // Inicializa Firebase
+        // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
 
-        class AnaliseIneficienciasApp {
-            constructor() {
-                this.dadosTecnicos = [];
-                this.dadosFiltrados = [];
-                this.tecnicoSelecionado = null;
-                this.authInitialized = false;
+        // Variáveis globais
+        let allRankings = [];
+        let filteredData = [];
+        let evolutionChartInstance = null;
+        let categoryChartInstance = null;
+
+        // Função para verificar autenticação
+        function checkAuth() {
+            console.log("Verificando autenticação...");
+            
+            // Verifica se há um usuário logado
+            const user = auth.currentUser;
+            
+            if (user) {
+                console.log("Usuário já está logado:", user.email);
+                showAppContent();
+                return;
+            }
+            
+            // Se não estiver logado, tenta verificar se há sessão salva
+            auth.onAuthStateChanged((user) => {
+                console.log("Estado da autenticação mudou:", user ? "Logado" : "Não logado");
                 
-                this.initialize();
-            }
-
-            async initialize() {
-                try {
-                    await this.initAuth();
-                    this.bindEvents();
-                    await this.carregarDados();
-                } catch (error) {
-                    console.error('Erro na inicialização:', error);
-                    this.mostrarErro('Erro ao inicializar aplicação');
-                }
-            }
-
-            async initAuth() {
-                return new Promise((resolve, reject) => {
-                    firebase.auth().onAuthStateChanged((user) => {
-                        if (user) {
-                            console.log("Usuário autenticado:", user.uid);
-                            this.authInitialized = true;
-                            resolve(user);
-                        } else {
-                            // Tenta fazer login anônimo se permitido
-                            firebase.auth().signInAnonymously()
-                                .then(() => {
-                                    console.log("Login anônimo realizado");
-                                    this.authInitialized = true;
-                                    resolve();
-                                })
-                                .catch(error => {
-                                    console.error("Erro no login anônimo:", error);
-                                    this.mostrarErro('Erro de autenticação');
-                                    reject(error);
-                                });
-                        }
-                    });
-                });
-            }
-
-            bindEvents() {
-                // Busca
-                document.getElementById('btnSearch').addEventListener('click', () => {
-                    const termo = document.getElementById('searchTecnico').value;
-                    this.filtrarTecnicos(termo);
-                });
-
-                document.getElementById('searchTecnico').addEventListener('keyup', (e) => {
-                    if (e.key === 'Enter') {
-                        this.filtrarTecnicos(e.target.value);
-                    }
-                });
-
-                // Botões de filtro
-                document.getElementById('btnTodos').addEventListener('click', () => {
-                    document.getElementById('searchTecnico').value = '';
-                    this.filtrarTecnicos('');
-                });
-
-                document.getElementById('btnMaisPerdas').addEventListener('click', () => {
-                    this.ordenarPorPerdas();
-                });
-
-                document.getElementById('btnMelhores').addEventListener('click', () => {
-                    this.ordenarPorPontuacao();
-                });
-            }
-
-            async carregarDados() {
-                try {
-                    if (!this.authInitialized) {
-                        throw new Error('Autenticação não inicializada');
-                    }
-
-                    const snapshot = await firebase.firestore()
-                        .collection('ranking-tst')
-                        .orderBy('createdAt', 'desc')
-                        .limit(500) // Limita para performance
-                        .get();
-
-                    if (snapshot.empty) {
-                        this.mostrarEmptyState();
-                        return;
-                    }
-
-                    const registros = [];
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        data.id = doc.id;
-                        registros.push(data);
-                    });
-
-                    this.processarDadosTecnicos(registros);
-                    this.renderizarListaTecnicos();
-                    
-                } catch (error) {
-                    console.error('Erro ao carregar dados:', error);
-                    this.mostrarErro('Erro ao carregar dados: ' + error.message);
-                    
-                    // Mostra dados de exemplo para desenvolvimento
-                    this.usarDadosExemplo();
-                }
-            }
-
-            processarDadosTecnicos(registros) {
-                const dadosPorTecnico = {};
-                const anoAtual = new Date().getFullYear();
-                
-                registros.forEach(registro => {
-                    const data = registro.dataHora ? 
-                        (registro.dataHora.toDate ? registro.dataHora.toDate() : new Date(registro.dataHora)) : 
-                        new Date();
-                    
-                    const ano = data.getFullYear();
-                    const mes = data.getMonth() + 1;
-                    
-                    if (ano !== anoAtual && ano !== anoAtual - 1) return; // Últimos 2 anos
-                    
-                    const tecnicoId = registro.tecnicoId;
-                    const tecnicoNome = registro.tecnicoNome || 'Técnico desconhecido';
-                    const unidade = registro.unidade || 'Sem unidade';
-                    
-                    if (!dadosPorTecnico[tecnicoId]) {
-                        dadosPorTecnico[tecnicoId] = {
-                            tecnicoId: tecnicoId,
-                            tecnicoNome: tecnicoNome,
-                            unidade: unidade,
-                            totalPontos: 0,
-                            totalPerdas: 0,
-                            mesesAtivos: 0,
-                            ultimaAvaliacao: data,
-                            dadosMensais: {}
-                        };
-                    }
-                    
-                    const pontosMes = registro.totalGeral || 0;
-                    const perdasMes = 174 - pontosMes;
-                    
-                    dadosPorTecnico[tecnicoId].totalPontos += pontosMes;
-                    dadosPorTecnico[tecnicoId].totalPerdas += perdasMes;
-                    dadosPorTecnico[tecnicoId].mesesAtivos++;
-                    
-                    if (data > dadosPorTecnico[tecnicoId].ultimaAvaliacao) {
-                        dadosPorTecnico[tecnicoId].ultimaAvaliacao = data;
-                    }
-                    
-                    // Armazena dados do mês
-                    const chaveMes = `${ano}-${mes.toString().padStart(2, '0')}`;
-                    if (!dadosPorTecnico[tecnicoId].dadosMensais[chaveMes]) {
-                        dadosPorTecnico[tecnicoId].dadosMensais[chaveMes] = {
-                            pontos: pontosMes,
-                            perdas: perdasMes,
-                            data: data,
-                            registro: registro
-                        };
-                    }
-                });
-
-                this.dadosTecnicos = Object.values(dadosPorTecnico)
-                    .filter(tecnico => tecnico.mesesAtivos > 0)
-                    .sort((a, b) => b.totalPontos - a.totalPontos);
-                    
-                this.dadosFiltrados = [...this.dadosTecnicos];
-            }
-
-            renderizarListaTecnicos() {
-                const lista = document.getElementById('tecnicoList');
-                
-                if (this.dadosFiltrados.length === 0) {
-                    lista.innerHTML = `
-                        <li class="empty-state">
-                            <div class="empty-icon">
-                                <i class="fas fa-users-slash"></i>
-                            </div>
-                            <p>Nenhum técnico encontrado</p>
-                            <button class="btn btn-sm btn-primary mt-2" onclick="app.carregarDados()">
-                                <i class="fas fa-sync"></i> Tentar Novamente
-                            </button>
-                        </li>`;
-                    return;
-                }
-
-                let html = '';
-                
-                this.dadosFiltrados.forEach(tecnico => {
-                    const pontuacaoMedia = tecnico.mesesAtivos > 0 ? 
-                        (tecnico.totalPontos / tecnico.mesesAtivos).toFixed(1) : '0.0';
-                    const perdasMedia = tecnico.mesesAtivos > 0 ? 
-                        (tecnico.totalPerdas / tecnico.mesesAtivos).toFixed(1) : '0.0';
-                    const dataFormatada = tecnico.ultimaAvaliacao.toLocaleDateString('pt-BR');
-                    
-                    html += `
-                        <li class="tecnico-item" data-tecnico-id="${tecnico.tecnicoId}">
-                            <div class="tecnico-avatar">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="tecnico-info">
-                                <div class="tecnico-name">${tecnico.tecnicoNome}</div>
-                                <div class="tecnico-unit">${tecnico.unidade}</div>
-                                <div class="d-flex justify-content-between small mt-1">
-                                    <span title="Pontuação média">⭐ ${pontuacaoMedia}</span>
-                                    <span title="Perdas média">📉 ${perdasMedia}</span>
-                                    <span title="Última avaliação">📅 ${dataFormatada}</span>
-                                </div>
-                            </div>
-                        </li>`;
-                });
-
-                lista.innerHTML = html;
-                
-                // Adiciona eventos de clique
-                document.querySelectorAll('.tecnico-item').forEach(item => {
-                    item.addEventListener('click', (e) => {
-                        const tecnicoId = e.currentTarget.dataset.tecnicoId;
-                        const tecnico = this.dadosTecnicos.find(t => t.tecnicoId === tecnicoId);
-                        
-                        if (tecnico) {
-                            this.selecionarTecnico(tecnico, e.currentTarget);
-                        }
-                    });
-                });
-            }
-
-            filtrarTecnicos(termo) {
-                termo = termo.toLowerCase().trim();
-                
-                if (!termo) {
-                    this.dadosFiltrados = [...this.dadosTecnicos];
+                if (user) {
+                    console.log("Usuário autenticado via onAuthStateChanged:", user.email);
+                    showAppContent();
                 } else {
-                    this.dadosFiltrados = this.dadosTecnicos.filter(tecnico => 
-                        tecnico.tecnicoNome.toLowerCase().includes(termo) ||
-                        tecnico.unidade.toLowerCase().includes(termo)
-                    );
-                }
-                
-                this.renderizarListaTecnicos();
-            }
-
-            ordenarPorPerdas() {
-                this.dadosFiltrados.sort((a, b) => b.totalPerdas - a.totalPerdas);
-                this.renderizarListaTecnicos();
-            }
-
-            ordenarPorPontuacao() {
-                this.dadosFiltrados.sort((a, b) => b.totalPontos - a.totalPontos);
-                this.renderizarListaTecnicos();
-            }
-
-            selecionarTecnico(tecnico, elemento) {
-                // Remove seleção anterior
-                document.querySelectorAll('.tecnico-item').forEach(item => {
-                    item.classList.remove('active');
-                });
-                
-                // Adiciona seleção atual
-                elemento.classList.add('active');
-                
-                this.tecnicoSelecionado = tecnico;
-                this.mostrarAnaliseTecnico(tecnico);
-            }
-
-            mostrarAnaliseTecnico(tecnico) {
-                const pontuacaoMedia = tecnico.mesesAtivos > 0 ? 
-                    (tecnico.totalPontos / tecnico.mesesAtivos).toFixed(1) : '0.0';
-                const perdasMedia = tecnico.mesesAtivos > 0 ? 
-                    (tecnico.totalPerdas / tecnico.mesesAtivos).toFixed(1) : '0.0';
-                
-                // Conta meses com dados
-                const mesesComDados = Object.keys(tecnico.dadosMensais).length;
-                
-                // Encontra melhor e pior mês
-                let melhorMes = { pontos: 0 };
-                let piorMes = { pontos: 174 };
-                
-                Object.values(tecnico.dadosMensais).forEach(dadosMes => {
-                    if (dadosMes.pontos > melhorMes.pontos) melhorMes = dadosMes;
-                    if (dadosMes.pontos < piorMes.pontos) piorMes = dadosMes;
-                });
-
-                const conteudo = `
-                    <div class="content-header">
-                        <h2 class="content-title">${tecnico.tecnicoNome}</h2>
-                        <p class="content-subtitle">${tecnico.unidade} • ${mesesComDados} avaliações registradas</p>
-                    </div>
-
-                    <div class="row mb-4">
-                        <div class="col-md-3">
-                            <div class="card border-success">
-                                <div class="card-body text-center">
-                                    <h3 class="text-success">${pontuacaoMedia}</h3>
-                                    <p class="text-muted mb-0">Pontuação Média</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card border-danger">
-                                <div class="card-body text-center">
-                                    <h3 class="text-danger">${perdasMedia}</h3>
-                                    <p class="text-muted mb-0">Perdas Média</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card border-primary">
-                                <div class="card-body text-center">
-                                    <h3 class="text-primary">${mesesComDados}</h3>
-                                    <p class="text-muted mb-0">Meses Ativos</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card border-warning">
-                                <div class="card-body text-center">
-                                    <h3 class="text-warning">${tecnico.totalPontos.toFixed(0)}</h3>
-                                    <p class="text-muted mb-0">Pontos Totais</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h5 class="mb-0">📊 Melhor vs Pior Desempenho</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="alert alert-success">
-                                        <h6>🎯 Melhor Mês</h6>
-                                        <p class="mb-1"><strong>Pontuação:</strong> ${melhorMes.pontos.toFixed(1)}</p>
-                                        <p class="mb-1"><strong>Perdas:</strong> ${melhorMes.perdas.toFixed(1)}</p>
-                                        ${melhorMes.data ? `<p class="mb-0"><strong>Data:</strong> ${melhorMes.data.toLocaleDateString('pt-BR')}</p>` : ''}
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="alert alert-danger">
-                                        <h6>⚠️ Pior Mês</h6>
-                                        <p class="mb-1"><strong>Pontuação:</strong> ${piorMes.pontos.toFixed(1)}</p>
-                                        <p class="mb-1"><strong>Perdas:</strong> ${piorMes.perdas.toFixed(1)}</p>
-                                        ${piorMes.data ? `<p class="mb-0"><strong>Data:</strong> ${piorMes.data.toLocaleDateString('pt-BR')}</p>` : ''}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0">📅 Histórico por Mês</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Mês/Ano</th>
-                                            <th>Pontuação</th>
-                                            <th>Perdas</th>
-                                            <th>Desempenho</th>
-                                            <th>Ações</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${this.gerarLinhasHistorico(tecnico.dadosMensais)}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-4">
-                        <button class="btn btn-primary" onclick="app.exportarAnalise()">
-                            <i class="fas fa-download"></i> Exportar Análise Completa
-                        </button>
-                        <button class="btn btn-outline-primary ms-2" onclick="app.compararComOutros()">
-                            <i class="fas fa-chart-bar"></i> Comparar com Outros
-                        </button>
-                    </div>
-                `;
-                
-                document.getElementById('contentEmpty').style.display = 'none';
-                document.getElementById('contentAnalise').style.display = 'block';
-                document.getElementById('contentAnalise').innerHTML = conteudo;
-            }
-
-            gerarLinhasHistorico(dadosMensais) {
-                // Ordena meses por data (mais recente primeiro)
-                const mesesOrdenados = Object.entries(dadosMensais)
-                    .sort(([chaveA, dadosA], [chaveB, dadosB]) => {
-                        return dadosB.data - dadosA.data;
-                    });
-
-                let html = '';
-                
-                mesesOrdenados.forEach(([chaveMes, dados]) => {
-                    const [ano, mes] = chaveMes.split('-');
-                    const nomeMes = this.getNomeMes(parseInt(mes));
-                    const desempenho = ((dados.pontos / 174) * 100).toFixed(1);
+                    console.log("Nenhum usuário autenticado, redirecionando para login");
+                    // Redireciona para a página de login
+                    // Verifica se estamos na raiz ou em subpasta
+                    const currentPath = window.location.pathname;
+                    const isInSubfolder = currentPath.includes('/') && currentPath.split('/').length > 2;
                     
-                    let classeDesempenho = 'text-success';
-                    if (desempenho < 60) classeDesempenho = 'text-danger';
-                    else if (desempenho < 80) classeDesempenho = 'text-warning';
-                    
-                    html += `
-                        <tr>
-                            <td><strong>${nomeMes} ${ano}</strong></td>
-                            <td><span class="badge bg-success">${dados.pontos.toFixed(1)}</span></td>
-                            <td><span class="badge bg-danger">${dados.perdas.toFixed(1)}</span></td>
-                            <td><span class="${classeDesempenho}">${desempenho}%</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-info" onclick="app.verDetalhesMes('${chaveMes}')">
-                                    <i class="fas fa-search"></i> Detalhes
-                                </button>
-                            </td>
-                        </tr>`;
-                });
-                
-                return html;
-            }
-
-            getNomeMes(numero) {
-                const meses = [
-                    '', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-                    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-                ];
-                return meses[numero] || '';
-            }
-
-            verDetalhesMes(chaveMes) {
-                if (!this.tecnicoSelecionado) return;
-                
-                const dadosMes = this.tecnicoSelecionado.dadosMensais[chaveMes];
-                if (!dadosMes) return;
-                
-                const registro = dadosMes.registro;
-                const [ano, mes] = chaveMes.split('-');
-                const nomeMes = this.getNomeMes(parseInt(mes));
-                
-                // Calcula ineficiências detalhadas
-                const ineficiencias = this.calcularIneficienciasDetalhadas(registro);
-                
-                const modalConteudo = `
-                    <div class="modal fade" id="detalhesModal" tabindex="-1">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Detalhes - ${nomeMes} ${ano}</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <h6>Pontuação Total: <span class="badge bg-success">${dadosMes.pontos.toFixed(1)}</span></h6>
-                                    <h6>Perdas Totais: <span class="badge bg-danger">${dadosMes.perdas.toFixed(1)}</span></h6>
-                                    
-                                    <div class="mt-4">
-                                        <h6>🔍 Análise de Ineficiências:</h6>
-                                        ${ineficiencias}
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                // Adiciona modal ao body
-                const modalContainer = document.createElement('div');
-                modalContainer.innerHTML = modalConteudo;
-                document.body.appendChild(modalContainer);
-                
-                // Mostra modal
-                const modal = new bootstrap.Modal(document.getElementById('detalhesModal'));
-                modal.show();
-                
-                // Remove modal do DOM após fechar
-                modalContainer.addEventListener('hidden.bs.modal', () => {
-                    modalContainer.remove();
-                });
-            }
-
-            calcularIneficienciasDetalhadas(registro) {
-                const categorias = {
-                    'Operacional': [
-                        { nome: 'Auditoria Comportamental', valor: registro.auditoriaComportamental || 0, max: 8 },
-                        { nome: 'DTO', valor: registro.dto || 0, max: 5 },
-                        { nome: 'Cartão Verde', valor: registro.cartaoVerde || 0, max: 5 },
-                        { nome: 'Relato de Desvio', valor: registro.relatoDesvio || 0, max: 15 },
-                        { nome: 'Ronda', valor: registro.ronda || 0, max: 12 }
-                    ],
-                    'Documental': [
-                        { nome: 'Rede + Sistemas', valor: registro.sistema || 0, max: 5 },
-                        { nome: 'Gestão do Plano', valor: registro.gestaoPlanoAcao || 0, max: 5 },
-                        { nome: 'Portal', valor: registro.Portal || 0, max: 5 },
-                        { nome: 'Ofensores', valor: registro.Ofensores || 0, max: 5 }
-                    ],
-                    'Ocorrência': [
-                        { nome: 'Incidente', valor: registro.incidente || 0, max: 35 },
-                        { nome: 'OSA', valor: registro.osa || 0, max: 35 },
-                        { nome: 'SAF', valor: registro.saf || 0, max: 35 },
-                        { nome: 'CAF', valor: registro.caf || 0, max: 35 }
-                    ]
-                };
-
-                let html = '';
-                
-                for (const [categoria, itens] of Object.entries(categorias)) {
-                    html += `<h6 class="mt-3">${categoria}:</h6>`;
-                    
-                    itens.forEach(item => {
-                        const perdas = item.max - item.valor;
-                        const percentual = (item.valor / item.max * 100).toFixed(1);
-                        
-                        let badgeClasse = 'bg-success';
-                        if (percentual < 60) badgeClasse = 'bg-danger';
-                        else if (percentual < 80) badgeClasse = 'bg-warning';
-                        
-                        html += `
-                            <div class="mb-2">
-                                <div class="d-flex justify-content-between">
-                                    <span>${item.nome}:</span>
-                                    <span>
-                                        <span class="badge ${badgeClasse}">${item.valor}/${item.max}</span>
-                                        <small class="text-muted ms-2">(${percentual}%)</small>
-                                    </span>
-                                </div>
-                                ${perdas > 0 ? `<small class="text-danger">Perdas: ${perdas} pontos</small>` : ''}
-                            </div>`;
-                    });
-                }
-                
-                return html;
-            }
-
-            exportarAnalise() {
-                if (!this.tecnicoSelecionado) {
-                    this.mostrarToast('Selecione um técnico primeiro', 'warning');
-                    return;
-                }
-
-                // Implementação simplificada de exportação
-                const tecnico = this.tecnicoSelecionado;
-                const data = JSON.stringify(tecnico, null, 2);
-                const blob = new Blob([data], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `analise_${tecnico.tecnicoNome.replace(/\s+/g, '_')}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                this.mostrarToast('Análise exportada com sucesso!', 'success');
-            }
-
-            compararComOutros() {
-                if (!this.tecnicoSelecionado) {
-                    this.mostrarToast('Selecione um técnico primeiro', 'warning');
-                    return;
-                }
-
-                // Implementação simplificada de comparação
-                const outrosTecnicos = this.dadosTecnicos
-                    .filter(t => t.tecnicoId !== this.tecnicoSelecionado.tecnicoId)
-                    .slice(0, 5); // Limita a 5 técnicos para comparação
-
-                let html = `
-                    <div class="modal fade" id="compararModal" tabindex="-1">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Comparação com Outros Técnicos</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <h6>Técnico Selecionado: <strong>${this.tecnicoSelecionado.tecnicoNome}</strong></h6>
-                                    
-                                    <div class="table-responsive mt-3">
-                                        <table class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>Técnico</th>
-                                                    <th>Pontuação Média</th>
-                                                    <th>Perdas Média</th>
-                                                    <th>Meses Ativos</th>
-                                                    <th>Comparação</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>`;
-
-                outrosTecnicos.forEach(outro => {
-                    const pontuacaoMediaOutro = outro.mesesAtivos > 0 ? 
-                        (outro.totalPontos / outro.mesesAtivos).toFixed(1) : '0.0';
-                    const pontuacaoMediaAtual = this.tecnicoSelecionado.mesesAtivos > 0 ? 
-                        (this.tecnicoSelecionado.totalPontos / this.tecnicoSelecionado.mesesAtivos).toFixed(1) : '0.0';
-                    
-                    const diferenca = (pontuacaoMediaAtual - pontuacaoMediaOutro).toFixed(1);
-                    
-                    html += `
-                        <tr>
-                            <td>${outro.tecnicoNome}</td>
-                            <td>${pontuacaoMediaOutro}</td>
-                            <td>${(outro.totalPerdas / outro.mesesAtivos).toFixed(1)}</td>
-                            <td>${outro.mesesAtivos}</td>
-                            <td>
-                                ${diferenca > 0 ? 
-                                    `<span class="text-success">+${diferenca}</span>` : 
-                                    `<span class="text-danger">${diferenca}</span>`
-                                }
-                            </td>
-                        </tr>`;
-                });
-
-                html += `
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
-
-                // Adiciona e mostra modal
-                const modalContainer = document.createElement('div');
-                modalContainer.innerHTML = html;
-                document.body.appendChild(modalContainer);
-                
-                const modal = new bootstrap.Modal(document.getElementById('compararModal'));
-                modal.show();
-                
-                modalContainer.addEventListener('hidden.bs.modal', () => {
-                    modalContainer.remove();
-                });
-            }
-
-            usarDadosExemplo() {
-                console.log('Usando dados de exemplo para desenvolvimento');
-                
-                // Dados de exemplo para desenvolvimento
-                this.dadosTecnicos = [
-                    {
-                        tecnicoId: 'exemplo1',
-                        tecnicoNome: 'João Silva',
-                        unidade: 'Unidade Central',
-                        totalPontos: 1250,
-                        totalPerdas: 350,
-                        mesesAtivos: 8,
-                        ultimaAvaliacao: new Date(),
-                        dadosMensais: {
-                            '2024-01': { pontos: 150, perdas: 24, data: new Date('2024-01-15') },
-                            '2024-02': { pontos: 145, perdas: 29, data: new Date('2024-02-15') }
-                        }
-                    },
-                    {
-                        tecnicoId: 'exemplo2',
-                        tecnicoNome: 'Maria Santos',
-                        unidade: 'Unidade Norte',
-                        totalPontos: 1400,
-                        totalPerdas: 200,
-                        mesesAtivos: 10,
-                        ultimaAvaliacao: new Date(),
-                        dadosMensais: {
-                            '2024-01': { pontos: 165, perdas: 9, data: new Date('2024-01-15') },
-                            '2024-02': { pontos: 170, perdas: 4, data: new Date('2024-02-15') }
-                        }
+                    if (isInSubfolder) {
+                        window.location.href = '../index.html';
+                    } else {
+                        window.location.href = 'index.html';
                     }
-                ];
+                }
+            });
+        }
+
+        function showAppContent() {
+            console.log("Mostrando conteúdo do app...");
+            
+            // Esconde o overlay de login
+            document.getElementById('loginOverlay').style.display = 'none';
+            
+            // Mostra o conteúdo do app
+            document.getElementById('appContent').style.display = 'flex';
+            
+            // Inicializa a aplicação
+            initializeApp();
+        }
+
+        function initializeApp() {
+            // Carrega dados do usuário atual
+            const user = auth.currentUser;
+            if (user) {
+                loadUserData(user.uid);
+                loadTecnicos();
+                loadData();
                 
-                this.dadosFiltrados = [...this.dadosTecnicos];
-                this.renderizarListaTecnicos();
+                // Configura logout
+                document.getElementById('logoutBtn').addEventListener('click', () => {
+                    auth.signOut().then(() => {
+                        // Redireciona para login
+                        const currentPath = window.location.pathname;
+                        const isInSubfolder = currentPath.includes('/') && currentPath.split('/').length > 2;
+                        
+                        if (isInSubfolder) {
+                            window.location.href = '../index.html';
+                        } else {
+                            window.location.href = 'index.html';
+                        }
+                    });
+                });
                 
-                this.mostrarToast('Usando dados de exemplo para demonstração', 'info');
-            }
-
-            mostrarEmptyState() {
-                const lista = document.getElementById('tecnicoList');
-                lista.innerHTML = `
-                    <li class="empty-state">
-                        <div class="empty-icon">
-                            <i class="fas fa-database"></i>
-                        </div>
-                        <p>Nenhum dado de ranking encontrado</p>
-                        <p class="small">Verifique se existem avaliações no sistema</p>
-                    </li>`;
-            }
-
-            mostrarErro(mensagem) {
-                const lista = document.getElementById('tecnicoList');
-                lista.innerHTML = `
-                    <li class="empty-state">
-                        <div class="empty-icon">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <p>${mensagem}</p>
-                        <button class="btn btn-sm btn-primary mt-2" onclick="app.carregarDados()">
-                            <i class="fas fa-sync"></i> Tentar Novamente
-                        </button>
-                    </li>`;
-            }
-
-            mostrarToast(mensagem, tipo = 'info') {
-                const backgroundColor = {
-                    success: '#28a745',
-                    error: '#dc3545',
-                    warning: '#fd7e14',
-                    info: '#1a5f7a'
-                }[tipo];
-
-                Toastify({
-                    text: mensagem,
-                    duration: 3000,
-                    gravity: "top",
-                    position: "right",
-                    backgroundColor: backgroundColor,
-                    stopOnFocus: true
-                }).showToast();
+                // Configura filtros
+                document.getElementById('btnFiltrar').addEventListener('click', applyFilters);
             }
         }
 
-        // Inicializa a aplicação
-        document.addEventListener('DOMContentLoaded', () => {
-            window.app = new AnaliseIneficienciasApp();
+        async function loadUserData(userId) {
+            try {
+                const userDoc = await db.collection('users').doc(userId).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    document.getElementById('userName').textContent = userData.name || userData.email || '-';
+                    document.getElementById('userUnit').textContent = userData.unit || '-';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar dados do usuário:', error);
+            }
+        }
+
+        async function loadTecnicos() {
+            try {
+                const usersSnapshot = await db.collection('users').get();
+                const tecnicos = [];
+                const unidades = new Set();
+
+                usersSnapshot.forEach(doc => {
+                    const user = doc.data();
+
+                    tecnicos.push({
+                        id: doc.id,
+                        nome: user.name || user.email,
+                        unidade: user.unit || 'N/I',
+                        role: user.role || 'N/I'
+                    });
+
+                    if (user.unit) {
+                        unidades.add(user.unit);
+                    }
+                });
+
+                // Preencher select de técnicos
+                const tecnicoSelect = document.getElementById('tecnicoSelect');
+                tecnicoSelect.innerHTML = '<option value="">Todos os técnicos</option>';
+                
+                tecnicos.forEach(tecnico => {
+                    const option = document.createElement('option');
+                    option.value = tecnico.id;
+                    option.textContent = `${tecnico.nome} - ${tecnico.unidade}`;
+                    option.dataset.unidade = tecnico.unidade;
+                    tecnicoSelect.appendChild(option);
+                });
+
+                // Preencher select de unidades
+                const unidadeSelect = document.getElementById('unidadeSelect');
+                unidadeSelect.innerHTML = '<option value="">Todas as unidades</option>';
+                
+                Array.from(unidades).sort().forEach(unidade => {
+                    const option = document.createElement('option');
+                    option.value = unidade;
+                    option.textContent = unidade;
+                    unidadeSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erro ao cargar técnicos:', error);
+                showError('Erro ao carregar lista de técnicos');
+            }
+        }
+
+        async function loadData() {
+            try {
+                console.log("Carregando dados do Firestore...");
+                
+                const snapshot = await db.collection('ranking-tst')
+                    .orderBy('dataHora', 'desc')
+                    .get();
+
+                allRankings = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    data.id = doc.id;
+                    
+                    // Garantir que dataHora seja um objeto Date
+                    if (data.dataHora && typeof data.dataHora.toDate === 'function') {
+                        data.dataHora = data.dataHora.toDate();
+                    } else if (data.dataHora && data.dataHora.seconds) {
+                        data.dataHora = new Date(data.dataHora.seconds * 1000);
+                    } else if (typeof data.dataHora === 'string') {
+                        data.dataHora = new Date(data.dataHora);
+                    }
+                    
+                    // Calcular pontos perdidos por categoria
+                    data.perdas = calcularPerdas(data);
+                    data.totalPerdido = calcularTotalPerdido(data);
+                    
+                    allRankings.push(data);
+                });
+
+                console.log(`Carregados ${allRankings.length} registros`);
+                applyFilters();
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                showError('Erro ao carregar dados do ranking');
+            }
+        }
+
+        function calcularPerdas(data) {
+            const perdas = {
+                operacional: {
+                    auditoriaComportamental: Math.max(0, 8 - (data.auditoriaComportamental || 0)),
+                    dto: Math.max(0, 5 - (data.dto || 0)),
+                    cartaoVerde: Math.max(0, 5 - (data.cartaoVerde || 0)),
+                    relatoDesvio: Math.max(0, 15 - (data.relatoDesvio || 0)),
+                    ronda: Math.max(0, 12 - (data.ronda || 0))
+                },
+                documental: {
+                    sistema: Math.max(0, 5 - (data.sistema || 0)),
+                    gestaoPlanoAcao: Math.max(0, 5 - (data.gestaoPlanoAcao || 0)),
+                    portal: Math.max(0, 5 - (data.Portal || 0)),
+                    ofensores: Math.max(0, 10 - (data.Ofensores || 0))
+                },
+                ocorrencia: {
+                    incidente: Math.min(35, data.incidente || 0),
+                    osa: Math.min(35, data.osa || 0),
+                    saf: Math.min(35, data.saf || 0),
+                    caf: Math.min(35, data.caf || 0)
+                },
+                deflator: {
+                    deflator: Math.min(10, data.deflator || 0),
+                    participacao: Math.min(10, data.participacao || 0),
+                    campanhas: Math.min(10, data.campanhas || 0)
+                }
+            };
+
+            return perdas;
+        }
+
+        function calcularTotalPerdido(data) {
+            const perdas = data.perdas;
+            let total = 0;
+            
+            // Operacional
+            total += perdas.operacional.auditoriaComportamental;
+            total += perdas.operacional.dto;
+            total += perdas.operacional.cartaoVerde;
+            total += perdas.operacional.relatoDesvio;
+            total += perdas.operacional.ronda;
+            
+            // Documental
+            total += perdas.documental.sistema;
+            total += perdas.documental.gestaoPlanoAcao;
+            total += perdas.documental.portal;
+            total += perdas.documental.ofensores;
+            
+            // Ocorrência
+            total += perdas.ocorrencia.incidente;
+            total += perdas.ocorrencia.osa;
+            total += perdas.ocorrencia.saf;
+            total += perdas.ocorrencia.caf;
+            
+            // Deflator
+            total += perdas.deflator.deflator;
+            total += perdas.deflator.participacao;
+            total += perdas.deflator.campanhas;
+            
+            return total;
+        }
+
+        function applyFilters() {
+            const tecnicoId = document.getElementById('tecnicoSelect').value;
+            const unidade = document.getElementById('unidadeSelect').value;
+            const periodo = document.getElementById('periodoSelect').value;
+            
+            filteredData = allRankings.filter(item => {
+                // Filtro por técnico
+                if (tecnicoId && item.tecnicoId !== tecnicoId) return false;
+                
+                // Filtro por unidade
+                if (unidade && item.unidade !== unidade) return false;
+                
+                // Filtro por período
+                if (periodo !== 'all' && item.dataHora) {
+                    const itemDate = item.dataHora;
+                    const monthsAgo = new Date();
+                    monthsAgo.setMonth(monthsAgo.getMonth() - parseInt(periodo));
+                    
+                    if (itemDate < monthsAgo) return false;
+                }
+                
+                return true;
+            });
+
+            console.log(`Filtrados ${filteredData.length} registros`);
+            updateDashboard();
+            updateCharts();
+            updateLossesTable();
+            updateImprovementAreas();
+            updateMonthlyDetails();
+        }
+
+        function updateDashboard() {
+            if (filteredData.length === 0) {
+                document.getElementById('avgScore').textContent = '-';
+                document.getElementById('avgLoss').textContent = '-';
+                document.getElementById('biggestLoss').textContent = '-';
+                document.getElementById('evolutionStatus').textContent = '-';
+                document.getElementById('lossProgress').style.width = '0%';
+                return;
+            }
+
+            // Calcular média de pontos
+            const avgScore = filteredData.reduce((sum, item) => sum + (item.totalGeral || 0), 0) / filteredData.length;
+            document.getElementById('avgScore').textContent = avgScore.toFixed(1);
+
+            // Calcular média de perdas
+            const avgLoss = filteredData.reduce((sum, item) => sum + (item.totalPerdido || 0), 0) / filteredData.length;
+            document.getElementById('avgLoss').textContent = avgLoss.toFixed(1);
+
+            // Calcular progresso de perdas (0-100%)
+            const maxPossibleLoss = 45 + 20 + 35 + 30;
+            const lossPercentage = Math.min((avgLoss / maxPossibleLoss) * 100, 100);
+            document.getElementById('lossProgress').style.width = `${lossPercentage}%`;
+
+            // Encontrar maior perda
+            let biggestLoss = { value: 0, category: '', item: '' };
+            const perdasAgrupadas = {};
+
+            filteredData.forEach(item => {
+                if (!item.perdas) return;
+                
+                Object.keys(item.perdas).forEach(categoria => {
+                    Object.keys(item.perdas[categoria]).forEach(subItem => {
+                        const key = `${categoria}.${subItem}`;
+                        if (!perdasAgrupadas[key]) perdasAgrupadas[key] = 0;
+                        perdasAgrupadas[key] += item.perdas[categoria][subItem] || 0;
+                    });
+                });
+            });
+
+            Object.keys(perdasAgrupadas).forEach(key => {
+                if (perdasAgrupadas[key] > biggestLoss.value) {
+                    biggestLoss = {
+                        value: perdasAgrupadas[key],
+                        category: key.split('.')[0],
+                        item: key.split('.')[1]
+                    };
+                }
+            });
+
+            document.getElementById('biggestLoss').textContent = biggestLoss.value > 0 ? biggestLoss.value.toFixed(1) : '-';
+            document.getElementById('lossCategory').textContent = biggestLoss.value > 0 ? 
+                `${traduzirCategoria(biggestLoss.category)} - ${traduzirItem(biggestLoss.item)}` : 'Nenhuma perda significativa';
+
+            // Calcular tendência
+            if (filteredData.length >= 2) {
+                const primeiroMes = filteredData[filteredData.length - 1];
+                const ultimoMes = filteredData[0];
+                const evolucao = (ultimoMes.totalGeral || 0) - (primeiroMes.totalGeral || 0);
+                
+                const trendIcon = document.getElementById('scoreTrend');
+                const evolutionStatus = document.getElementById('evolutionStatus');
+                
+                if (evolucao > 5) {
+                    trendIcon.innerHTML = '<i class="fas fa-arrow-up trend-up"></i>';
+                    trendIcon.className = 'trend-up me-2';
+                    evolutionStatus.textContent = 'Melhorando';
+                    evolutionStatus.className = 'trend-up';
+                    document.getElementById('evolutionDetail').textContent = `+${evolucao.toFixed(1)} pontos`;
+                } else if (evolucao < -5) {
+                    trendIcon.innerHTML = '<i class="fas fa-arrow-down trend-down"></i>';
+                    trendIcon.className = 'trend-down me-2';
+                    evolutionStatus.textContent = 'Piorando';
+                    evolutionStatus.className = 'trend-down';
+                    document.getElementById('evolutionDetail').textContent = `${evolucao.toFixed(1)} pontos`;
+                } else {
+                    trendIcon.innerHTML = '<i class="fas fa-minus trend-stable"></i>';
+                    trendIcon.className = 'trend-stable me-2';
+                    evolutionStatus.textContent = 'Estável';
+                    evolutionStatus.className = 'trend-stable';
+                    document.getElementById('evolutionDetail').textContent = 'Variação mínima';
+                }
+            }
+        }
+
+        function updateCharts() {
+            // Agrupar dados por mês
+            const dadosPorMes = {};
+            
+            filteredData.forEach(item => {
+                if (!item.dataHora) return;
+                
+                const date = item.dataHora;
+                const mes = date.getMonth() + 1;
+                const ano = date.getFullYear();
+                const mesAno = `${mes.toString().padStart(2, '0')}/${ano}`;
+                
+                if (!dadosPorMes[mesAno]) {
+                    dadosPorMes[mesAno] = {
+                        total: 0,
+                        operacional: 0,
+                        documental: 0,
+                        ocorrencia: 0,
+                        deflator: 0,
+                        count: 0
+                    };
+                }
+                
+                dadosPorMes[mesAno].total += item.totalGeral || 0;
+                dadosPorMes[mesAno].operacional += item.totalOperacional || 0;
+                dadosPorMes[mesAno].documental += item.totalDocumental || 0;
+                dadosPorMes[mesAno].ocorrencia += item.totalOcorrencia || 0;
+                dadosPorMes[mesAno].deflator += item.totalDeflator || 0;
+                dadosPorMes[mesAno].count++;
+            });
+
+            // Ordenar meses
+            const mesesOrdenados = Object.keys(dadosPorMes).sort((a, b) => {
+                const [mesA, anoA] = a.split('/').map(Number);
+                const [mesB, anoB] = b.split('/').map(Number);
+                return new Date(anoA, mesA - 1) - new Date(anoB, mesB - 1);
+            });
+
+            if (mesesOrdenados.length === 0) {
+                // Criar gráfico vazio
+                createEmptyCharts();
+                return;
+            }
+
+            // Preparar dados para gráfico de evolução
+            const medias = mesesOrdenados.map(mes => 
+                dadosPorMes[mes].total / dadosPorMes[mes].count
+            );
+
+            // Gráfico de evolução
+            const ctx1 = document.getElementById('evolutionChart').getContext('2d');
+            
+            if (evolutionChartInstance) {
+                evolutionChartInstance.destroy();
+            }
+
+            evolutionChartInstance = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: mesesOrdenados,
+                    datasets: [{
+                        label: 'Pontuação Média',
+                        data: medias,
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: 'Pontuação'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Mês/Ano'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de distribuição
+            const perdasPorCategoria = {
+                operacional: 0,
+                documental: 0,
+                ocorrencia: 0,
+                deflator: 0
+            };
+
+            filteredData.forEach(item => {
+                if (!item.perdas) return;
+                
+                Object.keys(item.perdas).forEach(categoria => {
+                    Object.keys(item.perdas[categoria]).forEach(subItem => {
+                        perdasPorCategoria[categoria] += item.perdas[categoria][subItem] || 0;
+                    });
+                });
+            });
+
+            const ctx2 = document.getElementById('categoryChart').getContext('2d');
+            
+            if (categoryChartInstance) {
+                categoryChartInstance.destroy();
+            }
+
+            categoryChartInstance = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Operacional', 'Documental', 'Ocorrência', 'Deflator'],
+                    datasets: [{
+                        data: [
+                            perdasPorCategoria.operacional,
+                            perdasPorCategoria.documental,
+                            perdasPorCategoria.ocorrencia,
+                            perdasPorCategoria.deflator
+                        ],
+                        backgroundColor: [
+                            'rgba(52, 152, 219, 0.8)',
+                            'rgba(155, 89, 182, 0.8)',
+                            'rgba(241, 196, 15, 0.8)',
+                            'rgba(46, 204, 113, 0.8)'
+                        ],
+                        borderColor: [
+                            '#3498db',
+                            '#9b59b6',
+                            '#f1c40f',
+                            '#2ecc71'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function createEmptyCharts() {
+            const ctx1 = document.getElementById('evolutionChart').getContext('2d');
+            const ctx2 = document.getElementById('categoryChart').getContext('2d');
+            
+            if (evolutionChartInstance) evolutionChartInstance.destroy();
+            if (categoryChartInstance) categoryChartInstance.destroy();
+
+            evolutionChartInstance = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Sem dados',
+                        data: [],
+                        borderColor: '#ccc',
+                        backgroundColor: 'rgba(204, 204, 204, 0.1)'
+                    }]
+                }
+            });
+
+            categoryChartInstance = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Sem dados'],
+                    datasets: [{
+                        data: [1],
+                        backgroundColor: ['#ccc']
+                    }]
+                }
+            });
+        }
+
+        function updateLossesTable() {
+            const tableBody = document.getElementById('lossesTable');
+            
+            if (filteredData.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Nenhum dado encontrado para os filtros selecionados
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // Agrupar perdas por item
+            const perdasPorItem = {};
+            
+            filteredData.forEach(item => {
+                if (!item.perdas) return;
+                
+                Object.keys(item.perdas).forEach(categoria => {
+                    Object.keys(item.perdas[categoria]).forEach(subItem => {
+                        const key = `${categoria}.${subItem}`;
+                        if (!perdasPorItem[key]) {
+                            perdasPorItem[key] = {
+                                total: 0,
+                                count: 0,
+                                categoria: categoria,
+                                maxPoints: getMaxPoints(categoria, subItem)
+                            };
+                        }
+                        perdasPorItem[key].total += item.perdas[categoria][subItem] || 0;
+                        perdasPorItem[key].count++;
+                    });
+                });
+            });
+
+            // Converter para array e ordenar
+            const itensArray = Object.keys(perdasPorItem).map(key => ({
+                nome: key,
+                ...perdasPorItem[key]
+            })).filter(item => item.total > 0) // Filtrar apenas itens com perdas
+              .sort((a, b) => {
+                const avgA = a.total / a.count;
+                const avgB = b.total / b.count;
+                return avgB - avgA;
+              });
+
+            if (itensArray.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Nenhuma perda significativa encontrada nos dados filtrados
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // Limitar a 10 principais
+            const principaisItens = itensArray.slice(0, 10);
+
+            // Preencher tabela
+            tableBody.innerHTML = '';
+            principaisItens.forEach(item => {
+                const avgLoss = item.total / item.count;
+                const percentage = item.maxPoints > 0 ? (avgLoss / item.maxPoints) * 100 : 0;
+                const trend = calcularTendenciaItem(item.nome);
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <strong>${traduzirItem(item.nome.split('.')[1])}</strong>
+                    </td>
+                    <td>
+                        <span class="category-badge badge-${item.categoria}">
+                            ${traduzirCategoria(item.categoria)}
+                        </span>
+                    </td>
+                    <td>
+                        <strong>${avgLoss.toFixed(1)}</strong>
+                        <small class="text-muted d-block">por avaliação</small>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="progress progress-custom flex-grow-1 me-2">
+                                <div class="progress-bar bg-warning" style="width: ${(item.count / filteredData.length) * 100}%"></div>
+                            </div>
+                            <span>${item.count}</span>
+                        </div>
+                    </td>
+                    <td>
+                        ${renderizarTendencia(trend)}
+                    </td>
+                    <td>${item.maxPoints}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="progress progress-custom flex-grow-1 me-2">
+                                <div class="progress-bar ${percentage > 50 ? 'bg-danger' : percentage > 25 ? 'bg-warning' : 'bg-info'}" 
+                                     style="width: ${Math.min(percentage, 100)}%"></div>
+                            </div>
+                            <span>${percentage.toFixed(0)}%</span>
+                        </div>
+                    </td>
+                    <td>
+                        <small>${gerarRecomendacao(item.nome, percentage)}</small>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function calcularTendenciaItem(itemKey) {
+            // Implementação simplificada
+            return Math.random() > 0.6 ? 'up' : Math.random() > 0.6 ? 'down' : 'stable';
+        }
+
+        function renderizarTendencia(trend) {
+            const icons = {
+                up: '<i class="fas fa-arrow-up trend-up"></i> Melhorando',
+                down: '<i class="fas fa-arrow-down trend-down"></i> Piorando',
+                stable: '<i class="fas fa-minus trend-stable"></i> Estável'
+            };
+            return icons[trend] || icons.stable;
+        }
+
+        function getMaxPoints(categoria, item) {
+            const maxPoints = {
+                operacional: {
+                    auditoriaComportamental: 8,
+                    dto: 5,
+                    cartaoVerde: 5,
+                    relatoDesvio: 15,
+                    ronda: 12
+                },
+                documental: {
+                    sistema: 5,
+                    gestaoPlanoAcao: 5,
+                    portal: 5,
+                    ofensores: 10
+                },
+                ocorrencia: {
+                    incidente: 35,
+                    osa: 35,
+                    saf: 35,
+                    caf: 35
+                },
+                deflator: {
+                    deflator: 10,
+                    participacao: 10,
+                    campanhas: 10
+                }
+            };
+            return maxPoints[categoria]?.[item] || 0;
+        }
+
+        function traduzirCategoria(categoria) {
+            const traducoes = {
+                operacional: 'Operacional',
+                documental: 'Documental',
+                ocorrencia: 'Ocorrência',
+                deflator: 'Deflator'
+            };
+            return traducoes[categoria] || categoria;
+        }
+
+        function traduzirItem(item) {
+            const traducoes = {
+                auditoriaComportamental: 'Auditoria Comportamental',
+                dto: 'DTO',
+                cartaoVerde: 'Cartão Verde',
+                relatoDesvio: 'Relato de Desvio',
+                ronda: 'Ronda',
+                sistema: 'Rede + Sistemas',
+                gestaoPlanoAcao: 'Gestão do Plano de Ação',
+                portal: 'Portal',
+                ofensores: 'Gestão dos Ofensores',
+                incidente: 'Incidente',
+                osa: 'OSA',
+                saf: 'SAF',
+                caf: 'CAF',
+                deflator: 'Qualidade da Aplicação',
+                participacao: 'Participação em Reuniões',
+                campanhas: 'Aplicação de Campanhas'
+            };
+            return traducoes[item] || item;
+        }
+
+        function gerarRecomendacao(itemKey, percentage) {
+            const item = itemKey.split('.')[1];
+            
+            const recomendacoes = {
+                auditoriaComportamental: 'Aumentar frequência das auditorias e feedbacks imediatos',
+                dto: 'Implementar checklist diário para verificação de DTO',
+                cartaoVerde: 'Capacitar equipe sobre os critérios do cartão verde',
+                relatoDesvio: 'Incentivar a cultura de reportar desvios sem punição',
+                ronda: 'Estabelecer roteiro fixo e horários definidos para rondas',
+                sistema: 'Verificar se todos os sistemas estão acessíveis e funcionando',
+                gestaoPlanoAcao: 'Revisar prazos e responsáveis dos planos de ação',
+                portal: 'Treinar equipe no uso do portal corporativo',
+                ofensores: 'Priorizar ações corretivas para os principais ofensores',
+                incidente: 'Analisar causas raiz dos incidentes recorrentes',
+                osa: 'Melhorar procedimentos de operação segura',
+                saf: 'Reforçar treinamento em segurança e meio ambiente',
+                caf: 'Implementar auditorias preventivas',
+                deflator: 'Padronizar a aplicação dos procedimentos',
+                participacao: 'Registrar presença e participação ativa nas reuniões',
+                campanhas: 'Divulgar e aplicar campanhas corporativas'
+            };
+
+            let recom = recomendacoes[item] || 'Revisar procedimentos específicos desta área';
+            
+            if (percentage > 75) {
+                recom = '🔴 ' + recom + ' (URGENTE - alta perda de pontos)';
+            } else if (percentage > 50) {
+                recom = '🟡 ' + recom + ' (ATENÇÃO - perda significativa)';
+            } else if (percentage > 25) {
+                recom = '🟠 ' + recom + ' (MONITORAR - perda moderada)';
+            } else {
+                recom = '🟢 ' + recom + ' (CONTROLE - perda aceitável)';
+            }
+            
+            return recom;
+        }
+
+        function updateImprovementAreas() {
+            const container = document.getElementById('improvementAreas');
+            
+            if (filteredData.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Nenhum dado disponível para gerar recomendações
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Identificar principais áreas para melhoria
+            const perdasPorItem = {};
+            
+            filteredData.forEach(item => {
+                if (!item.perdas) return;
+                
+                Object.keys(item.perdas).forEach(categoria => {
+                    Object.keys(item.perdas[categoria]).forEach(subItem => {
+                        const key = `${categoria}.${subItem}`;
+                        if (!perdasPorItem[key]) {
+                            perdasPorItem[key] = {
+                                total: 0,
+                                count: 0,
+                                categoria: categoria,
+                                item: subItem
+                            };
+                        }
+                        perdasPorItem[key].total += item.perdas[categoria][subItem] || 0;
+                        perdasPorItem[key].count++;
+                    });
+                });
+            });
+
+            // Converter para array e ordenar
+            const itensArray = Object.keys(perdasPorItem).map(key => ({
+                nome: key,
+                ...perdasPorItem[key]
+            })).filter(item => item.total > 0)
+              .sort((a, b) => {
+                const avgA = a.total / a.count;
+                const avgB = b.total / b.count;
+                return avgB - avgA;
+              });
+
+            // Pegar top 3 ou menos
+            const topItens = itensArray.slice(0, 3);
+            
+            if (topItens.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Excelente! Nenhuma área crítica identificada para melhoria
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            topItens.forEach((item, index) => {
+                const avgLoss = item.total / item.count;
+                const maxPoints = getMaxPoints(item.categoria, item.item);
+                const percentage = maxPoints > 0 ? (avgLoss / maxPoints) * 100 : 0;
+                
+                const card = document.createElement('div');
+                card.className = `col-md-${12 / topItens.length} mb-3`;
+                card.innerHTML = `
+                    <div class="loss-item ${percentage > 50 ? 'loss-high' : percentage > 25 ? 'loss-medium' : 'loss-low'}">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="mb-0">${traduzirItem(item.item)}</h6>
+                            <span class="category-badge badge-${item.categoria}">
+                                ${traduzirCategoria(item.categoria)}
+                            </span>
+                        </div>
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between">
+                                <small>Perda média:</small>
+                                <strong>${avgLoss.toFixed(1)} pontos</strong>
+                            </div>
+                            <div class="progress progress-custom mt-1">
+                                <div class="progress-bar ${percentage > 50 ? 'bg-danger' : percentage > 25 ? 'bg-warning' : 'bg-info'}" 
+                                     style="width: ${percentage}%"></div>
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            <i class="fas fa-lightbulb me-1"></i>
+                            ${gerarRecomendacao(item.nome, percentage).replace(/[🔴🟡🟠🟢].*?\)/, '').trim()}
+                        </small>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateMonthlyDetails() {
+            const container = document.getElementById('monthlyDetails');
+            
+            if (filteredData.length === 0) {
+                container.innerHTML = `
+                    <div class="alert alert-info">
+                        Nenhum dado disponível para detalhamento mensal
+                    </div>
+                `;
+                return;
+            }
+
+            // Agrupar por mês
+            const dadosPorMes = {};
+            
+            filteredData.forEach(item => {
+                if (!item.dataHora) return;
+                
+                const date = item.dataHora;
+                const mes = date.getMonth() + 1;
+                const ano = date.getFullYear();
+                const mesAno = `${mes.toString().padStart(2, '0')}/${ano}`;
+                
+                if (!dadosPorMes[mesAno]) {
+                    dadosPorMes[mesAno] = [];
+                }
+                dadosPorMes[mesAno].push(item);
+            });
+
+            // Ordenar meses
+            const mesesOrdenados = Object.keys(dadosPorMes).sort((a, b) => {
+                const [mesA, anoA] = a.split('/').map(Number);
+                const [mesB, anoB] = b.split('/').map(Number);
+                return new Date(anoB, mesB - 1) - new Date(anoA, mesA - 1);
+            });
+
+            // Criar acordeão
+            let accordionHTML = '';
+            mesesOrdenados.forEach((mesAno, index) => {
+                const registros = dadosPorMes[mesAno];
+                const primeiroRegistro = registros[0];
+                const tecnicoNome = primeiroRegistro?.tecnicoNome || 'Não informado';
+                const unidade = primeiroRegistro?.unidade || 'Não informada';
+                
+                // Calcular médias
+                const totalPontos = registros.reduce((sum, r) => sum + (r.totalGeral || 0), 0) / registros.length;
+                const totalPerdido = registros.reduce((sum, r) => sum + (r.totalPerdido || 0), 0) / registros.length;
+                
+                // Calcular principais perdas do mês
+                const perdasDoMes = {};
+                registros.forEach(reg => {
+                    if (!reg.perdas) return;
+                    
+                    Object.keys(reg.perdas).forEach(categoria => {
+                        Object.keys(reg.perdas[categoria]).forEach(item => {
+                            const key = `${categoria}.${item}`;
+                            if (!perdasDoMes[key]) perdasDoMes[key] = 0;
+                            perdasDoMes[key] += reg.perdas[categoria][item] || 0;
+                        });
+                    });
+                });
+
+                // Ordenar perdas
+                const principaisPerdas = Object.keys(perdasDoMes)
+                    .map(key => ({ 
+                        item: key, 
+                        pontos: perdasDoMes[key],
+                        categoria: key.split('.')[0]
+                    }))
+                    .filter(p => p.pontos > 0)
+                    .sort((a, b) => b.pontos - a.pontos)
+                    .slice(0, 5);
+
+                accordionHTML += `
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading${index}">
+                            <button class="accordion-button ${index > 0 ? 'collapsed' : ''}" 
+                                    type="button" 
+                                    data-bs-toggle="collapse" 
+                                    data-bs-target="#collapse${index}"
+                                    aria-expanded="${index === 0 ? 'true' : 'false'}"
+                                    aria-controls="collapse${index}">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div>
+                                        <strong>${mesAno}</strong>
+                                        <small class="ms-2 text-muted">${tecnicoNome} - ${unidade}</small>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-primary me-2">${totalPontos.toFixed(1)} pts</span>
+                                        <span class="badge bg-danger">Perda: ${totalPerdido.toFixed(1)} pts</span>
+                                    </div>
+                                </div>
+                            </button>
+                        </h2>
+                        <div id="collapse${index}" 
+                             class="accordion-collapse collapse ${index === 0 ? 'show' : ''}"
+                             aria-labelledby="heading${index}">
+                            <div class="accordion-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Principais Perdas:</h6>
+                                        ${principaisPerdas.length > 0 ? `
+                                            <ul class="list-group">
+                                                ${principaisPerdas.map(perda => {
+                                                    const [categoria, item] = perda.item.split('.');
+                                                    const media = perda.pontos / registros.length;
+                                                    return `
+                                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                            <div>
+                                                                <small class="text-muted">${traduzirCategoria(categoria)}</small><br>
+                                                                ${traduzirItem(item)}
+                                                            </div>
+                                                            <span class="badge bg-danger rounded-pill">${media.toFixed(1)}</span>
+                                                        </li>
+                                                    `;
+                                                }).join('')}
+                                            </ul>
+                                        ` : '<p class="text-muted">Nenhuma perda significativa neste mês</p>'}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Resumo do Mês:</h6>
+                                        <div class="row">
+                                            <div class="col-6 mb-2">
+                                                <small class="text-muted">Pontuação Operacional:</small>
+                                                <div class="fw-bold">
+                                                    ${(registros.reduce((sum, r) => sum + (r.totalOperacional || 0), 0) / registros.length).toFixed(1)} pts
+                                                </div>
+                                            </div>
+                                            <div class="col-6 mb-2">
+                                                <small class="text-muted">Pontuação Documental:</small>
+                                                <div class="fw-bold">
+                                                    ${(registros.reduce((sum, r) => sum + (r.totalDocumental || 0), 0) / registros.length).toFixed(1)} pts
+                                                </div>
+                                            </div>
+                                            <div class="col-6 mb-2">
+                                                <small class="text-muted">Pontuação Ocorrência:</small>
+                                                <div class="fw-bold">
+                                                    ${(registros.reduce((sum, r) => sum + (r.totalOcorrencia || 0), 0) / registros.length).toFixed(1)} pts
+                                                </div>
+                                            </div>
+                                            <div class="col-6 mb-2">
+                                                <small class="text-muted">Deflator:</small>
+                                                <div class="fw-bold">
+                                                    ${(registros.reduce((sum, r) => sum + (r.totalDeflator || 0), 0) / registros.length).toFixed(1)} pts
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <h6>Recomendação do Mês:</h6>
+                                            <div class="alert ${totalPontos < 75 ? 'alert-warning' : 'alert-info'}">
+                                                <small>
+                                                    <i class="fas fa-bullseye me-1"></i>
+                                                    ${gerarRecomendacaoMensal(totalPontos, principaisPerdas[0]?.item)}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = accordionHTML;
+            
+            // Ativar os accordions do Bootstrap
+            const accordions = container.querySelectorAll('.accordion-collapse');
+            accordions.forEach(accordion => {
+                new bootstrap.Collapse(accordion, {
+                    toggle: false
+                });
+            });
+        }
+
+        function gerarRecomendacaoMensal(pontuacao, maiorPerda) {
+            if (pontuacao < 60) {
+                return 'NÍVEL CRÍTICO - Revisão urgente dos processos operacionais e treinamento imediato da equipe.';
+            } else if (pontuacao < 75) {
+                return 'NECESSIDADE DE MELHORIA - Focar na padronização dos procedimentos e eliminar as principais falhas identificadas.';
+            } else if (pontuacao < 90) {
+                return 'DESEMPENHO SATISFATÓRIO - Manter os bons resultados e trabalhar nos pontos de atenção.';
+            } else {
+                return 'EXCELENTE DESEMPENHO - Manter o padrão de qualidade e compartilhar as melhores práticas com a equipe.';
+            }
+        }
+
+        function showError(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed top-0 end-0 m-3';
+            alertDiv.style.zIndex = '9999';
+            alertDiv.innerHTML = `
+                <i class="fas fa-exclamation-circle me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+
+        // Inicia a verificação de autenticação quando o DOM estiver carregado
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM carregado, verificando autenticação...");
+            checkAuth();
         });
     </script>
 </body>
